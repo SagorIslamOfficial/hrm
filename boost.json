@@ -1,0 +1,6 @@
+{
+    "agents": ["copilot", "phpstorm"],
+    "editors": ["cursor", "phpstorm", "vscode"],
+    "guidelines": [],
+    "herd_mcp": true
+}
