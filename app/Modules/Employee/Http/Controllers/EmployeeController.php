@@ -66,7 +66,7 @@ class EmployeeController
             'designations' => $designations,
             'employmentTypes' => $employmentTypes,
             'auth' => [
-                'user' => Auth::user(),
+                'user' => Auth::user()->load('roles'),
             ],
         ]);
     }
@@ -168,6 +168,9 @@ class EmployeeController
             'designations' => $designations,
             'employmentTypes' => $employmentTypes,
             'supervisors' => $supervisors,
+            'auth' => [
+                'user' => Auth::user()->load('roles'),
+            ],
         ]);
     }
 
