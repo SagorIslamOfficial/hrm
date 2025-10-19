@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Modules\Employee\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Modules\Employee\Database\Factories\EmployeeCustomFieldFactory;
+
+class EmployeeCustomField extends Model
+{
+    use HasFactory, HasUuids;
+
+    protected $fillable = [
+        'employee_id',
+        'field_key',
+        'field_value',
+        'field_type',
+        'section',
+    ];
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    protected static function newFactory()
+    {
+        return EmployeeCustomFieldFactory::new();
+    }
+}
