@@ -2,6 +2,7 @@
 
 namespace App\Modules\Employee\Http\Requests;
 
+use App\Modules\Employee\Models\EmploymentType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -22,6 +23,11 @@ class StoreEmployeeRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get valid employment type codes from database
+        $validEmploymentTypes = EmploymentType::where('is_active', true)
+            ->pluck('code')
+            ->implode(',');
+
         return [
             'employee_code' => 'required|string|unique:employees,employee_code|max:20',
             'first_name' => 'required|string|max:255',
@@ -32,7 +38,7 @@ class StoreEmployeeRequest extends FormRequest
             'department_id' => 'required|uuid|exists:departments,id',
             'designation_id' => 'required|uuid|exists:designations,id',
             'employment_status' => 'required|in:active,inactive,terminated,on_leave',
-            'employment_type' => 'required|in:permanent,contract,intern,part_time',
+            'employment_type' => 'required|in:'.$validEmploymentTypes,
             'joining_date' => 'required|date|before_or_equal:today',
 
             // Allow nested data for comprehensive employee creation
@@ -43,7 +49,7 @@ class StoreEmployeeRequest extends FormRequest
 
             'job_detail' => 'nullable|array',
             'job_detail.job_title' => 'nullable|string|max:255',
-            'job_detail.employment_type' => 'nullable|in:permanent,contract,intern,part_time',
+            'job_detail.employment_type' => 'nullable|in:'.$validEmploymentTypes,
 
             'salary_detail' => 'nullable|array',
             'salary_detail.basic_salary' => 'nullable|numeric|min:0',

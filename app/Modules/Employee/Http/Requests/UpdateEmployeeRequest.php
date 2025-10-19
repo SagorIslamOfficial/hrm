@@ -2,6 +2,7 @@
 
 namespace App\Modules\Employee\Http\Requests;
 
+use App\Modules\Employee\Models\EmploymentType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -24,6 +25,11 @@ class UpdateEmployeeRequest extends FormRequest
     {
         $employeeId = $this->route('employee');
 
+        // Get valid employment type codes from database
+        $validEmploymentTypes = EmploymentType::where('is_active', true)
+            ->pluck('code')
+            ->implode(',');
+
         return [
             // Basic employee fields
             'employee_code' => 'sometimes|string|unique:employees,employee_code,'.$employeeId.'|max:20',
@@ -36,7 +42,7 @@ class UpdateEmployeeRequest extends FormRequest
             'department_id' => 'sometimes|uuid|exists:departments,id',
             'designation_id' => 'sometimes|uuid|exists:designations,id',
             'employment_status' => 'sometimes|in:active,inactive,terminated,on_leave',
-            'employment_type' => 'sometimes|in:permanent,contract,intern,part_time',
+            'employment_type' => 'sometimes|in:'.$validEmploymentTypes,
             'joining_date' => 'sometimes|date|before_or_equal:today',
 
             // Personal details
@@ -52,7 +58,7 @@ class UpdateEmployeeRequest extends FormRequest
 
             // Job details
             'job_detail.job_title' => 'nullable|string|max:255',
-            'job_detail.employment_type' => 'nullable|in:permanent,contract,intern,part_time',
+            'job_detail.employment_type' => 'nullable|in:'.$validEmploymentTypes,
             'job_detail.supervisor_id' => 'nullable|uuid|exists:employees,id',
             'job_detail.work_shift' => 'nullable|in:day,night,rotating,flexible',
             'job_detail.probation_end_date' => 'nullable|date|after:today',
