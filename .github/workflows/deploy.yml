@@ -49,10 +49,12 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: '.'
+          SOURCE: .
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
-          TARGET: '/var/www/html/hrm'
+        with:
+          target: '/var/www/html/hrm'
+          args: '-rltgoDzvO'
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
