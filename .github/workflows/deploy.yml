@@ -31,6 +31,17 @@ jobs:
       - name: Build NPM assets
         run: npm run build
 
+      - name: Prepare server permissions
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/hrm
+            sudo chown -R ${{ secrets.VPS_USER }}:www-data .
+            sudo chmod -R 775 .
+
       - name: Synchronize Files To Server
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
