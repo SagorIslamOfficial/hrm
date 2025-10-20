@@ -26,7 +26,7 @@ jobs:
           node-version: '22'
 
       - name: Install NPM dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build NPM assets
         run: npm run build
