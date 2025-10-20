@@ -38,6 +38,9 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            if [ ! -d /var/www/html/hrm ]; then
+              mkdir -p /var/www/html/hrm
+            fi
             cd /var/www/html/hrm
             sudo chown -R ${{ secrets.VPS_USER }}:www-data .
             sudo chmod -R 775 .
