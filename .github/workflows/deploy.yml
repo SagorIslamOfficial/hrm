@@ -17,8 +17,8 @@ jobs:
         with:
           php-version: '8.4'
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+      - name: Install Composer dependencies (with dev)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,6 +36,9 @@ jobs:
 
       - name: Build NPM assets
         run: npm run build
+
+      - name: Reinstall Composer (without dev)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: List generated build files
         run: |
