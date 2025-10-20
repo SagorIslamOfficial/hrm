@@ -26,20 +26,13 @@ jobs:
           node-version: '22'
 
       - name: Install NPM dependencies
-        run: npm ci --include=optional
+        run: npm ci
 
-      - name: Verify Linux binaries installation
-        run: |
-          echo "Checking for Linux binaries..."
-          ls -la node_modules/@rollup/ || echo "Rollup binaries not found"
-          ls -la node_modules/@tailwindcss/ || echo "Tailwind binaries not found"
-          ls -la node_modules/lightningcss-linux-x64-gnu/ || echo "LightningCSS binaries not found"
+      - name: Rebuild native Linux binaries
+        run: npm rebuild
 
-      - name: Force install Linux-specific binaries
-        run: |
-          npm install --force @rollup/rollup-linux-x64-gnu@4.9.5
-          npm install --force @tailwindcss/oxide-linux-x64-gnu@4.0.1
-          npm install --force lightningcss-linux-x64-gnu@1.29.1
+      - name: Generate Laravel Wayfinder types
+        run: php artisan vite:types
 
       - name: Build NPM assets
         run: npm run build
