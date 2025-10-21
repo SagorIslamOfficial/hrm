@@ -13,7 +13,7 @@ interface TabsNavigationProps {
 export function TabsNavigation({ tabs, className = '' }: TabsNavigationProps) {
     return (
         <TabsList
-            className={`grid w-full grid-cols-${tabs.length} ${className}`}
+            className={`flex w-full grid-cols-${tabs.length} ${className}`}
         >
             {tabs.map((tab) => (
                 <TabsTrigger
