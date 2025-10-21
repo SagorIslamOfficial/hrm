@@ -16,8 +16,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, bcmath, gd, curl, zip, pdo_mysql
-          coverage: none
 
       - name: Install Composer dependencies (with dev)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -38,11 +36,6 @@ jobs:
 
       - name: Reinstall Composer (without dev)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-
-      - name: List generated build files
-        run: |
-          echo "Build files generated:"
-          ls -la public/build/assets/ | head -30
 
       - name: Prepare server permissions
         uses: appleboy/ssh-action@v1.0.3
