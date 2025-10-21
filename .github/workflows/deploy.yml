@@ -55,7 +55,7 @@ jobs:
           EXCLUDE: '/node_modules/, /.git/'
         with:
           target: '/var/www/html/hrm'
-          args: '-rltgoDzvO'
+          args: '-rltgoDzvO --delete'
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
