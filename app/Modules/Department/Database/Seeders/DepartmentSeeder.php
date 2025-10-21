@@ -21,12 +21,14 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $dept) {
-            Department::create([
-                'name' => $dept['name'],
-                'code' => $dept['code'],
-                'description' => $dept['description'],
-                'is_active' => true,
-            ]);
+            Department::firstOrCreate(
+                ['code' => $dept['code']],
+                [
+                    'name' => $dept['name'],
+                    'description' => $dept['description'],
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

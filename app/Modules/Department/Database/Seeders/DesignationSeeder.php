@@ -59,13 +59,15 @@ class DesignationSeeder extends Seeder
 
             if ($department) {
                 foreach ($designations as $designation) {
-                    Designation::create([
-                        'title' => $designation['title'],
-                        'code' => $designation['code'],
-                        'description' => null,
-                        'department_id' => $department->id,
-                        'is_active' => true,
-                    ]);
+                    Designation::firstOrCreate(
+                        ['code' => $designation['code']],
+                        [
+                            'title' => $designation['title'],
+                            'description' => null,
+                            'department_id' => $department->id,
+                            'is_active' => true,
+                        ]
+                    );
                 }
             }
         }
