@@ -18,7 +18,7 @@ jobs:
           php-version: '8.4'
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -65,12 +65,11 @@ jobs:
           script: |
             cd /var/www/html/hrm
 
-            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-
             cp .env.example .env
 
             sed -i 's/APP_ENV=.*/APP_ENV=production/' .env
             sed -i 's|APP_URL=.*|APP_URL=${{ secrets.APP_URL }}|' .env
+            sed -i 's/DB_HOST=.*/DB_HOST=localhost/' .env
             sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' .env
             sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' .env
             sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' .env
@@ -82,7 +81,6 @@ jobs:
             mkdir -p storage/logs
             mkdir -p bootstrap/cache
             php artisan migrate --force
-            php artisan db:seed --force
             php artisan config:clear
             php artisan config:cache
             php artisan route:clear
