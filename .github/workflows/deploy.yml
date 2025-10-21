@@ -74,9 +74,6 @@ jobs:
             sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' .env
             sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' .env
 
-            npm ci
-            npm run build
-
             php artisan config:clear
             php artisan key:generate
 
