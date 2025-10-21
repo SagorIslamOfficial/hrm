@@ -16,6 +16,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          extensions: mbstring, bcmath, gd, curl, zip, pdo_mysql
+          coverage: none
 
       - name: Install Composer dependencies (with dev)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -30,9 +32,6 @@ jobs:
 
       - name: Rebuild native Linux binaries
         run: npm rebuild
-
-      - name: Generate Laravel Wayfinder types
-        run: php artisan vite:types
 
       - name: Build NPM assets
         run: npm run build
@@ -68,7 +67,7 @@ jobs:
           REMOTE_USER: ${{ secrets.VPS_USER }}
         with:
           target: '/var/www/html/hrm'
-          args: '-rltgoDzvO'
+          args: '-rltgoDzvO --delete'
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
