@@ -52,20 +52,10 @@ jobs:
           SOURCE: .
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
-          EXCLUDE: '/public/build/, /node_modules/, /.git/'
+          EXCLUDE: '/node_modules/, /.git/'
         with:
           target: '/var/www/html/hrm'
           args: '-rltgoDzvO'
-
-      - name: Copy built assets to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: 'public/build/*'
-          target: '/var/www/html/hrm/'
-          strip_components: 0
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
