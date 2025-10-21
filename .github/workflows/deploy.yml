@@ -1,4 +1,4 @@
-name: Deploy HRM Application to Server
+name: Deploy HRM to Server
 
 on:
   push:
@@ -17,8 +17,8 @@ jobs:
         with:
           php-version: '8.4'
 
-      - name: Install Composer dependencies (with dev)
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,14 +28,8 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
 
-      - name: Rebuild native Linux binaries
-        run: npm rebuild
-
       - name: Build NPM assets
         run: npm run build
-
-      - name: Reinstall Composer (without dev)
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: Prepare server permissions
         uses: appleboy/ssh-action@v1.0.3
