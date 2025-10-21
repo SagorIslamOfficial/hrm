@@ -54,7 +54,7 @@ jobs:
           REMOTE_USER: ${{ secrets.VPS_USER }}
         with:
           target: '/var/www/html/hrm'
-          args: '-rltgoDzvO --delete'
+          args: '-rltgoDzvO'
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
@@ -64,11 +64,39 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/html/hrm
-            php artisan migrate --force
+
+            cat > .env << 'EOF'
+            APP_ENV=production
+            APP_URL=${{ secrets.APP_URL }}
+
+            DB_CONNECTION=mysql
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=3306
+            DB_DATABASE=${{ secrets.DB_DATABASE }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+            CACHE_DRIVER=file
+            QUEUE_CONNECTION=sync
+            SESSION_DRIVER=file
+            SESSION_LIFETIME=120
+            EOF
+
+            php artisan key:generate
+
+            mkdir -p storage/framework/{sessions,views,cache}
+            mkdir -p storage/logs
+            mkdir -p bootstrap/cache
+            php artisan migrate --force --seed
+            php artisan config:clear
             php artisan config:cache
+            php artisan route:clear
             php artisan route:cache
+            php artisan view:clear
             php artisan view:cache
             php artisan optimize
-            sudo chown -R www-data:www-data storage bootstrap/cache public/build
+            php artisan storage:link || true
+            sudo chown -R www-data:www-data storage bootstrap/cache public/build public/storage
             sudo chmod -R 775 storage bootstrap/cache public/build
+            sudo chmod -R 775 public/storage
             sudo systemctl reload nginx
