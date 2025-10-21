@@ -6,7 +6,9 @@ on:
 
 jobs:
   build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -16,6 +18,19 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          extensions: mbstring, xml, ctype, json, bcmath, pdo, mysql
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
@@ -24,16 +39,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Clear npm cache and install dependencies
-        run: |
-          npm cache clean --force
-          npm install
+      - name: Install NPM dependencies
+        run: npm ci
 
       - name: Build NPM assets
         run: npm run build
 
-      - name: Prepare server permissions
+      - name: Prepare deployment directory
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -47,19 +61,19 @@ jobs:
             sudo chown -R ${{ secrets.VPS_USER }}:www-data .
             sudo chmod -R 775 .
 
-      - name: Synchronize Files To Server
+      - name: Sync files to server
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: .
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
-          EXCLUDE: '/node_modules/, /.git/'
+          EXCLUDE: '/node_modules/, /.git/, /storage/, /bootstrap/cache/'
         with:
           target: '/var/www/html/hrm'
           args: '-rltgoDzvO --delete'
 
-      - name: Deploy to server
+      - name: Run deployment commands
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -68,31 +82,33 @@ jobs:
           script: |
             cd /var/www/html/hrm
 
-            cp .env.example .env
-
-            sed -i 's/APP_ENV=.*/APP_ENV=production/' .env
-            sed -i 's|APP_URL=.*|APP_URL=${{ secrets.APP_URL }}|' .env
-            sed -i 's/DB_HOST=.*/DB_HOST=localhost/' .env
-            sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' .env
-            sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' .env
-            sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' .env
-
-            php artisan config:clear
-            php artisan key:generate
+            if [ ! -f .env ]; then
+              cp .env.example .env
+              sed -i 's/APP_ENV=.*/APP_ENV=production/' .env
+              sed -i 's|APP_URL=.*|APP_URL=${{ secrets.APP_URL }}|' .env
+              sed -i 's/DB_HOST=.*/DB_HOST=localhost/' .env
+              sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' .env
+              sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' .env
+              sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' .env
+              php artisan key:generate --force
+            fi
 
             mkdir -p storage/framework/{sessions,views,cache}
             mkdir -p storage/logs
             mkdir -p bootstrap/cache
+
             php artisan migrate --force
-            php artisan config:clear
             php artisan config:cache
-            php artisan route:clear
             php artisan route:cache
-            php artisan view:clear
             php artisan view:cache
             php artisan optimize
+
             php artisan storage:link || true
+
             sudo chown -R www-data:www-data storage bootstrap/cache public/build public/storage
-            sudo chmod -R 775 storage bootstrap/cache public/build
-            sudo chmod -R 775 public/storage
+            sudo chmod -R 775 storage bootstrap/cache public/build public/storage
+
             sudo systemctl reload nginx
+
+      - name: Deployment complete
+        run: echo "🚀 Deployment to ${{ secrets.VPS_HOST }} completed successfully!"
