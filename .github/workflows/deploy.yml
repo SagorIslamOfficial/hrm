@@ -18,7 +18,7 @@ jobs:
           php-version: '8.4'
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -64,6 +64,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/html/hrm
+
+            composer install --no-interaction --prefer-dist --optimize-autoloader
 
             cp .env.example .env
 
