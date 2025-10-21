@@ -13,7 +13,8 @@ createServer((page) =>
         resolve: (name) =>
             resolvePageComponent(
                 `./pages/${name}.tsx`,
-                import.meta.glob('./pages/**/*.tsx'),
+                // @ts-expect-error - Vite's eager loading returns modules directly, not promises
+                import.meta.glob('./pages/**/*.tsx', { eager: true }),
             ),
         setup: ({ App, props }) => {
             return <App {...props} />;
