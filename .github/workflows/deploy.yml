@@ -65,7 +65,7 @@ jobs:
           script: |
             cd /var/www/html/hrm
 
-            composer install --no-interaction --prefer-dist --optimize-autoloader
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
             cp .env.example .env
 
@@ -81,7 +81,8 @@ jobs:
             mkdir -p storage/framework/{sessions,views,cache}
             mkdir -p storage/logs
             mkdir -p bootstrap/cache
-            php artisan migrate --force --seed
+            php artisan migrate --force
+            php artisan db:seed --force
             php artisan config:clear
             php artisan config:cache
             php artisan route:clear
