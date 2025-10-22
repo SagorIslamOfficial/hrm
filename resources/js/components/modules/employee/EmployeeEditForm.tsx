@@ -298,15 +298,29 @@ export default function EmployeeEditForm({
                             },
                         );
                     }
-                } catch (contactError) {
-                    console.error(
-                        'Failed to sync contact:',
-                        contact,
-                        contactError,
-                    );
-                    toast.error(
-                        `Failed to sync contact: ${contact.contact_name}`,
-                    );
+                } catch (contactError: unknown) {
+                    const error = contactError as {
+                        response?: {
+                            data?: {
+                                errors?: Record<string, string[]>;
+                            };
+                        };
+                    };
+
+                    // Show specific validation error if available
+                    const validationErrors = error?.response?.data?.errors;
+                    if (
+                        validationErrors &&
+                        Object.keys(validationErrors).length > 0
+                    ) {
+                        const firstError =
+                            Object.values(validationErrors)[0][0];
+                        toast.error(`Failed to sync contact: ${firstError}`);
+                    } else {
+                        toast.error(
+                            `Failed to sync contact: ${contact.contact_name}`,
+                        );
+                    }
                 }
             }
 
@@ -316,12 +330,7 @@ export default function EmployeeEditForm({
                     const freshEmployee = page.props
                         .employee as typeof employee;
                     if (freshEmployee?.contacts) {
-                        // Update local state with fresh data from server
                         setContacts(freshEmployee.contacts);
-                        console.log(
-                            'Contacts refreshed via Inertia:',
-                            freshEmployee.contacts,
-                        );
                     }
                     toast.success(
                         'Employee and contacts updated successfully!',
