@@ -121,14 +121,52 @@ export function ContactForm({
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
+        if (!file) return;
+
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Photo must not exceed 2MB in size.');
+            if (photoInputRef.current) photoInputRef.current.value = '';
+            return;
+        }
+
+        // Validate image dimensions
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+
+            // Check dimensions (100x100 to 1000x1000)
+            if (
+                img.width < 100 ||
+                img.height < 100 ||
+                img.width > 1000 ||
+                img.height > 1000
+            ) {
+                toast.error(
+                    'Photo must be between 100x100 and 1000x1000 pixels.',
+                );
+                if (photoInputRef.current) photoInputRef.current.value = '';
+                return;
+            }
+
+            // Validation passed - set the photo
             setPhoto(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPhotoPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
-        }
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            toast.error('Invalid image file.');
+            if (photoInputRef.current) photoInputRef.current.value = '';
+        };
+
+        img.src = objectUrl;
     };
 
     const handlePhotoRemove = () => {
