@@ -111,4 +111,4 @@ jobs:
             sudo systemctl reload nginx
 
       - name: Deployment complete
-        run: echo "🚀 Deployment to ${{ secrets.VPS_HOST }} completed successfully!"
+        run: echo "Deployment completed successfully!"
