@@ -28,7 +28,7 @@ export function UseEmployeeColumns({
             cell: ({ row }) => (
                 <Link
                     href={employeesShow(row.original.id).url}
-                    className="font-medium text-blue-600 hover:text-amber-600"
+                    className="font-medium text-primary hover:text-amber-600"
                 >
                     {row.getValue('employee_code')}
                 </Link>
