@@ -1,15 +1,13 @@
-import { PageHeader } from '@/components/common';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+    CreatedByField,
+    DateField,
+    FormActions,
+    InfoCard,
+    PageHeader,
+    PhotoUploadField,
+    SelectField,
+    TextField,
+} from '@/components/common';
 import AppLayout from '@/layouts/app-layout';
 import {
     create as employeesCreate,
@@ -18,8 +16,7 @@ import {
 } from '@/routes/employees/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Upload, UserPlus } from 'lucide-react';
-import { useMemo, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -52,7 +49,7 @@ export default function Create({
     employmentTypes,
     auth,
 }: Props) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     // Get current date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
@@ -118,13 +115,14 @@ export default function Create({
     const handleReset = () => {
         reset();
         clearErrors();
+        setPreviewUrl(null);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Employee" />
 
-            <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
+            <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto p-4">
                 <PageHeader
                     title="Create Employee"
                     description="Add a new employee with basic information. You'll be able to complete their full profile after creation."
@@ -132,351 +130,170 @@ export default function Create({
                     backLabel="Cancel"
                 />
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <UserPlus className="size-5" />
-                            Employee Information
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="employee_code">
-                                        Employee Code *
-                                    </Label>
-                                    <Input
-                                        id="employee_code"
-                                        value={data.employee_code}
-                                        onChange={(e) =>
-                                            setData(
-                                                'employee_code',
-                                                e.target.value,
-                                            )
-                                        }
-                                        placeholder="Enter employee code"
-                                        required
-                                    />
-                                    {errors.employee_code && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.employee_code}
-                                        </p>
-                                    )}
-                                </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <InfoCard
+                        title="Employee Information"
+                        className="rounded-xl border border-sidebar-border/70 p-6"
+                    >
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <TextField
+                                id="employee_code"
+                                label="Employee Code"
+                                value={data.employee_code}
+                                onChange={(value) =>
+                                    setData('employee_code', value)
+                                }
+                                error={errors.employee_code}
+                                required
+                                placeholder="Enter employee code (e.g., EMP001)"
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="created_by">
-                                        Created By *
-                                    </Label>
-                                    <Input
-                                        id="created_by"
-                                        value={
-                                            auth?.user?.name || 'Current User'
-                                        }
-                                        disabled
-                                        className="bg-muted"
-                                    />
-                                </div>
+                            <TextField
+                                id="email"
+                                label="Email Address"
+                                type="email"
+                                value={data.email}
+                                onChange={(value) => setData('email', value)}
+                                error={errors.email}
+                                required
+                                placeholder="Enter email address (e.g., me@sagorislam.dev)"
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="first_name">
-                                        First Name *
-                                    </Label>
-                                    <Input
-                                        id="first_name"
-                                        value={data.first_name}
-                                        onChange={(e) =>
-                                            setData(
-                                                'first_name',
-                                                e.target.value,
-                                            )
-                                        }
-                                        placeholder="Enter first name"
-                                        required
-                                    />
-                                    {errors.first_name && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.first_name}
-                                        </p>
-                                    )}
-                                </div>
+                            <TextField
+                                id="first_name"
+                                label="First Name"
+                                value={data.first_name}
+                                onChange={(value) =>
+                                    setData('first_name', value)
+                                }
+                                error={errors.first_name}
+                                required
+                                placeholder="Enter first name (e.g., Sagor)"
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="last_name">
-                                        Last Name *
-                                    </Label>
-                                    <Input
-                                        id="last_name"
-                                        value={data.last_name}
-                                        onChange={(e) =>
-                                            setData('last_name', e.target.value)
-                                        }
-                                        placeholder="Enter last name"
-                                        required
-                                    />
-                                    {errors.last_name && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.last_name}
-                                        </p>
-                                    )}
-                                </div>
+                            <TextField
+                                id="last_name"
+                                label="Last Name"
+                                value={data.last_name}
+                                onChange={(value) =>
+                                    setData('last_name', value)
+                                }
+                                error={errors.last_name}
+                                required
+                                placeholder="Enter last name (e.g., Islam)"
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="email">Email *</Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        value={data.email}
-                                        onChange={(e) =>
-                                            setData('email', e.target.value)
-                                        }
-                                        placeholder="Enter email address"
-                                        required
-                                    />
-                                    {errors.email && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.email}
-                                        </p>
-                                    )}
-                                </div>
+                            <TextField
+                                id="phone"
+                                label="Phone Number"
+                                type="tel"
+                                value={data.phone}
+                                onChange={(value) => setData('phone', value)}
+                                error={errors.phone}
+                                placeholder="Enter phone number (e.g., +8801933126160)"
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="phone">Phone</Label>
-                                    <Input
-                                        id="phone"
-                                        type="tel"
-                                        value={data.phone}
-                                        onChange={(e) =>
-                                            setData('phone', e.target.value)
-                                        }
-                                        placeholder="Enter phone number"
-                                    />
-                                    {errors.phone && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.phone}
-                                        </p>
-                                    )}
-                                </div>
+                            <SelectField
+                                id="department_id"
+                                label="Department"
+                                required
+                                value={data.department_id}
+                                onChange={(value) =>
+                                    setData('department_id', value)
+                                }
+                                options={departments.map((dept) => ({
+                                    value: dept.id,
+                                    label: dept.name,
+                                }))}
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="photo">Photo</Label>
-                                    <div className="flex items-center gap-4">
-                                        <Input
-                                            ref={fileInputRef}
-                                            id="photo"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file =
-                                                    e.target.files?.[0] || null;
-                                                setData('photo', file);
-                                            }}
-                                            className="hidden"
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() =>
-                                                fileInputRef.current?.click()
-                                            }
-                                            className="flex items-center gap-2"
-                                        >
-                                            <Upload className="size-4" />
-                                            {data.photo
-                                                ? 'Change Photo'
-                                                : 'Upload Photo'}
-                                        </Button>
-                                        {data.photo && (
-                                            <span className="text-sm text-muted-foreground">
-                                                {data.photo.name}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        Upload a profile photo (max 2MB,
-                                        JPEG/PNG/WebP)
-                                    </p>
-                                    {errors.photo && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.photo}
-                                        </p>
-                                    )}
-                                </div>
+                            <SelectField
+                                id="designation_id"
+                                label="Designation"
+                                required
+                                value={data.designation_id}
+                                onChange={(value) =>
+                                    setData('designation_id', value)
+                                }
+                                options={designations.map((desig) => ({
+                                    value: desig.id,
+                                    label: desig.title,
+                                }))}
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="department_id">
-                                        Department *
-                                    </Label>
-                                    <Select
-                                        value={data.department_id}
-                                        onValueChange={(value) =>
-                                            setData('department_id', value)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select department" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {departments.map((department) => (
-                                                <SelectItem
-                                                    key={department.id}
-                                                    value={department.id}
-                                                >
-                                                    {department.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.department_id && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.department_id}
-                                        </p>
-                                    )}
-                                </div>
+                            <SelectField
+                                id="employment_status"
+                                label="Employment Status"
+                                required
+                                value={data.employment_status}
+                                onChange={(value) =>
+                                    setData('employment_status', value)
+                                }
+                                options={[
+                                    { value: 'active', label: 'Active' },
+                                    { value: 'inactive', label: 'InActive' },
+                                    {
+                                        value: 'terminated',
+                                        label: 'Terminated',
+                                    },
+                                    { value: 'on_leave', label: 'On Leave' },
+                                ]}
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="designation_id">
-                                        Designation *
-                                    </Label>
-                                    <Select
-                                        value={data.designation_id}
-                                        onValueChange={(value) =>
-                                            setData('designation_id', value)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select designation" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {designations.map((designation) => (
-                                                <SelectItem
-                                                    key={designation.id}
-                                                    value={designation.id}
-                                                >
-                                                    {designation.title}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.designation_id && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.designation_id}
-                                        </p>
-                                    )}
-                                </div>
+                            <SelectField
+                                id="employment_type"
+                                label="Employment Type"
+                                required
+                                value={data.employment_type}
+                                onChange={(value) =>
+                                    setData('employment_type', value)
+                                }
+                                options={employmentTypes.map((type) => ({
+                                    value: type.code,
+                                    label: type.name,
+                                }))}
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="employment_status">
-                                        Employment Status *
-                                    </Label>
-                                    <Select
-                                        value={data.employment_status}
-                                        onValueChange={(value) =>
-                                            setData('employment_status', value)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="active">
-                                                Active
-                                            </SelectItem>
-                                            <SelectItem value="inactive">
-                                                Inactive
-                                            </SelectItem>
-                                            <SelectItem value="terminated">
-                                                Terminated
-                                            </SelectItem>
-                                            <SelectItem value="on_leave">
-                                                On Leave
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.employment_status && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.employment_status}
-                                        </p>
-                                    )}
-                                </div>
+                            <DateField
+                                id="joining_date"
+                                label="Joining Date"
+                                value={data.joining_date}
+                                onChange={(value) =>
+                                    setData('joining_date', value)
+                                }
+                                error={errors.joining_date}
+                                required
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="employment_type">
-                                        Employment Type *
-                                    </Label>
-                                    <Select
-                                        value={data.employment_type}
-                                        onValueChange={(value) =>
-                                            setData('employment_type', value)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {employmentTypes.map((type) => (
-                                                <SelectItem
-                                                    key={type.code}
-                                                    value={type.code}
-                                                >
-                                                    {type.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.employment_type && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.employment_type}
-                                        </p>
-                                    )}
-                                </div>
+                            <PhotoUploadField
+                                value={data.photo}
+                                onChange={(file) => {
+                                    setData('photo', file);
+                                    if (file) {
+                                        const url = URL.createObjectURL(file);
+                                        setPreviewUrl(url);
+                                    }
+                                }}
+                                onDelete={() => {
+                                    setData('photo', null);
+                                    setPreviewUrl(null);
+                                }}
+                                helpText="Upload a profile photo (max 2MB, JPEG/PNG/WebP)"
+                                error={errors.photo}
+                                previewUrl={previewUrl}
+                            />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="joining_date">
-                                        Joining Date *
-                                    </Label>
-                                    <Input
-                                        id="joining_date"
-                                        type="date"
-                                        value={data.joining_date}
-                                        onChange={(e) =>
-                                            setData(
-                                                'joining_date',
-                                                e.target.value,
-                                            )
-                                        }
-                                        required
-                                    />
-                                    {errors.joining_date && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.joining_date}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
+                            <CreatedByField userName={auth?.user?.name} />
+                        </div>
+                    </InfoCard>
 
-                            <div className="flex justify-end gap-4">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleReset}
-                                    disabled={processing}
-                                >
-                                    Reset
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={processing || !isFormValid}
-                                >
-                                    {processing
-                                        ? 'Creating...'
-                                        : 'Create Employee'}
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                    <FormActions
+                        onReset={handleReset}
+                        submitLabel="Create Employee"
+                        processing={processing}
+                        disabled={!isFormValid}
+                    />
+                </form>
             </div>
         </AppLayout>
     );
