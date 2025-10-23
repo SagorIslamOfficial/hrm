@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignUuid('employee_id')->constrained()->cascadeOnDelete();
             $table->string('doc_type');
             $table->string('title');
-            $table->string('file_path');
-            $table->string('file_name');
+            $table->string('file_path')->nullable();
+            $table->string('file_name')->nullable();
             $table->integer('file_size')->nullable();
             $table->string('mime_type')->nullable();
             $table->date('expiry_date')->nullable();
