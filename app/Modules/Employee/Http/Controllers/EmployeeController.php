@@ -118,7 +118,7 @@ class EmployeeController
             'jobDetail',
             'salaryDetail',
             'contacts',
-            'documents',
+            'documents.uploader:id,name',
             'notes.creator',
             'attendanceRecords' => fn ($query) => $query->latest()->limit(30),
             'leaveRecords' => fn ($query) => $query->latest()->limit(10),
@@ -139,7 +139,7 @@ class EmployeeController
             'jobDetail',
             'salaryDetail',
             'contacts',
-            'documents',
+            'documents.uploader:id,name',
             'notes',
             'customFields',
         ]);
