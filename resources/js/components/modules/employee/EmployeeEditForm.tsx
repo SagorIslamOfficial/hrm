@@ -42,6 +42,29 @@ interface Contact {
     _isDeleted?: boolean;
 }
 
+interface Document {
+    id: string;
+    doc_type: string;
+    title: string;
+    file_name: string;
+    file_path: string;
+    file_url: string;
+    file_size: number;
+    expiry_date: string | null;
+    is_expired: boolean;
+    is_expiring_soon: boolean;
+    uploader?: {
+        id: string;
+        name: string;
+    };
+    created_at: string;
+    // Staging properties for pending changes
+    _documentFile?: File;
+    _isNew?: boolean;
+    _isModified?: boolean;
+    _isDeleted?: boolean;
+}
+
 interface Employee {
     id: string;
     employee_code: string;
@@ -92,13 +115,7 @@ interface Employee {
         tax_id?: string;
     };
     contacts?: Contact[];
-    documents?: Array<{
-        id: string;
-        document_type: string;
-        document_name: string;
-        file_path: string;
-        uploaded_at: string;
-    }>;
+    documents?: Document[];
     notes?: Array<{
         id: string;
         title: string;
@@ -141,6 +158,7 @@ export function EmployeeEditForm({
     className,
 }: EmployeeEditFormProps) {
     const [contacts, setContacts] = useState(employee.contacts || []);
+    const [documents, setDocuments] = useState(employee.documents || []);
 
     // Use URL-based tab persistence hook
     const [activeTab, handleTabChange] = useUrlTab('basic');
@@ -326,6 +344,108 @@ export function EmployeeEditForm({
                 }
             }
 
+            // Then handle staged documents
+            const stagedDocuments = documents.filter(
+                (doc) => doc._isNew || doc._isModified || doc._isDeleted,
+            );
+
+            for (const doc of stagedDocuments) {
+                try {
+                    // Skip documents that are both new and deleted
+                    if (doc._isNew && doc._isDeleted) {
+                        continue;
+                    }
+
+                    if (doc._isDeleted && !doc._isNew) {
+                        // Delete existing document
+                        await axios.delete(
+                            `/dashboard/employees/${employee.id}/documents/${doc.id}`,
+                        );
+                    } else if (doc._isNew && !doc._isDeleted) {
+                        // Create new document
+                        const formData = new FormData();
+                        formData.append('doc_type', doc.doc_type);
+                        formData.append('title', doc.title);
+                        if (doc.expiry_date) {
+                            formData.append('expiry_date', doc.expiry_date);
+                        }
+
+                        if (doc._documentFile) {
+                            formData.append('file', doc._documentFile);
+                        }
+
+                        await axios.post(
+                            `/dashboard/employees/${employee.id}/documents`,
+                            formData,
+                            {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data',
+                                },
+                            },
+                        );
+                    } else if (doc._isModified) {
+                        // Update existing document
+                        const formData = new FormData();
+                        formData.append('doc_type', doc.doc_type);
+                        formData.append('title', doc.title);
+                        if (doc.expiry_date) {
+                            formData.append('expiry_date', doc.expiry_date);
+                        }
+                        formData.append('_method', 'put');
+
+                        if (doc._documentFile) {
+                            formData.append('file', doc._documentFile);
+                        }
+
+                        await axios.post(
+                            `/dashboard/employees/${employee.id}/documents/${doc.id}`,
+                            formData,
+                            {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data',
+                                },
+                            },
+                        );
+                    }
+                } catch (documentError: unknown) {
+                    const error = documentError as {
+                        response?: {
+                            data?: {
+                                errors?: Record<string, string[]>;
+                                message?: string;
+                            };
+                        };
+                    };
+
+                    // Show specific validation error if available
+                    const validationErrors = error?.response?.data?.errors;
+                    if (
+                        validationErrors &&
+                        Object.keys(validationErrors).length > 0
+                    ) {
+                        // Show all validation errors
+                        const errorMessages = Object.entries(validationErrors)
+                            .map(
+                                ([field, messages]) =>
+                                    `${field}: ${messages.join(', ')}`,
+                            )
+                            .join(' | ');
+                        toast.error(
+                            `Document "${doc.title}" validation failed: ${errorMessages}`,
+                        );
+                    } else if (error?.response?.data?.message) {
+                        toast.error(
+                            `Failed to sync document "${doc.title}": ${error.response.data.message}`,
+                        );
+                    } else {
+                        toast.error(
+                            `Failed to sync document "${doc.title}". Please try again.`,
+                        );
+                    }
+                    console.error('Document sync error:', error);
+                }
+            }
+
             router.reload({
                 only: ['employee'],
                 onSuccess: (page) => {
@@ -334,8 +454,11 @@ export function EmployeeEditForm({
                     if (freshEmployee?.contacts) {
                         setContacts(freshEmployee.contacts);
                     }
+                    if (freshEmployee?.documents) {
+                        setDocuments(freshEmployee.documents);
+                    }
                     toast.success(
-                        'Employee and contacts updated successfully!',
+                        'Employee, contacts, and documents updated successfully!',
                     );
                 },
                 onError: () => {
@@ -384,10 +507,38 @@ export function EmployeeEditForm({
         handleTabChange('contacts');
     };
 
+    const handleDocumentAdd = (documentData: Document) => {
+        // Add new staged document
+        setDocuments([...documents, documentData]);
+        handleTabChange('documents');
+    };
+
+    const handleDocumentEdit = (documentData: Document) => {
+        // Update existing document (staged)
+        setDocuments(
+            documents.map((doc) =>
+                doc.id === documentData.id ? documentData : doc,
+            ),
+        );
+        handleTabChange('documents');
+    };
+
+    const handleDeleteDocument = (documentId: string) => {
+        // Mark document as deleted (staged)
+        setDocuments(
+            documents.map((doc) =>
+                doc.id === documentId ? { ...doc, _isDeleted: true } : doc,
+            ),
+        );
+        toast.success('Document deletion staged - save employee to apply');
+        handleTabChange('documents');
+    };
+
     // Check if form has any changes
     const hasChanges =
         isDirty || // Form data has changed
-        contacts.some((c) => c._isNew || c._isModified || c._isDeleted); // Contacts have changed
+        contacts.some((c) => c._isNew || c._isModified || c._isDeleted) || // Contacts have changed
+        documents.some((d) => d._isNew || d._isModified || d._isDeleted); // Documents have changed
 
     const isSuperAdminOrOwner =
         auth?.user?.is_super_admin ||
@@ -482,7 +633,12 @@ export function EmployeeEditForm({
                     </TabsContent>
 
                     <TabsContent value="documents" className="space-y-6">
-                        <DocumentsEdit />
+                        <DocumentsEdit
+                            documents={documents}
+                            onDocumentAdd={handleDocumentAdd}
+                            onDocumentEdit={handleDocumentEdit}
+                            onDocumentDelete={handleDeleteDocument}
+                        />
                     </TabsContent>
 
                     <TabsContent value="notes" className="space-y-6">

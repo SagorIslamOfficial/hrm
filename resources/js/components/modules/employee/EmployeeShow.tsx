@@ -83,8 +83,16 @@ interface Employee {
         doc_type: string;
         title: string;
         file_name: string;
+        file_path: string;
+        file_url: string;
         file_size: number;
         expiry_date: string | null;
+        is_expired: boolean;
+        is_expiring_soon: boolean;
+        uploader?: {
+            id: string;
+            name: string;
+        };
         created_at: string;
     }>;
     notes?: Array<{
@@ -186,7 +194,10 @@ export function EmployeeShow({ employee, className }: EmployeeShowFormProps) {
                 </TabsContent>
 
                 <TabsContent value="documents" className="space-y-4">
-                    <DocumentsView documents={employee.documents} />
+                    <DocumentsView
+                        documents={employee.documents}
+                        employeeId={employee.id}
+                    />
                 </TabsContent>
 
                 <TabsContent value="notes" className="space-y-4">
