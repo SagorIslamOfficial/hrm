@@ -6,6 +6,7 @@ export { DateField } from './DateField';
 export { DeleteDialog } from './DeleteDialog';
 export { EmptyState } from './EmptyState';
 export { FormActions } from './FormActions';
+export { InfoCard } from './InfoCard';
 export { NumberField } from './NumberField';
 export { PageHeader } from './PageHeader';
 export { PhotoDialog } from './PhotoDialog';
