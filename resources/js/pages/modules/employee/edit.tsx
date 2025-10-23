@@ -1,5 +1,5 @@
 import { PageHeader } from '@/components/common';
-import EmployeeEditForm from '@/components/modules/employee/EmployeeEditForm';
+import { EmployeeEditForm } from '@/components/modules/employee';
 import AppLayout from '@/layouts/app-layout';
 import {
     edit as employeesEdit,
@@ -137,7 +137,7 @@ export default function Edit({
                     backUrl={employeesIndex().url}
                 />
 
-                {/* EmployeeEditForm component */}
+                {/* Employee Edit */}
                 <EmployeeEditForm
                     employee={employee}
                     departments={departments}
@@ -145,7 +145,7 @@ export default function Edit({
                     employmentTypes={employmentTypes}
                     supervisors={supervisors}
                     auth={auth}
-                    className="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-card p-6 shadow-sm dark:border-sidebar-border"
+                    className="rounded-xl border border-sidebar-border/70 p-6"
                 />
             </div>
         </AppLayout>

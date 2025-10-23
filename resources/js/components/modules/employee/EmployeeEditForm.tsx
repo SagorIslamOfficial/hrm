@@ -10,16 +10,18 @@ import { router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { AdditionalTab } from './AdditionalTab';
-import { AttendanceTab } from './AttendanceTab';
-import { BasicTab } from './BasicTab';
-import { ContactsTab } from './ContactsTab';
-import { DocumentsTab } from './DocumentsTab';
-import { JobTab } from './JobTab';
-import { LeaveTab } from './LeaveTab';
-import { NotesTab } from './NotesTab';
-import { PersonalTab } from './PersonalTab';
-import { SalaryTab } from './SalaryTab';
+import {
+    AdditionalEdit,
+    AttendanceEdit,
+    BasicEdit,
+    ContactsEdit,
+    DocumentsEdit,
+    JobEdit,
+    LeaveEdit,
+    NotesEdit,
+    PersonalEdit,
+    SalaryEdit,
+} from './edit';
 
 interface Contact {
     id: string;
@@ -129,7 +131,7 @@ interface EmployeeEditFormProps {
     className?: string;
 }
 
-export default function EmployeeEditForm({
+export function EmployeeEditForm({
     employee,
     departments,
     designations,
@@ -412,12 +414,10 @@ export default function EmployeeEditForm({
                     onValueChange={handleTabChange}
                     className="space-y-6"
                 >
-                    {/* Tabs Navigation */}
                     <TabsNavigation tabs={employeeTabs} />
 
-                    {/* Tabs Content */}
                     <TabsContent value="basic" className="space-y-6">
-                        <BasicTab
+                        <BasicEdit
                             data={{
                                 employee_code: data.employee_code,
                                 email: data.email,
@@ -442,9 +442,8 @@ export default function EmployeeEditForm({
                         />
                     </TabsContent>
 
-                    {/* Personal Tab */}
                     <TabsContent value="personal" className="space-y-6">
-                        <PersonalTab
+                        <PersonalEdit
                             data={{
                                 personal_detail: data.personal_detail,
                             }}
@@ -452,9 +451,8 @@ export default function EmployeeEditForm({
                         />
                     </TabsContent>
 
-                    {/* Job Tab */}
                     <TabsContent value="job" className="space-y-6">
-                        <JobTab
+                        <JobEdit
                             data={{
                                 job_detail: data.job_detail,
                             }}
@@ -465,9 +463,8 @@ export default function EmployeeEditForm({
                         />
                     </TabsContent>
 
-                    {/* Salary Tab */}
                     <TabsContent value="salary" className="space-y-6">
-                        <SalaryTab
+                        <SalaryEdit
                             data={{
                                 salary_detail: data.salary_detail,
                             }}
@@ -475,9 +472,8 @@ export default function EmployeeEditForm({
                         />
                     </TabsContent>
 
-                    {/* Contacts Tab */}
                     <TabsContent value="contacts" className="space-y-6">
-                        <ContactsTab
+                        <ContactsEdit
                             contacts={contacts}
                             onContactAdd={handleContactAdd}
                             onContactEdit={handleContactEdit}
@@ -485,29 +481,24 @@ export default function EmployeeEditForm({
                         />
                     </TabsContent>
 
-                    {/* Documents Tab */}
                     <TabsContent value="documents" className="space-y-6">
-                        <DocumentsTab />
+                        <DocumentsEdit />
                     </TabsContent>
 
-                    {/* Notes Tab */}
                     <TabsContent value="notes" className="space-y-6">
-                        <NotesTab />
+                        <NotesEdit />
                     </TabsContent>
 
-                    {/* Attendance Tab */}
                     <TabsContent value="attendance" className="space-y-6">
-                        <AttendanceTab />
+                        <AttendanceEdit />
                     </TabsContent>
 
-                    {/* Leave Tab */}
                     <TabsContent value="leave" className="space-y-6">
-                        <LeaveTab />
+                        <LeaveEdit />
                     </TabsContent>
 
-                    {/* Additional Tab */}
                     <TabsContent value="additional" className="space-y-6">
-                        <AdditionalTab />
+                        <AdditionalEdit />
                     </TabsContent>
                 </Tabs>
 

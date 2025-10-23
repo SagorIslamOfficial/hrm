@@ -42,6 +42,7 @@ export interface Contact {
 
 // Export all components
 export { EmployeeDeleteDialog } from './EmployeeDeleteDialog';
+export { EmployeeEditForm } from './EmployeeEditForm';
 export { EmployeeEmptyState } from './EmployeeEmptyState';
 export { EmployeeShow } from './EmployeeShow';
 export { UseEmployeeColumns } from './UseEmployeeColumns';
