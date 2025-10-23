@@ -44,4 +44,5 @@ export interface Contact {
 export { EmployeeDeleteDialog } from './EmployeeDeleteDialog';
 export { EmployeeEmptyState } from './EmployeeEmptyState';
 export { EmployeePageHeader } from './EmployeePageHeader';
+export { EmployeeShow } from './EmployeeShow';
 export { UseEmployeeColumns } from './UseEmployeeColumns';
