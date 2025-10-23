@@ -1,18 +1,20 @@
+import { PageHeader } from '@/components/common';
 import {
     EmployeeDeleteDialog,
     EmployeeEmptyState,
-    EmployeePageHeader,
     UseEmployeeColumns,
     type Employee,
 } from '@/components/modules/employee';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import {
+    create as employeesCreate,
     destroy as employeesDestroy,
     index as employeesIndex,
 } from '@/routes/employees/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { FilePlus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -62,7 +64,15 @@ export default function Index({ employees = [] }: Props) {
             <Head title="Employees" />
 
             <div className="mx-auto flex h-full w-11/12 flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
-                <EmployeePageHeader />
+                <PageHeader
+                    title="Employees"
+                    description="Manage your employee records"
+                    action={{
+                        label: 'Add',
+                        href: employeesCreate().url,
+                        icon: <FilePlus className="mr-1 size-4" />,
+                    }}
+                />
 
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     {employees.length === 0 ? (

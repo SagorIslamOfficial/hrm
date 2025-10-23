@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/common';
 import { EmployeeShow } from '@/components/modules/employee';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -8,7 +9,7 @@ import {
 } from '@/routes/employees/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { Edit } from 'lucide-react';
 
 interface Employee {
     id: string;
@@ -137,35 +138,19 @@ export default function Show({ employee }: Props) {
             <Head title={`${employee.first_name} ${employee.last_name}`} />
 
             <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div>
-                            <h1 className="text-2xl font-bold">
-                                {employee.first_name} {employee.last_name}
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                {employee.employee_code} -{' '}
-                                {employee.designation.title} -{' '}
-                                {employee.department.name}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" asChild>
-                            <Link href={employeesIndex().url}>
-                                <ArrowLeft className="mr-1 size-4" />
-                                Back
-                            </Link>
-                        </Button>
+                <PageHeader
+                    title={`${employee.first_name} ${employee.last_name}`}
+                    description={`${employee.employee_code} - ${employee.designation.title} - ${employee.department.name}`}
+                    backUrl={employeesIndex().url}
+                    actions={
                         <Button size="sm" asChild>
                             <Link href={employeesEdit(employee.id).url}>
                                 <Edit className="mr-1 size-4" />
-                                Edit Employee
+                                Edit
                             </Link>
                         </Button>
-                    </div>
-                </div>
+                    }
+                />
 
                 {/* Employee Show */}
                 <EmployeeShow

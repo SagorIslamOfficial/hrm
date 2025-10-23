@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,7 @@ import {
     store as employeesStore,
 } from '@/routes/employees/index';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Upload, UserPlus } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import { toast } from 'sonner';
@@ -124,26 +125,12 @@ export default function Create({
             <Head title="Create Employee" />
 
             <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div>
-                            <h1 className="text-2xl font-bold">
-                                Create Employee
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Add a new employee with basic information.
-                                You'll be able to complete their full profile
-                                after creation.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" asChild>
-                            <Link href={employeesIndex().url}>Cancel</Link>
-                        </Button>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Create Employee"
+                    description="Add a new employee with basic information. You'll be able to complete their full profile after creation."
+                    backUrl={employeesIndex().url}
+                    backLabel="Cancel"
+                />
 
                 <Card>
                     <CardHeader>

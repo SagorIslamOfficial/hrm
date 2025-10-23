@@ -1,5 +1,5 @@
+import { PageHeader } from '@/components/common';
 import EmployeeEditForm from '@/components/modules/employee/EmployeeEditForm';
-import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import {
     edit as employeesEdit,
@@ -7,8 +7,7 @@ import {
     show as employeesShow,
 } from '@/routes/employees/index';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Head } from '@inertiajs/react';
 
 interface Employee {
     id: string;
@@ -125,30 +124,18 @@ export default function Edit({
             <Head title={`Edit ${employee.first_name} ${employee.last_name}`} />
 
             <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div>
-                            <h1 className="text-2xl font-bold">
-                                Edit Employee Profile
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Complete profile information for{' '}
-                                <span className="font-bold">
-                                    {employee.first_name} {employee.last_name}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" asChild>
-                            <Link href={employeesIndex().url}>
-                                <ArrowLeft className="mr-1 size-4" />
-                                Back
-                            </Link>
-                        </Button>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Edit Employee Profile"
+                    description={
+                        <>
+                            Complete profile information for{' '}
+                            <span className="font-bold">
+                                {employee.first_name} {employee.last_name}
+                            </span>
+                        </>
+                    }
+                    backUrl={employeesIndex().url}
+                />
 
                 {/* EmployeeEditForm component */}
                 <EmployeeEditForm
