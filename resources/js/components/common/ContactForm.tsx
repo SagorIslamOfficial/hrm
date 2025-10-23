@@ -1,3 +1,4 @@
+import { FormActions } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -361,27 +362,13 @@ export function ContactForm({
                 </Label>
             </div>
 
-            <div className="flex justify-end gap-2 border-t pt-4">
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onCancel}
-                    disabled={submitting}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                >
-                    {submitting
-                        ? 'Saving...'
-                        : contact
-                          ? 'Update Contact'
-                          : 'Add Contact'}
-                </Button>
-            </div>
+            <FormActions
+                type="dialog"
+                onCancel={onCancel}
+                onSubmit={handleSubmit}
+                submitLabel={contact ? 'Update' : 'Add'}
+                submitting={submitting}
+            />
         </div>
     );
 }
