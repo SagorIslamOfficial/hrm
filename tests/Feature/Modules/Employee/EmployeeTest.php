@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Modules\Department\Models\Department;
 use App\Modules\Department\Models\Designation;
 use App\Modules\Employee\Models\Employee;
+use App\Modules\Employee\Models\EmploymentType;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -49,6 +50,13 @@ it('can create a new employee with valid data', function () {
     $user = User::factory()->create();
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
+
+    // Create employment type for validation
+    $employmentType = EmploymentType::factory()->state([
+        'name' => 'Permanent',
+        'code' => 'permanent',
+        'is_active' => true,
+    ])->create();
 
     $employeeData = [
         'employee_code' => 'EMP001',
@@ -199,6 +207,13 @@ it('can update an employee with valid data', function () {
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
 
+    // Create employment type for validation
+    EmploymentType::factory()->state([
+        'name' => 'Permanent',
+        'code' => 'permanent',
+        'is_active' => true,
+    ])->create();
+
     $employee = Employee::factory()->create([
         'department_id' => $department->id,
         'designation_id' => $designation->id,
@@ -272,6 +287,13 @@ it('creates related data when creating employee with nested data', function () {
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
 
+    // Create employment type for validation
+    EmploymentType::factory()->state([
+        'name' => 'Permanent',
+        'code' => 'permanent',
+        'is_active' => true,
+    ])->create();
+
     $employeeData = [
         'employee_code' => 'EMP001',
         'first_name' => 'John',
@@ -316,6 +338,13 @@ it('can create employee with photo upload', function () {
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
 
+    // Create employment type for validation
+    EmploymentType::factory()->state([
+        'name' => 'Permanent',
+        'code' => 'permanent',
+        'is_active' => true,
+    ])->create();
+
     $employeeData = [
         'employee_code' => 'EMP001',
         'first_name' => 'John',
@@ -351,6 +380,13 @@ it('validates photo upload requirements', function () {
     $user = User::factory()->create();
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
+
+    // Create employment type for validation
+    EmploymentType::factory()->state([
+        'name' => 'Permanent',
+        'code' => 'permanent',
+        'is_active' => true,
+    ])->create();
 
     $employeeData = [
         'employee_code' => 'EMP001',
@@ -488,6 +524,13 @@ it('handles photo upload errors gracefully', function () {
     $user = User::factory()->create();
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
+
+    // Create employment type for validation
+    EmploymentType::factory()->state([
+        'name' => 'Permanent',
+        'code' => 'permanent',
+        'is_active' => true,
+    ])->create();
 
     // Mock Storage to simulate failure
     Storage::shouldReceive('disk->put')->andReturn(false);
