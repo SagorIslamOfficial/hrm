@@ -3,6 +3,8 @@
 /node_modules
 /public/hot
 /public/build
+/public/build/assets
+/public/build/mix-manifest.json
 /public/storage
 /resources/js/actions
 /resources/js/routes
