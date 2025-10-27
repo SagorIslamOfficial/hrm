@@ -101,8 +101,12 @@ interface Employee {
         category: string;
         is_private: boolean;
         created_at: string;
-        creator: {
+        creator?: {
             name: string;
+        };
+        updated_at?: string;
+        updater?: {
+            name?: string;
         };
     }>;
     attendance?: Array<{

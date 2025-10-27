@@ -71,7 +71,11 @@ interface Note {
     category: string;
     is_private: boolean;
     created_at: string;
+    updated_at?: string;
     creator?: {
+        name?: string;
+    };
+    updater?: {
         name?: string;
     };
     _isNew?: boolean;
@@ -620,15 +624,30 @@ export function EmployeeEditForm({
     };
 
     const handleNoteAdd = (noteData: Note) => {
-        // Add new staged note
-        setNotes([...notes, noteData]);
+        // Add new staged note - set creator to current user
+        const newNote = {
+            ...noteData,
+            creator: {
+                name: auth?.user?.name || 'Unknown',
+            },
+            _isNew: true,
+        };
+        setNotes([...notes, newNote]);
         handleTabChange('notes');
     };
 
     const handleNoteEdit = (noteData: Note) => {
-        // Update existing note (staged)
+        // Update existing note (staged) - preserve relationships
         setNotes(
-            notes.map((note) => (note.id === noteData.id ? noteData : note)),
+            notes.map((note) =>
+                note.id === noteData.id
+                    ? {
+                          ...note,
+                          ...noteData,
+                          _isModified: true,
+                      }
+                    : note,
+            ),
         );
         handleTabChange('notes');
     };

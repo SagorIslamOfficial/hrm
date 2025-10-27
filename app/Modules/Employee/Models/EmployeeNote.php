@@ -13,6 +13,7 @@ use App\Modules\Employee\Database\Factories\EmployeeNoteFactory;
  * @property string $id
  * @property string $employee_id
  * @property string $created_by
+ * @property string $updated_by
  * @property string $note
  * @property bool $is_private
  * @property string $category
@@ -24,9 +25,24 @@ class EmployeeNote extends Model
     protected $fillable = [
         'employee_id',
         'created_by',
+        'updated_by',
         'note',
         'is_private',
         'category',
+    ];
+
+    protected $visible = [
+        'id',
+        'employee_id',
+        'created_by',
+        'updated_by',
+        'note',
+        'is_private',
+        'category',
+        'created_at',
+        'updated_at',
+        'creator',
+        'updater',
     ];
 
     protected function casts(): array
@@ -44,6 +60,11 @@ class EmployeeNote extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     protected static function newFactory()

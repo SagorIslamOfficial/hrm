@@ -16,7 +16,7 @@ class EmployeeNoteRepository implements EmployeeNoteRepositoryInterface
 
     public function findById(string $id): EmployeeNote
     {
-        return EmployeeNote::with(['employee', 'creator'])->findOrFail($id);
+        return EmployeeNote::with(['employee', 'creator', 'updater'])->findOrFail($id);
     }
 
     public function update(EmployeeNote $note, array $data): bool
@@ -31,7 +31,7 @@ class EmployeeNoteRepository implements EmployeeNoteRepositoryInterface
 
     public function getByEmployee(string $employeeId): Collection
     {
-        return EmployeeNote::with(['creator:id,name'])
+        return EmployeeNote::with(['creator:id,name', 'updater:id,name'])
             ->where('employee_id', $employeeId)
             ->latest()
             ->get();
@@ -39,7 +39,7 @@ class EmployeeNoteRepository implements EmployeeNoteRepositoryInterface
 
     public function getByEmployeeWithFilters(string $employeeId, array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = EmployeeNote::with(['creator'])
+        $query = EmployeeNote::with(['creator', 'updater'])
             ->where('employee_id', $employeeId);
 
         if (isset($filters['category']) && $filters['category'] !== '') {
@@ -59,6 +59,6 @@ class EmployeeNoteRepository implements EmployeeNoteRepositoryInterface
 
     public function all(): Collection
     {
-        return EmployeeNote::with(['employee', 'creator'])->get();
+        return EmployeeNote::with(['employee', 'creator', 'updater'])->get();
     }
 }

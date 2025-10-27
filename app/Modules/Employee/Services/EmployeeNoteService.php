@@ -14,7 +14,9 @@ class EmployeeNoteService implements EmployeeNoteServiceInterface
 
     public function createNote(array $data): EmployeeNote
     {
-        return $this->noteRepository->create($data);
+        $note = $this->noteRepository->create($data);
+
+        return $note->fresh();
     }
 
     public function updateNote(string $id, array $data): EmployeeNote

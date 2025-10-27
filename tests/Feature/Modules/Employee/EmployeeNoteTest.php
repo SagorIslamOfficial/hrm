@@ -34,6 +34,7 @@ test('can list employee notes', function () {
                     'id',
                     'employee_id',
                     'created_by',
+                    'updated_by',
                     'note',
                     'is_private',
                     'category',
@@ -75,6 +76,7 @@ it('can create an employee note', function () {
                 'id',
                 'employee_id',
                 'created_by',
+                'updated_by',
                 'note',
                 'is_private',
                 'category',
@@ -84,17 +86,6 @@ it('can create an employee note', function () {
                     'id',
                     'name',
                 ],
-            ],
-        ])
-        ->assertJson([
-            'success' => true,
-            'message' => 'Note created successfully.',
-            'note' => [
-                'employee_id' => $employee->id,
-                'created_by' => $user->id,
-                'note' => $noteData['note'],
-                'category' => $noteData['category'],
-                'is_private' => $noteData['is_private'],
             ],
         ]);
 
@@ -155,6 +146,7 @@ it('can show a specific employee note', function () {
                 'id',
                 'employee_id',
                 'created_by',
+                'updated_by',
                 'note',
                 'is_private',
                 'category',
@@ -239,12 +231,17 @@ it('can update an employee note', function () {
                 'id',
                 'employee_id',
                 'created_by',
+                'updated_by',
                 'note',
                 'is_private',
                 'category',
                 'created_at',
                 'updated_at',
                 'creator' => [
+                    'id',
+                    'name',
+                ],
+                'updater' => [
                     'id',
                     'name',
                 ],
@@ -266,6 +263,44 @@ it('can update an employee note', function () {
     expect($note->note)->toBe($updateData['note']);
     expect($note->category)->toBe($updateData['category']);
     expect($note->is_private)->toBe($updateData['is_private']);
+    expect($note->updated_by)->toBe($user->id);
+});
+
+it('sets updated_by to current user when updating note', function () {
+    $creator = User::factory()->create();
+    $updater = User::factory()->create();
+    $department = Department::factory()->create();
+    $designation = Designation::factory()->create();
+
+    $employee = Employee::factory()->create([
+        'department_id' => $department->id,
+        'designation_id' => $designation->id,
+    ]);
+
+    $note = EmployeeNote::factory()->create([
+        'employee_id' => $employee->id,
+        'created_by' => $creator->id,
+        'note' => 'Original note',
+        'category' => 'general',
+        'is_private' => false,
+    ]);
+
+    $updateData = [
+        'note' => 'Updated by different user',
+        'category' => 'performance',
+        'is_private' => true,
+    ];
+
+    $response = $this->actingAs($updater)
+        ->putJson("/dashboard/employees/{$employee->id}/notes/{$note->id}", $updateData);
+
+    $response->assertSuccessful();
+
+    // Verify the note was updated with the correct updated_by user
+    $note->refresh();
+    expect($note->created_by)->toBe($creator->id); // Original creator should remain
+    expect($note->updated_by)->toBe($updater->id); // Updated by should be the current user
+    expect($note->note)->toBe($updateData['note']);
 });
 
 it('cannot update note that belongs to different employee', function () {

@@ -22,7 +22,7 @@ class EmployeeNoteController extends Controller
     {
         $notes = $this->noteRepository->getByEmployee($employee->id);
 
-        return response()->json(['notes' => $notes]);
+        return response()->json(['notes' => $notes->load(['creator:id,name', 'updater:id,name'])]);
     }
 
     public function store(StoreEmployeeNoteRequest $request, Employee $employee)
@@ -37,7 +37,7 @@ class EmployeeNoteController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Note created successfully.',
-                'note' => $note->load('creator:id,name'),
+                'note' => $note->load(['creator:id,name', 'updater:id,name']),
             ], 201);
         } catch (\Exception $e) {
             Log::error('Employee note creation failed: '.$e->getMessage());
@@ -59,7 +59,7 @@ class EmployeeNoteController extends Controller
             ], 404);
         }
 
-        return response()->json(['note' => $note->load('creator:id,name')]);
+        return response()->json(['note' => $note->load(['creator:id,name', 'updater:id,name'])]);
     }
 
     public function update(UpdateEmployeeNoteRequest $request, Employee $employee, EmployeeNote $note)
@@ -73,12 +73,15 @@ class EmployeeNoteController extends Controller
                 ], 404);
             }
 
-            $updatedNote = $this->noteService->updateNote($note->id, $request->validated());
+            $updatedNote = $this->noteService->updateNote($note->id, [
+                ...$request->validated(),
+                'updated_by' => $request->user()->id,
+            ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Note updated successfully.',
-                'note' => $updatedNote->load('creator:id,name'),
+                'note' => $updatedNote->load(['creator:id,name', 'updater:id,name']),
             ]);
         } catch (\Exception $e) {
             Log::error('Employee note update failed: '.$e->getMessage());

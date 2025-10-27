@@ -83,7 +83,7 @@ export function NotesEdit({
             >
                 {activeNotes.length > 0 ? (
                     <div className="space-y-4">
-                        {[...activeNotes].reverse().map((note) => {
+                        {activeNotes.map((note) => {
                             let borderClass = 'border';
                             if (note._isNew) {
                                 borderClass = 'border-2 border-green-500';

@@ -60,16 +60,34 @@ interface Employee {
     };
     documents?: Array<{
         id: string;
-        document_type: string;
-        document_name: string;
+        doc_type: string;
+        title: string;
+        file_name: string;
         file_path: string;
-        uploaded_at: string;
+        file_url: string;
+        file_size: number;
+        expiry_date: string | null;
+        is_expired: boolean;
+        is_expiring_soon: boolean;
+        uploader?: {
+            id: string;
+            name: string;
+        };
+        created_at: string;
     }>;
     notes?: Array<{
         id: string;
-        title: string;
-        content: string;
+        note: string;
+        category: string;
+        is_private: boolean;
         created_at: string;
+        updated_at?: string;
+        creator?: {
+            name?: string;
+        };
+        updater?: {
+            name?: string;
+        };
     }>;
     customFields?: Array<{
         id: string;
