@@ -6,8 +6,15 @@ use App\Modules\Department\Models\Designation;
 use App\Modules\Employee\Models\Employee;
 use App\Modules\Employee\Models\EmployeeNote;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    // Create permissions required by the policy
+    Permission::create(['name' => 'view-private-notes']);
+    Permission::create(['name' => 'manage-private-notes']);
+});
 
 test('can list employee notes', function () {
     $user = User::factory()->create();
@@ -269,6 +276,10 @@ it('can update an employee note', function () {
 it('sets updated_by to current user when updating note', function () {
     $creator = User::factory()->create();
     $updater = User::factory()->create();
+
+    // Give updater permission to manage private notes
+    $updater->givePermissionTo('manage-private-notes');
+
     $department = Department::factory()->create();
     $designation = Designation::factory()->create();
 
