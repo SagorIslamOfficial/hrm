@@ -1,7 +1,7 @@
-export { AdditionalEdit } from './AdditionalEdit';
 export { AttendanceEdit } from './AttendanceEdit';
 export { BasicEdit } from './BasicEdit';
 export { ContactsEdit } from './ContactsEdit';
+export { CustomFieldsEdit } from './CustomFieldsEdit';
 export { DocumentsEdit } from './DocumentsEdit';
 export { JobEdit } from './JobEdit';
 export { LeaveEdit } from './LeaveEdit';

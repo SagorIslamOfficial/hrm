@@ -11,10 +11,10 @@ import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
-    AdditionalEdit,
     AttendanceEdit,
     BasicEdit,
     ContactsEdit,
+    CustomFieldsEdit,
     DocumentsEdit,
     JobEdit,
     LeaveEdit,
@@ -83,6 +83,17 @@ interface Note {
     _isDeleted?: boolean;
 }
 
+interface CustomField {
+    id: string;
+    field_key: string;
+    field_value: string;
+    field_type: string;
+    section: string;
+    _isNew?: boolean;
+    _isModified?: boolean;
+    _isDeleted?: boolean;
+}
+
 interface Employee {
     id: string;
     employee_code: string;
@@ -135,12 +146,7 @@ interface Employee {
     contacts?: Contact[];
     documents?: Document[];
     notes?: Note[];
-    customFields?: Array<{
-        id: string;
-        field_name: string;
-        field_value: string;
-        field_type: string;
-    }>;
+    custom_fields?: CustomField[];
 }
 
 interface EmployeeEditFormProps {
@@ -173,6 +179,9 @@ export function EmployeeEditForm({
     const [contacts, setContacts] = useState(employee.contacts || []);
     const [documents, setDocuments] = useState(employee.documents || []);
     const [notes, setNotes] = useState(employee.notes || []);
+    const [customFields, setCustomFields] = useState(
+        employee.custom_fields || [],
+    );
 
     // Use URL-based tab persistence hook
     const [activeTab, handleTabChange] = useUrlTab('basic');
@@ -532,6 +541,86 @@ export function EmployeeEditForm({
                 }
             }
 
+            // Then handle staged custom fields
+            const stagedCustomFields = customFields.filter(
+                (field) =>
+                    field._isNew || field._isModified || field._isDeleted,
+            );
+
+            for (const field of stagedCustomFields) {
+                try {
+                    // Skip fields that are both new and deleted
+                    if (field._isNew && field._isDeleted) {
+                        continue;
+                    }
+
+                    if (field._isDeleted && !field._isNew) {
+                        // Delete existing custom field
+                        await axios.delete(
+                            `/dashboard/employees/${employee.id}/custom-fields/${field.id}`,
+                        );
+                    } else if (field._isNew && !field._isDeleted) {
+                        // Create new custom field
+                        await axios.post(
+                            `/dashboard/employees/${employee.id}/custom-fields`,
+                            {
+                                employee_id: employee.id,
+                                field_key: field.field_key,
+                                field_value: field.field_value,
+                                field_type: field.field_type,
+                                section: field.section,
+                            },
+                        );
+                    } else if (field._isModified) {
+                        // Update existing custom field
+                        await axios.put(
+                            `/dashboard/employees/${employee.id}/custom-fields/${field.id}`,
+                            {
+                                field_key: field.field_key,
+                                field_value: field.field_value,
+                                field_type: field.field_type,
+                                section: field.section,
+                            },
+                        );
+                    }
+                } catch (customFieldError: unknown) {
+                    const error = customFieldError as {
+                        response?: {
+                            data?: {
+                                errors?: Record<string, string[]>;
+                                message?: string;
+                            };
+                        };
+                    };
+
+                    // Show specific validation error if available
+                    const validationErrors = error?.response?.data?.errors;
+                    if (
+                        validationErrors &&
+                        Object.keys(validationErrors).length > 0
+                    ) {
+                        const errorMessages = Object.entries(validationErrors)
+                            .map(
+                                ([field, messages]) =>
+                                    `${field}: ${messages.join(', ')}`,
+                            )
+                            .join(' | ');
+                        toast.error(
+                            `Custom field validation failed: ${errorMessages}`,
+                        );
+                    } else if (error?.response?.data?.message) {
+                        toast.error(
+                            `Failed to sync custom field: ${error.response.data.message}`,
+                        );
+                    } else {
+                        toast.error(
+                            'Failed to sync custom field. Please try again.',
+                        );
+                    }
+                    console.error('Custom field sync error:', error);
+                }
+            }
+
             router.reload({
                 only: ['employee'],
                 onSuccess: (page) => {
@@ -546,8 +635,11 @@ export function EmployeeEditForm({
                     if (freshEmployee?.notes) {
                         setNotes(freshEmployee.notes);
                     }
+                    if (freshEmployee?.custom_fields) {
+                        setCustomFields(freshEmployee.custom_fields);
+                    }
                     toast.success(
-                        'Employee, contacts, documents, and notes updated successfully!',
+                        'Employee updated successfully with all changes!',
                     );
                 },
                 onError: () => {
@@ -663,12 +755,42 @@ export function EmployeeEditForm({
         handleTabChange('notes');
     };
 
+    const handleCustomFieldAdd = (customFieldData: CustomField) => {
+        // Add new staged custom field
+        setCustomFields([...customFields, customFieldData]);
+        handleTabChange('customFields');
+    };
+
+    const handleCustomFieldEdit = (customFieldData: CustomField) => {
+        // Update existing custom field (staged)
+        setCustomFields(
+            customFields.map((field) =>
+                field.id === customFieldData.id ? customFieldData : field,
+            ),
+        );
+        handleTabChange('customFields');
+    };
+
+    const handleDeleteCustomField = (customFieldId: string) => {
+        // Mark custom field as deleted (staged)
+        setCustomFields(
+            customFields.map((field) =>
+                field.id === customFieldId
+                    ? { ...field, _isDeleted: true }
+                    : field,
+            ),
+        );
+        toast.success('Custom field deletion staged - save employee to apply');
+        handleTabChange('customFields');
+    };
+
     // Check if form has any changes
     const hasChanges =
         isDirty || // Form data has changed
         contacts.some((c) => c._isNew || c._isModified || c._isDeleted) || // Contacts have changed
         documents.some((d) => d._isNew || d._isModified || d._isDeleted) || // Documents have changed
-        notes.some((n) => n._isNew || n._isModified || n._isDeleted); // Notes have changed
+        notes.some((n) => n._isNew || n._isModified || n._isDeleted) || // Notes have changed
+        customFields.some((f) => f._isNew || f._isModified || f._isDeleted); // Custom fields have changed
 
     const isSuperAdminOrOwner =
         auth?.user?.is_super_admin ||
@@ -684,7 +806,7 @@ export function EmployeeEditForm({
         { value: 'notes', label: 'Notes' },
         { value: 'attendance', label: 'Attendance' },
         { value: 'leave', label: 'Leave' },
-        { value: 'additional', label: 'Additional' },
+        { value: 'customFields', label: 'Custom Fields' },
     ];
 
     return (
@@ -792,8 +914,13 @@ export function EmployeeEditForm({
                         <LeaveEdit />
                     </TabsContent>
 
-                    <TabsContent value="additional" className="space-y-6">
-                        <AdditionalEdit />
+                    <TabsContent value="customFields" className="space-y-6">
+                        <CustomFieldsEdit
+                            customFields={customFields}
+                            onCustomFieldAdd={handleCustomFieldAdd}
+                            onCustomFieldEdit={handleCustomFieldEdit}
+                            onCustomFieldDelete={handleDeleteCustomField}
+                        />
                     </TabsContent>
                 </Tabs>
 

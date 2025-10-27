@@ -1,6 +1,8 @@
 export { ContactDialog } from './ContactDialog';
 export { ContactForm } from './ContactForm';
 export { CreatedByField } from './CreatedByField';
+export { CustomFieldDialog } from './CustomFieldDialog';
+export { CustomFieldForm } from './CustomFieldForm';
 export { DataTableActions } from './DataTableActions';
 export { DateField } from './DateField';
 export { DeleteDialog } from './DeleteDialog';

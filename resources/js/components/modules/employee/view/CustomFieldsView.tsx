@@ -1,5 +1,6 @@
 import { InfoCard } from '@/components/common';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface CustomField {
     id: string;
@@ -14,28 +15,91 @@ interface CustomFieldsViewProps {
 }
 
 export function CustomFieldsView({ customFields }: CustomFieldsViewProps) {
+    const formatFieldKey = (key: string) => {
+        return key
+            .split(/[-_]/)
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
+    const formatFieldType = (type: string) => {
+        return type.charAt(0).toUpperCase() + type.slice(1);
+    };
+
+    const formatSection = (section: string) => {
+        return section.charAt(0).toUpperCase() + section.slice(1);
+    };
+
+    const groupedFields = (customFields || []).reduce(
+        (acc, field) => {
+            const section = field.section || 'other';
+            if (!acc[section]) {
+                acc[section] = [];
+            }
+            acc[section].push(field);
+            return acc;
+        },
+        {} as Record<string, CustomField[]>,
+    );
+
+    const sections = ['personal', 'professional', 'other'];
+
     return (
         <InfoCard title="Custom Fields">
             {customFields && customFields.length > 0 ? (
-                <div className="grid gap-6 md:grid-cols-2">
-                    {customFields.map((field) => (
-                        <div key={field.id}>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                {field.field_key.replace(/-/g, ' ')}{' '}
-                                <Badge variant="outline" className="ml-1">
-                                    {field.field_type}
-                                </Badge>
-                            </label>
-                            <p className="text-sm font-medium">
-                                {field.field_value}
-                            </p>
-                        </div>
-                    ))}
+                <div className="space-y-6">
+                    {sections.map((section) => {
+                        const fields = groupedFields[section] || [];
+                        if (fields.length === 0) return null;
+
+                        return (
+                            <div key={section}>
+                                <h4 className="mb-3 text-sm font-semibold text-muted-foreground">
+                                    {formatSection(section)}
+                                </h4>
+                                <div className="space-y-3">
+                                    {fields.map((field) => (
+                                        <div
+                                            key={field.id}
+                                            className="rounded-lg border p-4"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <h5 className="font-medium">
+                                                    {formatFieldKey(
+                                                        field.field_key,
+                                                    )}
+                                                </h5>
+                                                <Badge variant="outline">
+                                                    {formatFieldType(
+                                                        field.field_type,
+                                                    )}
+                                                </Badge>
+                                            </div>
+                                            <p className="mt-1 text-sm text-muted-foreground">
+                                                {field.field_value ||
+                                                    'No value set'}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground">
-                    No custom fields available
-                </p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <p className="mb-4 text-sm text-muted-foreground">
+                        Add custom fields to track employee information.
+                    </p>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        className="border"
+                        disabled
+                    >
+                        Add Custom Field
+                    </Button>
+                </div>
             )}
         </InfoCard>
     );
