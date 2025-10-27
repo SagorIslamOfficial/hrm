@@ -136,7 +136,7 @@ export function NoteForm({
                     required
                 />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-5">
                     <Label htmlFor="is_private">Private Note</Label>
                     <Switch
                         id="is_private"
