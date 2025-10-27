@@ -2,6 +2,8 @@
 
 namespace App\Modules\Employee\Providers;
 
+use App\Modules\Employee\Contracts\EmployeeCustomFieldRepositoryInterface;
+use App\Modules\Employee\Contracts\EmployeeCustomFieldServiceInterface;
 use App\Modules\Employee\Contracts\EmployeeDocumentRepositoryInterface;
 use App\Modules\Employee\Contracts\EmployeeDocumentServiceInterface;
 use App\Modules\Employee\Contracts\EmployeeNoteRepositoryInterface;
@@ -10,9 +12,11 @@ use App\Modules\Employee\Contracts\EmployeeRepositoryInterface;
 use App\Modules\Employee\Contracts\EmployeeServiceInterface;
 use App\Modules\Employee\Models\EmployeeNote;
 use App\Modules\Employee\Policies\EmployeeNotePolicy;
+use App\Modules\Employee\Repositories\EmployeeCustomFieldRepository;
 use App\Modules\Employee\Repositories\EmployeeDocumentRepository;
 use App\Modules\Employee\Repositories\EmployeeNoteRepository;
 use App\Modules\Employee\Repositories\EmployeeRepository;
+use App\Modules\Employee\Services\EmployeeCustomFieldService;
 use App\Modules\Employee\Services\EmployeeDocumentService;
 use App\Modules\Employee\Services\EmployeeNoteService;
 use App\Modules\Employee\Services\EmployeeService;
@@ -32,6 +36,8 @@ class EmployeeServiceProvider extends ServiceProvider
         $this->app->bind(EmployeeDocumentServiceInterface::class, EmployeeDocumentService::class);
         $this->app->bind(EmployeeNoteRepositoryInterface::class, EmployeeNoteRepository::class);
         $this->app->bind(EmployeeNoteServiceInterface::class, EmployeeNoteService::class);
+        $this->app->bind(EmployeeCustomFieldRepositoryInterface::class, EmployeeCustomFieldRepository::class);
+        $this->app->bind(EmployeeCustomFieldServiceInterface::class, EmployeeCustomFieldService::class);
     }
 
     /**
