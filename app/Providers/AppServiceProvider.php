@@ -30,9 +30,6 @@ class AppServiceProvider extends ServiceProvider
         $rateLimiter->for('register', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
         $rateLimiter->for('password-reset', fn (Request $request) => Limit::perMinute(2)->by($request->ip()));
 
-        Feature::define('super-admin', fn (User $user) => match (true) {
-            $user->is_super_admin => true,
-            default => false,
-        });
+        Feature::define('super-admin', fn (User $user) => $user->hasRole('Admin'));
     }
 }
