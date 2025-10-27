@@ -1,5 +1,6 @@
 import { InfoCard } from '@/components/common';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Lock } from 'lucide-react';
 
 interface Note {
@@ -108,8 +109,16 @@ export function NotesView({ notes }: NotesViewProps) {
             ) : (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                     <p className="mb-4 text-sm text-muted-foreground">
-                        No internal notes added yet. Add notes in the edit view.
+                        Add internal notes and comments about what matters.
                     </p>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        className="border"
+                        disabled
+                    >
+                        Add Note
+                    </Button>
                 </div>
             )}
         </InfoCard>

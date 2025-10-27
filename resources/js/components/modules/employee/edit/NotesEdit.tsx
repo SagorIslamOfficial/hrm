@@ -244,9 +244,14 @@ export function NotesEdit({
                 ) : (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
                         <p className="mb-4 text-sm text-muted-foreground">
-                            Add internal notes and comments about this employee.
+                            Add internal notes and comments about what matters.
                         </p>
-                        <Button variant="outline" disabled>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            className="border"
+                            disabled
+                        >
                             Add Note
                         </Button>
                     </div>
@@ -257,7 +262,6 @@ export function NotesEdit({
             <NoteDialog
                 mode="add"
                 open={isAddNoteDialogOpen}
-                onOpenChange={setIsAddNoteDialogOpen}
                 onSuccess={(noteData) => {
                     onNoteAdd(noteData);
                     setIsAddNoteDialogOpen(false);
@@ -272,9 +276,6 @@ export function NotesEdit({
             <NoteDialog
                 mode="edit"
                 open={!!editNoteDialogOpen}
-                onOpenChange={(open) => {
-                    if (!open) setEditNoteDialogOpen(null);
-                }}
                 note={
                     editNoteDialogOpen
                         ? (notes || []).find((n) => n.id === editNoteDialogOpen)
