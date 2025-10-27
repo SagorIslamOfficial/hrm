@@ -35,7 +35,6 @@ interface NoteDialogProps {
     };
     onSuccess: (data: Note) => void;
     onCancel: () => void;
-    onOpenChange?: (open: boolean) => void;
     resourceLabel?: string;
     subjectLabel?: string;
 }
@@ -47,14 +46,13 @@ export function NoteDialog({
     currentUser,
     onSuccess,
     onCancel,
-    onOpenChange,
     resourceLabel = '',
     subjectLabel = '',
 }: NoteDialogProps) {
     const isEdit = mode === 'edit';
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open}>
             <DialogContent className="max-w-2xl [&>button]:hidden">
                 <DialogHeader className="mb-4">
                     <DialogTitle>
