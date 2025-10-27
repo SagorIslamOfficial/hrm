@@ -2,6 +2,7 @@
 
 namespace App\Modules\Employee\Contracts;
 
+use App\Models\User;
 use App\Modules\Employee\Models\EmployeeNote;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,9 +17,9 @@ interface EmployeeNoteRepositoryInterface
 
     public function delete(EmployeeNote $note): bool;
 
-    public function getByEmployee(string $employeeId): Collection;
+    public function getByEmployee(string $employeeId, ?User $user = null): Collection;
 
-    public function getByEmployeeWithFilters(string $employeeId, array $filters = [], int $perPage = 10): LengthAwarePaginator;
+    public function getByEmployeeWithFilters(string $employeeId, array $filters = [], int $perPage = 10, ?User $user = null): LengthAwarePaginator;
 
     public function all(): Collection;
 }

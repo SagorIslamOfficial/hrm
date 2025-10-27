@@ -8,12 +8,15 @@ use App\Modules\Employee\Contracts\EmployeeNoteRepositoryInterface;
 use App\Modules\Employee\Contracts\EmployeeNoteServiceInterface;
 use App\Modules\Employee\Contracts\EmployeeRepositoryInterface;
 use App\Modules\Employee\Contracts\EmployeeServiceInterface;
+use App\Modules\Employee\Models\EmployeeNote;
+use App\Modules\Employee\Policies\EmployeeNotePolicy;
 use App\Modules\Employee\Repositories\EmployeeDocumentRepository;
 use App\Modules\Employee\Repositories\EmployeeNoteRepository;
 use App\Modules\Employee\Repositories\EmployeeRepository;
 use App\Modules\Employee\Services\EmployeeDocumentService;
 use App\Modules\Employee\Services\EmployeeNoteService;
 use App\Modules\Employee\Services\EmployeeService;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class EmployeeServiceProvider extends ServiceProvider
@@ -36,6 +39,9 @@ class EmployeeServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register policies
+        Gate::policy(EmployeeNote::class, EmployeeNotePolicy::class);
+
         // Load module migrations
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 

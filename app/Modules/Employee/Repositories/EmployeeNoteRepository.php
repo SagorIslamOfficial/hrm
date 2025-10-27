@@ -2,6 +2,7 @@
 
 namespace App\Modules\Employee\Repositories;
 
+use App\Models\User;
 use App\Modules\Employee\Contracts\EmployeeNoteRepositoryInterface;
 use App\Modules\Employee\Models\EmployeeNote;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -29,18 +30,34 @@ class EmployeeNoteRepository implements EmployeeNoteRepositoryInterface
         return $note->delete();
     }
 
-    public function getByEmployee(string $employeeId): Collection
+    public function getByEmployee(string $employeeId, ?User $user = null): Collection
     {
-        return EmployeeNote::with(['creator:id,name', 'updater:id,name'])
-            ->where('employee_id', $employeeId)
-            ->latest()
-            ->get();
+        $query = EmployeeNote::with(['creator:id,name', 'updater:id,name'])
+            ->where('employee_id', $employeeId);
+
+        // Filter private notes based on user permissions
+        if ($user && ! $user->hasPermissionTo('view-private-notes') && ! $user->hasRole(['Admin', 'HR'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('is_private', false)
+                    ->orWhere('created_by', $user->id);
+            });
+        }
+
+        return $query->latest()->get();
     }
 
-    public function getByEmployeeWithFilters(string $employeeId, array $filters = [], int $perPage = 10): LengthAwarePaginator
+    public function getByEmployeeWithFilters(string $employeeId, array $filters = [], int $perPage = 10, ?User $user = null): LengthAwarePaginator
     {
         $query = EmployeeNote::with(['creator', 'updater'])
             ->where('employee_id', $employeeId);
+
+        // Filter private notes based on user permissions
+        if ($user && ! $user->hasPermissionTo('view-private-notes') && ! $user->hasRole(['Admin', 'HR'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('is_private', false)
+                    ->orWhere('created_by', $user->id);
+            });
+        }
 
         if (isset($filters['category']) && $filters['category'] !== '') {
             $query->where('category', $filters['category']);

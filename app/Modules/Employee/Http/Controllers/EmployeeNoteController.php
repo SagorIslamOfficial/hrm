@@ -9,10 +9,13 @@ use App\Modules\Employee\Http\Requests\UpdateEmployeeNoteRequest;
 use App\Modules\Employee\Models\Employee;
 use App\Modules\Employee\Models\EmployeeNote;
 use App\Modules\Employee\Services\EmployeeNoteService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class EmployeeNoteController extends Controller
 {
+    use AuthorizesRequests;
     public function __construct(
         private EmployeeNoteService $noteService,
         private EmployeeNoteRepositoryInterface $noteRepository,
@@ -20,7 +23,7 @@ class EmployeeNoteController extends Controller
 
     public function index(Employee $employee)
     {
-        $notes = $this->noteRepository->getByEmployee($employee->id);
+        $notes = $this->noteRepository->getByEmployee($employee->id, Auth::user());
 
         return response()->json(['notes' => $notes->load(['creator:id,name', 'updater:id,name'])]);
     }
@@ -59,20 +62,26 @@ class EmployeeNoteController extends Controller
             ], 404);
         }
 
+        // Authorize view access
+        $this->authorize('view', $note);
+
         return response()->json(['note' => $note->load(['creator:id,name', 'updater:id,name'])]);
     }
 
     public function update(UpdateEmployeeNoteRequest $request, Employee $employee, EmployeeNote $note)
     {
-        try {
-            // Ensure the note belongs to the employee
-            if ($note->employee_id !== $employee->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Note not found.',
-                ], 404);
-            }
+        // Ensure the note belongs to the employee
+        if ($note->employee_id !== $employee->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Note not found.',
+            ], 404);
+        }
 
+        // Authorize update access
+        $this->authorize('update', $note);
+
+        try {
             $updatedNote = $this->noteService->updateNote($note->id, [
                 ...$request->validated(),
                 'updated_by' => $request->user()->id,
@@ -95,15 +104,18 @@ class EmployeeNoteController extends Controller
 
     public function destroy(Employee $employee, EmployeeNote $note)
     {
-        try {
-            // Ensure the note belongs to the employee
-            if ($note->employee_id !== $employee->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Note not found.',
-                ], 404);
-            }
+        // Ensure the note belongs to the employee
+        if ($note->employee_id !== $employee->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Note not found.',
+            ], 404);
+        }
 
+        // Authorize delete access
+        $this->authorize('delete', $note);
+
+        try {
             $this->noteService->deleteNote($note->id);
 
             return response()->json([
