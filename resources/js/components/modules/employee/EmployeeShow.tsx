@@ -159,7 +159,7 @@ export function EmployeeShow({ employee, className }: EmployeeShowFormProps) {
         { value: 'notes', label: 'Notes' },
         { value: 'attendance', label: 'Attendance' },
         { value: 'leaves', label: 'Leaves' },
-        { value: 'custom', label: 'Custom' },
+        { value: 'customFields', label: 'Custom Fields' },
     ];
 
     return (
@@ -216,7 +216,7 @@ export function EmployeeShow({ employee, className }: EmployeeShowFormProps) {
                     <LeavesView leaves={employee.leaves} />
                 </TabsContent>
 
-                <TabsContent value="custom" className="space-y-4">
+                <TabsContent value="customFields" className="space-y-4">
                     <CustomFieldsView customFields={employee.custom_fields} />
                 </TabsContent>
             </Tabs>
