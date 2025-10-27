@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Modules\Employee\Database\Factories\EmployeeNoteFactory;
 
+/**
+ * @property string $id
+ * @property string $employee_id
+ * @property string $created_by
+ * @property string $note
+ * @property bool $is_private
+ * @property string $category
+ */
 class EmployeeNote extends Model
 {
     use HasFactory, HasUuids;

@@ -65,6 +65,20 @@ interface Document {
     _isDeleted?: boolean;
 }
 
+interface Note {
+    id: string;
+    note: string;
+    category: string;
+    is_private: boolean;
+    created_at: string;
+    creator?: {
+        name?: string;
+    };
+    _isNew?: boolean;
+    _isModified?: boolean;
+    _isDeleted?: boolean;
+}
+
 interface Employee {
     id: string;
     employee_code: string;
@@ -116,12 +130,7 @@ interface Employee {
     };
     contacts?: Contact[];
     documents?: Document[];
-    notes?: Array<{
-        id: string;
-        title: string;
-        content: string;
-        created_at: string;
-    }>;
+    notes?: Note[];
     customFields?: Array<{
         id: string;
         field_name: string;
@@ -159,6 +168,7 @@ export function EmployeeEditForm({
 }: EmployeeEditFormProps) {
     const [contacts, setContacts] = useState(employee.contacts || []);
     const [documents, setDocuments] = useState(employee.documents || []);
+    const [notes, setNotes] = useState(employee.notes || []);
 
     // Use URL-based tab persistence hook
     const [activeTab, handleTabChange] = useUrlTab('basic');
@@ -446,6 +456,78 @@ export function EmployeeEditForm({
                 }
             }
 
+            // Then handle staged notes
+            const stagedNotes = notes.filter(
+                (note) => note._isNew || note._isModified || note._isDeleted,
+            );
+
+            for (const note of stagedNotes) {
+                try {
+                    // Skip notes that are both new and deleted
+                    if (note._isNew && note._isDeleted) {
+                        continue;
+                    }
+
+                    if (note._isDeleted && !note._isNew) {
+                        // Delete existing note
+                        await axios.delete(
+                            `/dashboard/employees/${employee.id}/notes/${note.id}`,
+                        );
+                    } else if (note._isNew && !note._isDeleted) {
+                        // Create new note
+                        await axios.post(
+                            `/dashboard/employees/${employee.id}/notes`,
+                            {
+                                note: note.note,
+                                category: note.category,
+                                is_private: note.is_private,
+                            },
+                        );
+                    } else if (note._isModified) {
+                        // Update existing note
+                        await axios.put(
+                            `/dashboard/employees/${employee.id}/notes/${note.id}`,
+                            {
+                                note: note.note,
+                                category: note.category,
+                                is_private: note.is_private,
+                            },
+                        );
+                    }
+                } catch (noteError: unknown) {
+                    const error = noteError as {
+                        response?: {
+                            data?: {
+                                errors?: Record<string, string[]>;
+                                message?: string;
+                            };
+                        };
+                    };
+
+                    // Show specific validation error if available
+                    const validationErrors = error?.response?.data?.errors;
+                    if (
+                        validationErrors &&
+                        Object.keys(validationErrors).length > 0
+                    ) {
+                        const errorMessages = Object.entries(validationErrors)
+                            .map(
+                                ([field, messages]) =>
+                                    `${field}: ${messages.join(', ')}`,
+                            )
+                            .join(' | ');
+                        toast.error(`Note validation failed: ${errorMessages}`);
+                    } else if (error?.response?.data?.message) {
+                        toast.error(
+                            `Failed to sync note: ${error.response.data.message}`,
+                        );
+                    } else {
+                        toast.error('Failed to sync note. Please try again.');
+                    }
+                    console.error('Note sync error:', error);
+                }
+            }
+
             router.reload({
                 only: ['employee'],
                 onSuccess: (page) => {
@@ -457,8 +539,11 @@ export function EmployeeEditForm({
                     if (freshEmployee?.documents) {
                         setDocuments(freshEmployee.documents);
                     }
+                    if (freshEmployee?.notes) {
+                        setNotes(freshEmployee.notes);
+                    }
                     toast.success(
-                        'Employee, contacts, and documents updated successfully!',
+                        'Employee, contacts, documents, and notes updated successfully!',
                     );
                 },
                 onError: () => {
@@ -534,11 +619,37 @@ export function EmployeeEditForm({
         handleTabChange('documents');
     };
 
+    const handleNoteAdd = (noteData: Note) => {
+        // Add new staged note
+        setNotes([...notes, noteData]);
+        handleTabChange('notes');
+    };
+
+    const handleNoteEdit = (noteData: Note) => {
+        // Update existing note (staged)
+        setNotes(
+            notes.map((note) => (note.id === noteData.id ? noteData : note)),
+        );
+        handleTabChange('notes');
+    };
+
+    const handleDeleteNote = (noteId: string) => {
+        // Mark note as deleted (staged)
+        setNotes(
+            notes.map((note) =>
+                note.id === noteId ? { ...note, _isDeleted: true } : note,
+            ),
+        );
+        toast.success('Note deletion staged - save employee to apply');
+        handleTabChange('notes');
+    };
+
     // Check if form has any changes
     const hasChanges =
         isDirty || // Form data has changed
         contacts.some((c) => c._isNew || c._isModified || c._isDeleted) || // Contacts have changed
-        documents.some((d) => d._isNew || d._isModified || d._isDeleted); // Documents have changed
+        documents.some((d) => d._isNew || d._isModified || d._isDeleted) || // Documents have changed
+        notes.some((n) => n._isNew || n._isModified || n._isDeleted); // Notes have changed
 
     const isSuperAdminOrOwner =
         auth?.user?.is_super_admin ||
@@ -642,7 +753,16 @@ export function EmployeeEditForm({
                     </TabsContent>
 
                     <TabsContent value="notes" className="space-y-6">
-                        <NotesEdit />
+                        <NotesEdit
+                            notes={notes}
+                            onNoteAdd={handleNoteAdd}
+                            onNoteEdit={handleNoteEdit}
+                            onNoteDelete={handleDeleteNote}
+                            currentUser={{
+                                id: auth?.user?.id || '',
+                                name: auth?.user?.name,
+                            }}
+                        />
                     </TabsContent>
 
                     <TabsContent value="attendance" className="space-y-6">

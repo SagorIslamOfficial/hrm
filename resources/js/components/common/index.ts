@@ -11,6 +11,8 @@ export { EmptyState } from './EmptyState';
 export { FileUploadField } from './FileUploadField';
 export { FormActions } from './FormActions';
 export { InfoCard } from './InfoCard';
+export { NoteDialog } from './NoteDialog';
+export { NoteForm } from './NoteForm';
 export { NumberField } from './NumberField';
 export { PageHeader } from './PageHeader';
 export { PhotoDialog } from './PhotoDialog';
@@ -18,6 +20,7 @@ export { PhotoUploadField } from './PhotoUploadField';
 export { SelectField } from './SelectField';
 export { StatusBadge } from './StatusBadge';
 export { TabsNavigation } from './TabsNavigation';
+export { TextareaField } from './TextareaField';
 export { TextField } from './TextField';
 
 // Utilities

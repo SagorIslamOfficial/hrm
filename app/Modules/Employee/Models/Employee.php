@@ -16,6 +16,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @property string $id
+ * @property string $employee_code
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $email
+ * @property string $phone
+ * @property string $photo
+ * @property string $department_id
+ * @property string $designation_id
+ * @property string $employment_status
+ * @property string $employment_type
+ * @property string $joining_date
+ */
 class Employee extends Model
 {
     use FileUploadTrait, HasFactory, HasUuids, SoftDeletes;

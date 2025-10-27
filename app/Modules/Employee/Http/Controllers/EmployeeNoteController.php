@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Modules\Employee\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Modules\Employee\Contracts\EmployeeNoteRepositoryInterface;
+use App\Modules\Employee\Http\Requests\StoreEmployeeNoteRequest;
+use App\Modules\Employee\Http\Requests\UpdateEmployeeNoteRequest;
+use App\Modules\Employee\Models\Employee;
+use App\Modules\Employee\Models\EmployeeNote;
+use App\Modules\Employee\Services\EmployeeNoteService;
+use Illuminate\Support\Facades\Log;
+
+class EmployeeNoteController extends Controller
+{
+    public function __construct(
+        private EmployeeNoteService $noteService,
+        private EmployeeNoteRepositoryInterface $noteRepository,
+    ) {}
+
+    public function index(Employee $employee)
+    {
+        $notes = $this->noteRepository->getByEmployee($employee->id);
+
+        return response()->json(['notes' => $notes]);
+    }
+
+    public function store(StoreEmployeeNoteRequest $request, Employee $employee)
+    {
+        try {
+            $note = $this->noteService->createNote([
+                ...$request->validated(),
+                'employee_id' => $employee->id,
+                'created_by' => $request->user()->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Note created successfully.',
+                'note' => $note->load('creator:id,name'),
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Employee note creation failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create note. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function show(Employee $employee, EmployeeNote $note)
+    {
+        // Ensure the note belongs to the employee
+        if ($note->employee_id !== $employee->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Note not found.',
+            ], 404);
+        }
+
+        return response()->json(['note' => $note->load('creator:id,name')]);
+    }
+
+    public function update(UpdateEmployeeNoteRequest $request, Employee $employee, EmployeeNote $note)
+    {
+        try {
+            // Ensure the note belongs to the employee
+            if ($note->employee_id !== $employee->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Note not found.',
+                ], 404);
+            }
+
+            $updatedNote = $this->noteService->updateNote($note->id, $request->validated());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Note updated successfully.',
+                'note' => $updatedNote->load('creator:id,name'),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Employee note update failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update note. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function destroy(Employee $employee, EmployeeNote $note)
+    {
+        try {
+            // Ensure the note belongs to the employee
+            if ($note->employee_id !== $employee->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Note not found.',
+                ], 404);
+            }
+
+            $this->noteService->deleteNote($note->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Note deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Employee note deletion failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete note. Please try again.',
+            ], 500);
+        }
+    }
+}

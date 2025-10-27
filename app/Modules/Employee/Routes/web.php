@@ -3,6 +3,7 @@
 use App\Modules\Employee\Http\Controllers\EmployeeContactController;
 use App\Modules\Employee\Http\Controllers\EmployeeController;
 use App\Modules\Employee\Http\Controllers\EmployeeDocumentController;
+use App\Modules\Employee\Http\Controllers\EmployeeNoteController;
 use App\Modules\Employee\Http\Controllers\EmploymentTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,10 @@ Route::middleware(['employee.access'])->group(function () {
     // Document Download
     Route::get('employees/{employee}/documents/{document}/download', [EmployeeDocumentController::class, 'download'])
         ->name('employees.documents.download');
+
+    // Notes
+    Route::resource('employees.notes', EmployeeNoteController::class)
+        ->except(['create', 'edit']);
 
     // Type
     Route::resource('employment-types', EmploymentTypeController::class)

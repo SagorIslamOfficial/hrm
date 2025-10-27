@@ -4,11 +4,15 @@ namespace App\Modules\Employee\Providers;
 
 use App\Modules\Employee\Contracts\EmployeeDocumentRepositoryInterface;
 use App\Modules\Employee\Contracts\EmployeeDocumentServiceInterface;
+use App\Modules\Employee\Contracts\EmployeeNoteRepositoryInterface;
+use App\Modules\Employee\Contracts\EmployeeNoteServiceInterface;
 use App\Modules\Employee\Contracts\EmployeeRepositoryInterface;
 use App\Modules\Employee\Contracts\EmployeeServiceInterface;
 use App\Modules\Employee\Repositories\EmployeeDocumentRepository;
+use App\Modules\Employee\Repositories\EmployeeNoteRepository;
 use App\Modules\Employee\Repositories\EmployeeRepository;
 use App\Modules\Employee\Services\EmployeeDocumentService;
+use App\Modules\Employee\Services\EmployeeNoteService;
 use App\Modules\Employee\Services\EmployeeService;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +27,8 @@ class EmployeeServiceProvider extends ServiceProvider
         $this->app->bind(EmployeeServiceInterface::class, EmployeeService::class);
         $this->app->bind(EmployeeDocumentRepositoryInterface::class, EmployeeDocumentRepository::class);
         $this->app->bind(EmployeeDocumentServiceInterface::class, EmployeeDocumentService::class);
+        $this->app->bind(EmployeeNoteRepositoryInterface::class, EmployeeNoteRepository::class);
+        $this->app->bind(EmployeeNoteServiceInterface::class, EmployeeNoteService::class);
     }
 
     /**
