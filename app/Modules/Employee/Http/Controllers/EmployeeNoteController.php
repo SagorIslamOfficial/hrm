@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 class EmployeeNoteController extends Controller
 {
     use AuthorizesRequests;
+
     public function __construct(
         private EmployeeNoteService $noteService,
         private EmployeeNoteRepositoryInterface $noteRepository,

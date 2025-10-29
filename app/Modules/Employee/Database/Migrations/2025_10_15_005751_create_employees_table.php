@@ -24,6 +24,7 @@ return new class extends Migration
             $table->enum('employment_status', ['active', 'inactive', 'terminated', 'on_leave'])->default('active');
             $table->enum('employment_type', ['permanent', 'contract', 'intern', 'part_time'])->default('permanent');
             $table->date('joining_date')->nullable();
+            $table->string('currency')->default('BDT');
             $table->timestamps();
             $table->softDeletes();
         });

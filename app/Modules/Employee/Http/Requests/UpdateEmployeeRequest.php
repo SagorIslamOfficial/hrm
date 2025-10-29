@@ -3,8 +3,8 @@
 namespace App\Modules\Employee\Http\Requests;
 
 use App\Modules\Employee\Models\EmploymentType;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateEmployeeRequest extends FormRequest
 {
@@ -13,7 +13,7 @@ class UpdateEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Add authorization logic as needed
+        return true;
     }
 
     /**
@@ -44,6 +44,7 @@ class UpdateEmployeeRequest extends FormRequest
             'employment_status' => 'sometimes|in:active,inactive,terminated,on_leave',
             'employment_type' => 'sometimes|in:'.$validEmploymentTypes,
             'joining_date' => 'sometimes|date|before_or_equal:today',
+            'currency' => 'sometimes|string|size:3',
 
             // Personal details
             'personal_detail.date_of_birth' => 'nullable|date|before:today',

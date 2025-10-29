@@ -35,7 +35,8 @@ export function UseEmployeeColumns({
             ),
         },
         {
-            accessorKey: 'first_name',
+            id: 'name',
+            accessorFn: (row) => `${row.first_name} ${row.last_name}`,
             header: 'Name',
             cell: ({ row }) => (
                 <div>

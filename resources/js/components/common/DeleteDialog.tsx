@@ -42,10 +42,16 @@ export function DeleteDialog({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleClose}>
+                    <AlertDialogCancel
+                        onClick={handleClose}
+                        className="cursor-pointer"
+                    >
                         {cancelLabel}
                     </AlertDialogCancel>
-                    <AlertDialogAction onClick={onConfirm}>
+                    <AlertDialogAction
+                        onClick={onConfirm}
+                        className="cursor-pointer"
+                    >
                         {confirmLabel}
                     </AlertDialogAction>
                 </AlertDialogFooter>

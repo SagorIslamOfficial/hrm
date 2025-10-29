@@ -1,5 +1,7 @@
-import { InfoCard } from '@/components/common';
+import { EmptyActionState, InfoCard } from '@/components/common';
 import { Separator } from '@/components/ui/separator';
+import { getCurrencySymbol } from '@/config/currency';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface SalaryDetail {
     basic_salary: number;
@@ -14,9 +16,23 @@ interface SalaryDetail {
 
 interface SalaryViewProps {
     salaryDetail?: SalaryDetail;
+    currency?: string;
 }
 
-export function SalaryView({ salaryDetail }: SalaryViewProps) {
+export function SalaryView({
+    salaryDetail,
+    currency: currencyProp,
+}: SalaryViewProps) {
+    const defaultCurrency = useCurrency();
+    const currency = currencyProp || defaultCurrency;
+    const formatAmountOnly = (amount: number) => {
+        const num = Number(amount ?? 0);
+        const hasFraction = !Number.isInteger(num) && !Number.isNaN(num);
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: hasFraction ? 2 : 0,
+            maximumFractionDigits: hasFraction ? 2 : 0,
+        }).format(num);
+    };
     return (
         <InfoCard title="Salary Information">
             {salaryDetail ? (
@@ -27,7 +43,14 @@ export function SalaryView({ salaryDetail }: SalaryViewProps) {
                                 Basic Salary
                             </label>
                             <p className="text-sm font-medium">
-                                ${salaryDetail.basic_salary.toLocaleString()}
+                                <span className="mr-1 font-medium text-primary">
+                                    {currency} {getCurrencySymbol(currency)}
+                                </span>
+                                <span>
+                                    {formatAmountOnly(
+                                        salaryDetail.basic_salary,
+                                    )}
+                                </span>
                             </p>
                         </div>
                         <div>
@@ -35,7 +58,12 @@ export function SalaryView({ salaryDetail }: SalaryViewProps) {
                                 Allowances
                             </label>
                             <p className="text-sm font-medium">
-                                ${salaryDetail.allowances.toLocaleString()}
+                                <span className="mr-1 font-medium text-primary">
+                                    {currency} {getCurrencySymbol(currency)}
+                                </span>
+                                <span>
+                                    {formatAmountOnly(salaryDetail.allowances)}
+                                </span>
                             </p>
                         </div>
                         <div>
@@ -43,7 +71,12 @@ export function SalaryView({ salaryDetail }: SalaryViewProps) {
                                 Deductions
                             </label>
                             <p className="text-sm font-medium">
-                                ${salaryDetail.deductions.toLocaleString()}
+                                <span className="mr-1 font-medium text-primary">
+                                    {currency} {getCurrencySymbol(currency)}
+                                </span>
+                                <span>
+                                    {formatAmountOnly(salaryDetail.deductions)}
+                                </span>
                             </p>
                         </div>
                         <div>
@@ -51,7 +84,12 @@ export function SalaryView({ salaryDetail }: SalaryViewProps) {
                                 Net Salary
                             </label>
                             <p className="text-lg font-bold">
-                                ${salaryDetail.net_salary.toLocaleString()}
+                                <span className="mr-1 font-medium text-primary">
+                                    {currency} {getCurrencySymbol(currency)}
+                                </span>
+                                <span>
+                                    {formatAmountOnly(salaryDetail.net_salary)}
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -92,9 +130,10 @@ export function SalaryView({ salaryDetail }: SalaryViewProps) {
                     </div>
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground">
-                    No salary details available
-                </p>
+                <EmptyActionState
+                    message="Add salary details to manage employee compensation."
+                    buttonText="Add Salary Details"
+                />
             )}
         </InfoCard>
     );

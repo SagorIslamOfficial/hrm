@@ -1,31 +1,16 @@
-import { DeleteDialog, DocumentDialog, InfoCard } from '@/components/common';
-import { Badge } from '@/components/ui/badge';
+import {
+    DataTableActions,
+    DeleteDialog,
+    EmptyActionState,
+    InfoCard,
+    ResourceDialog,
+} from '@/components/common';
+import { DocumentForm } from '@/components/common/DocumentForm';
+import { EntityHeader, GetBorderClass } from '@/components/common/EntityHeader';
+import type { Document } from '@/components/common/interfaces';
 import { Button } from '@/components/ui/button';
-import { FileText, SquarePen, Trash2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { useState } from 'react';
-
-interface Document {
-    id: string;
-    doc_type: string;
-    title: string;
-    file_name: string;
-    file_path: string;
-    file_url: string;
-    file_size: number;
-    expiry_date: string | null;
-    is_expired: boolean;
-    is_expiring_soon: boolean;
-    uploader?: {
-        id: string;
-        name: string;
-    };
-    created_at: string;
-    // Staging properties for pending changes
-    _documentFile?: File;
-    _isNew?: boolean;
-    _isModified?: boolean;
-    _isDeleted?: boolean;
-}
 
 interface DocumentsEditProps {
     documents: Document[];
@@ -105,13 +90,10 @@ export function DocumentsEdit({
                         {documents
                             .filter((doc) => !doc._isDeleted)
                             .map((doc) => {
-                                // Determine border color based on staging state
-                                let borderClass = 'border';
-                                if (doc._isNew) {
-                                    borderClass = 'border-2 border-green-500';
-                                } else if (doc._isModified) {
-                                    borderClass = 'border-2 border-yellow-500';
-                                }
+                                const borderClass = GetBorderClass(
+                                    doc._isNew,
+                                    doc._isModified,
+                                );
 
                                 return (
                                     <div
@@ -122,42 +104,48 @@ export function DocumentsEdit({
                                             <div>
                                                 <FileText className="size-8 text-muted-foreground" />
                                             </div>
+
                                             <div className="flex-1 space-y-2">
                                                 <div className="flex items-center gap-2">
-                                                    <h4 className="text-lg font-semibold">
-                                                        {doc.title}
-                                                    </h4>
-                                                    {doc._isNew && (
-                                                        <Badge
-                                                            className="border-green-500 bg-green-100 text-green-800 hover:bg-green-200"
-                                                            variant="outline"
-                                                        >
-                                                            New
-                                                        </Badge>
-                                                    )}
-                                                    {doc._isModified && (
-                                                        <Badge
-                                                            className="border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                                            variant="outline"
-                                                        >
-                                                            Modified
-                                                        </Badge>
-                                                    )}
-                                                    {doc.is_expired && (
-                                                        <Badge variant="destructive">
-                                                            Expired
-                                                        </Badge>
-                                                    )}
-                                                    {!doc.is_expired &&
-                                                        doc.is_expiring_soon && (
-                                                            <Badge
-                                                                variant="outline"
-                                                                className="border-yellow-500 bg-yellow-50 text-yellow-700"
-                                                            >
-                                                                Expiring Soon
-                                                            </Badge>
-                                                        )}
+                                                    <EntityHeader
+                                                        name={doc.title}
+                                                        badges={[
+                                                            {
+                                                                show: doc._isNew,
+                                                                label: 'New',
+                                                                variant:
+                                                                    'outline',
+                                                                className:
+                                                                    'border-green-500 bg-green-100 text-green-800 hover:bg-green-200',
+                                                            },
+                                                            {
+                                                                show: doc._isModified,
+                                                                label: 'Modified',
+                                                                variant:
+                                                                    'outline',
+                                                                className:
+                                                                    'border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+                                                            },
+                                                            {
+                                                                show: doc.is_expired,
+                                                                label: 'Expired',
+                                                                variant:
+                                                                    'destructive',
+                                                            },
+                                                            {
+                                                                show:
+                                                                    !doc.is_expired &&
+                                                                    doc.is_expiring_soon,
+                                                                label: 'Expiring Soon',
+                                                                variant:
+                                                                    'outline',
+                                                                className:
+                                                                    'border-yellow-500 bg-yellow-50 text-yellow-700',
+                                                            },
+                                                        ]}
+                                                    />
                                                 </div>
+
                                                 <div className="space-y-1 text-sm">
                                                     <div>
                                                         <span className="text-muted-foreground">
@@ -173,6 +161,7 @@ export function DocumentsEdit({
                                                         </span>{' '}
                                                         {doc.file_name}
                                                     </div>
+
                                                     <div>
                                                         <span className="text-muted-foreground">
                                                             Size:
@@ -193,6 +182,7 @@ export function DocumentsEdit({
                                                             </>
                                                         )}
                                                     </div>
+
                                                     {doc.uploader && (
                                                         <div>
                                                             <span className="text-muted-foreground">
@@ -203,33 +193,22 @@ export function DocumentsEdit({
                                                     )}
                                                 </div>
                                             </div>
+
                                             <div className="absolute top-1/2 right-4 flex -translate-y-1/2 gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="cursor-pointer"
-                                                    onClick={() =>
+                                                <DataTableActions
+                                                    item={doc}
+                                                    onEdit={() =>
                                                         setEditDocumentDialogOpen(
                                                             doc.id,
                                                         )
                                                     }
-                                                >
-                                                    <SquarePen className="h-4 w-4 text-primary" />
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="cursor-pointer"
-                                                    onClick={() =>
+                                                    onDelete={() =>
                                                         setDeleteDocumentDialogOpen(
                                                             doc.id,
                                                         )
                                                     }
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                </Button>
+                                                    showView={false}
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -237,45 +216,44 @@ export function DocumentsEdit({
                             })}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <p className="mb-4 text-sm text-muted-foreground">
-                            Upload and manage employee documents like contracts,
-                            certificates, and identification.
-                        </p>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            className="border"
-                            disabled
-                        >
-                            Upload Document
-                        </Button>
-                    </div>
+                    <EmptyActionState
+                        message="Upload and manage employee documents like contracts,
+                            certificates, and identification."
+                        buttonText="Add Document"
+                    />
                 )}
             </InfoCard>
 
             {/* Add Document Dialog */}
-            <DocumentDialog
+            <ResourceDialog
                 mode="add"
                 open={isAddDocumentDialogOpen}
-                onSuccess={handleDocumentAdd}
-                onCancel={handleDocumentAddCancel}
                 resourceLabel="Document"
                 subjectLabel="employee"
-            />
+            >
+                <DocumentForm
+                    onSuccess={handleDocumentAdd}
+                    onCancel={handleDocumentAddCancel}
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Edit Document Dialog */}
-            <DocumentDialog
+            <ResourceDialog
                 mode="edit"
                 open={!!editDocumentDialogOpen}
-                document={documents.find(
-                    (d) => d.id === editDocumentDialogOpen,
-                )}
-                onSuccess={handleDocumentEdit}
-                onCancel={handleDocumentEditCancel}
                 resourceLabel="Document"
                 subjectLabel="employee"
-            />
+            >
+                <DocumentForm
+                    document={documents.find(
+                        (d) => d.id === editDocumentDialogOpen,
+                    )}
+                    onSuccess={handleDocumentEdit}
+                    onCancel={handleDocumentEditCancel}
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Delete Document Dialog */}
             <DeleteDialog

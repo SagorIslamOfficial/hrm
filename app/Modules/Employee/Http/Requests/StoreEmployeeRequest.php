@@ -3,8 +3,8 @@
 namespace App\Modules\Employee\Http\Requests;
 
 use App\Modules\Employee\Models\EmploymentType;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreEmployeeRequest extends FormRequest
 {
@@ -13,7 +13,7 @@ class StoreEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Add authorization logic as needed
+        return true;
     }
 
     /**
@@ -40,6 +40,7 @@ class StoreEmployeeRequest extends FormRequest
             'employment_status' => 'required|in:active,inactive,terminated,on_leave',
             'employment_type' => 'required|in:'.$validEmploymentTypes,
             'joining_date' => 'required|date|before_or_equal:today',
+            'currency' => 'sometimes|string|size:3',
 
             // Allow nested data for comprehensive employee creation
             'personal_detail' => 'nullable|array',

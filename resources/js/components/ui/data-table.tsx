@@ -37,12 +37,14 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     searchPlaceholder?: string;
+    globalSearchKeys?: (keyof TData)[];
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
     searchPlaceholder = 'Search all columns...',
+    globalSearchKeys,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -68,16 +70,23 @@ export function DataTable<TData, TValue>({
             const searchValue = filterValue.toLowerCase().trim();
             if (!searchValue) return true;
 
-            // Get all cell values from the row
+            if (globalSearchKeys && globalSearchKeys.length > 0) {
+                return globalSearchKeys.some((key) => {
+                    const value = row.original[key];
+                    return value
+                        ? String(value).toLowerCase().includes(searchValue)
+                        : false;
+                });
+            }
+
+            // Fallback to original cell-based search
             const rowValues = row.getAllCells().map((cell) => {
                 const value = cell.getValue();
                 return value ? String(value).toLowerCase() : '';
             });
 
-            // Check if any cell value contains the search term as a substring
             return rowValues.some((value) => {
                 if (!value) return false;
-
                 return value.includes(searchValue);
             });
         },

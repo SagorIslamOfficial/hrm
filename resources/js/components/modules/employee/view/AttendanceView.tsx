@@ -1,4 +1,4 @@
-import { InfoCard } from '@/components/common';
+import { EmptyActionState, InfoCard } from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 
 interface Attendance {
@@ -73,9 +73,10 @@ export function AttendanceView({ attendance }: AttendanceViewProps) {
                     ))}
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground">
-                    No attendance records available
-                </p>
+                <EmptyActionState
+                    message="Add attendance records to track employee information."
+                    buttonText="Add Attendance Record"
+                />
             )}
         </InfoCard>
     );

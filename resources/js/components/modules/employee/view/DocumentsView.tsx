@@ -1,4 +1,8 @@
-import { DocumentPreviewDialog, InfoCard } from '@/components/common';
+import {
+    DocumentPreviewDialog,
+    EmptyActionState,
+    InfoCard,
+} from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Eye, FileText } from 'lucide-react';
@@ -135,20 +139,11 @@ export function DocumentsView({ documents, employeeId }: DocumentsViewProps) {
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <p className="mb-4 text-sm text-muted-foreground">
-                        Upload and manage employee documents like contracts,
-                        certificates, and identification.
-                    </p>
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        className="border"
-                        disabled
-                    >
-                        Upload Document
-                    </Button>
-                </div>
+                <EmptyActionState
+                    message="Upload and manage employee documents like contracts,
+                        certificates, and identification."
+                    buttonText="Add Document"
+                />
             )}
 
             {/* Document Preview Dialog */}

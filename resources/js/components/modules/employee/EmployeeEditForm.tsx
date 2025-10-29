@@ -7,7 +7,12 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useUrlTab } from '@/hooks';
 import { update as employeesUpdate } from '@/routes/employees/index';
 import { router, useForm } from '@inertiajs/react';
-import axios from 'axios';
+// axios removed - use lib helpers
+import * as ContactsApi from '@/lib/employee/contacts';
+import * as CustomFieldsApi from '@/lib/employee/customFields';
+import * as DocumentsApi from '@/lib/employee/documents';
+import * as NotesApi from '@/lib/employee/notes';
+import processAndReport from '@/lib/employee/processAndReport';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -106,6 +111,7 @@ interface Employee {
     employment_status: string;
     employment_type: string;
     joining_date: string;
+    currency?: string;
     department?: {
         id: string;
         name: string;
@@ -127,7 +133,6 @@ interface Employee {
     };
     job_detail?: {
         job_title?: string;
-        employment_type?: string;
         supervisor_id?: string;
         work_shift?: string;
         probation_end_date?: string;
@@ -229,9 +234,6 @@ export function EmployeeEditForm({
         // Job details
         job_detail: {
             job_title: employee.job_detail?.job_title || '',
-            employment_type:
-                employee.job_detail?.employment_type ||
-                employee.employment_type,
             supervisor_id: employee.job_detail?.supervisor_id || '',
             work_shift: employee.job_detail?.work_shift || '',
             probation_end_date: formatDateForInput(
@@ -254,6 +256,9 @@ export function EmployeeEditForm({
             bank_branch: employee.salary_detail?.bank_branch || '',
             tax_id: employee.salary_detail?.tax_id || '',
         },
+
+        // Currency
+        currency: employee.currency || 'BDT',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -269,357 +274,115 @@ export function EmployeeEditForm({
                 });
             });
 
-            // Then handle staged contacts
-            const stagedContacts = contacts.filter(
-                (contact) =>
-                    contact._isNew || contact._isModified || contact._isDeleted,
+            // Then handle staged contacts/documents/notes/custom fields via processAndReport
+            await processAndReport<Contact>(
+                contacts,
+                {
+                    isNew: (c) => Boolean(c._isNew),
+                    isModified: (c) => Boolean(c._isModified),
+                    isDeleted: (c) => Boolean(c._isDeleted),
+                    create: (c) =>
+                        ContactsApi.createContact(employee.id, {
+                            contact_name: c.contact_name,
+                            relationship: c.relationship,
+                            phone: c.phone,
+                            email: c.email || '',
+                            address: c.address || '',
+                            is_primary: Boolean(c.is_primary),
+                            _photoFile: c._photoFile,
+                        }),
+                    update: (c) =>
+                        ContactsApi.updateContact(employee.id, c.id, {
+                            contact_name: c.contact_name,
+                            relationship: c.relationship,
+                            phone: c.phone,
+                            email: c.email || '',
+                            address: c.address || '',
+                            is_primary: Boolean(c.is_primary),
+                            _photoFile: c._photoFile,
+                        }),
+                    remove: (c) => ContactsApi.deleteContact(employee.id, c.id),
+                },
+                {
+                    label: 'contact',
+                    getItemLabel: (c) => c.contact_name || 'contact',
+                },
             );
 
-            for (const contact of stagedContacts) {
-                try {
-                    // Skip contacts that are both new and deleted
-                    if (contact._isNew && contact._isDeleted) {
-                        continue;
-                    }
-
-                    if (contact._isDeleted && !contact._isNew) {
-                        // Delete existing contact
-                        await axios.delete(
-                            `/dashboard/employees/${employee.id}/contacts/${contact.id}`,
-                        );
-                    } else if (contact._isNew && !contact._isDeleted) {
-                        // Create new contact
-                        const formData = new FormData();
-                        formData.append('contact_name', contact.contact_name);
-                        formData.append('relationship', contact.relationship);
-                        formData.append('phone', contact.phone);
-                        formData.append('email', contact.email || '');
-                        formData.append('address', contact.address || '');
-                        formData.append(
-                            'is_primary',
-                            contact.is_primary ? '1' : '0',
-                        );
-
-                        if (contact._photoFile) {
-                            formData.append('photo', contact._photoFile);
-                        }
-
-                        await axios.post(
-                            `/dashboard/employees/${employee.id}/contacts`,
-                            formData,
-                            {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                },
-                            },
-                        );
-                    } else if (contact._isModified) {
-                        // Update existing contact
-                        const formData = new FormData();
-                        formData.append('contact_name', contact.contact_name);
-                        formData.append('relationship', contact.relationship);
-                        formData.append('phone', contact.phone);
-                        formData.append('email', contact.email || '');
-                        formData.append('address', contact.address || '');
-                        formData.append(
-                            'is_primary',
-                            contact.is_primary ? '1' : '0',
-                        );
-                        formData.append('_method', 'put');
-
-                        if (contact._photoFile) {
-                            formData.append('photo', contact._photoFile);
-                        }
-
-                        await axios.post(
-                            `/dashboard/employees/${employee.id}/contacts/${contact.id}`,
-                            formData,
-                            {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                },
-                            },
-                        );
-                    }
-                } catch (contactError: unknown) {
-                    const error = contactError as {
-                        response?: {
-                            data?: {
-                                errors?: Record<string, string[]>;
-                            };
-                        };
-                    };
-
-                    // Show specific validation error if available
-                    const validationErrors = error?.response?.data?.errors;
-                    if (
-                        validationErrors &&
-                        Object.keys(validationErrors).length > 0
-                    ) {
-                        const firstError =
-                            Object.values(validationErrors)[0][0];
-                        toast.error(`Failed to sync contact: ${firstError}`);
-                    } else {
-                        toast.error(
-                            `Failed to sync contact: ${contact.contact_name}`,
-                        );
-                    }
-                }
-            }
-
-            // Then handle staged documents
-            const stagedDocuments = documents.filter(
-                (doc) => doc._isNew || doc._isModified || doc._isDeleted,
+            await processAndReport<Document>(
+                documents,
+                {
+                    isNew: (d) => Boolean(d._isNew),
+                    isModified: (d) => Boolean(d._isModified),
+                    isDeleted: (d) => Boolean(d._isDeleted),
+                    create: (d) => DocumentsApi.createDocument(employee.id, d),
+                    update: (d) =>
+                        DocumentsApi.updateDocument(employee.id, d.id, d),
+                    remove: (d) =>
+                        DocumentsApi.deleteDocument(employee.id, d.id),
+                },
+                {
+                    label: 'document',
+                    getItemLabel: (d) => d.title || 'document',
+                },
             );
 
-            for (const doc of stagedDocuments) {
-                try {
-                    // Skip documents that are both new and deleted
-                    if (doc._isNew && doc._isDeleted) {
-                        continue;
-                    }
-
-                    if (doc._isDeleted && !doc._isNew) {
-                        // Delete existing document
-                        await axios.delete(
-                            `/dashboard/employees/${employee.id}/documents/${doc.id}`,
-                        );
-                    } else if (doc._isNew && !doc._isDeleted) {
-                        // Create new document
-                        const formData = new FormData();
-                        formData.append('doc_type', doc.doc_type);
-                        formData.append('title', doc.title);
-                        if (doc.expiry_date) {
-                            formData.append('expiry_date', doc.expiry_date);
-                        }
-
-                        if (doc._documentFile) {
-                            formData.append('file', doc._documentFile);
-                        }
-
-                        await axios.post(
-                            `/dashboard/employees/${employee.id}/documents`,
-                            formData,
-                            {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                },
-                            },
-                        );
-                    } else if (doc._isModified) {
-                        // Update existing document
-                        const formData = new FormData();
-                        formData.append('doc_type', doc.doc_type);
-                        formData.append('title', doc.title);
-                        if (doc.expiry_date) {
-                            formData.append('expiry_date', doc.expiry_date);
-                        }
-                        formData.append('_method', 'put');
-
-                        if (doc._documentFile) {
-                            formData.append('file', doc._documentFile);
-                        }
-
-                        await axios.post(
-                            `/dashboard/employees/${employee.id}/documents/${doc.id}`,
-                            formData,
-                            {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                },
-                            },
-                        );
-                    }
-                } catch (documentError: unknown) {
-                    const error = documentError as {
-                        response?: {
-                            data?: {
-                                errors?: Record<string, string[]>;
-                                message?: string;
-                            };
-                        };
-                    };
-
-                    // Show specific validation error if available
-                    const validationErrors = error?.response?.data?.errors;
-                    if (
-                        validationErrors &&
-                        Object.keys(validationErrors).length > 0
-                    ) {
-                        // Show all validation errors
-                        const errorMessages = Object.entries(validationErrors)
-                            .map(
-                                ([field, messages]) =>
-                                    `${field}: ${messages.join(', ')}`,
-                            )
-                            .join(' | ');
-                        toast.error(
-                            `Document "${doc.title}" validation failed: ${errorMessages}`,
-                        );
-                    } else if (error?.response?.data?.message) {
-                        toast.error(
-                            `Failed to sync document "${doc.title}": ${error.response.data.message}`,
-                        );
-                    } else {
-                        toast.error(
-                            `Failed to sync document "${doc.title}". Please try again.`,
-                        );
-                    }
-                    console.error('Document sync error:', error);
-                }
-            }
-
-            // Then handle staged notes
-            const stagedNotes = notes.filter(
-                (note) => note._isNew || note._isModified || note._isDeleted,
+            await processAndReport<Note>(
+                notes,
+                {
+                    isNew: (n) => Boolean(n._isNew),
+                    isModified: (n) => Boolean(n._isModified),
+                    isDeleted: (n) => Boolean(n._isDeleted),
+                    create: (n) =>
+                        NotesApi.createNote(employee.id, {
+                            note: n.note,
+                            category: n.category,
+                            is_private: n.is_private,
+                        }),
+                    update: (n) =>
+                        NotesApi.updateNote(employee.id, n.id, {
+                            note: n.note,
+                            category: n.category,
+                            is_private: n.is_private,
+                        }),
+                    remove: (n) => NotesApi.deleteNote(employee.id, n.id),
+                },
+                {
+                    label: 'note',
+                    getItemLabel: (n) =>
+                        n.category || n.note?.slice(0, 30) || 'note',
+                },
             );
 
-            for (const note of stagedNotes) {
-                try {
-                    // Skip notes that are both new and deleted
-                    if (note._isNew && note._isDeleted) {
-                        continue;
-                    }
-
-                    if (note._isDeleted && !note._isNew) {
-                        // Delete existing note
-                        await axios.delete(
-                            `/dashboard/employees/${employee.id}/notes/${note.id}`,
-                        );
-                    } else if (note._isNew && !note._isDeleted) {
-                        // Create new note
-                        await axios.post(
-                            `/dashboard/employees/${employee.id}/notes`,
-                            {
-                                note: note.note,
-                                category: note.category,
-                                is_private: note.is_private,
-                            },
-                        );
-                    } else if (note._isModified) {
-                        // Update existing note
-                        await axios.put(
-                            `/dashboard/employees/${employee.id}/notes/${note.id}`,
-                            {
-                                note: note.note,
-                                category: note.category,
-                                is_private: note.is_private,
-                            },
-                        );
-                    }
-                } catch (noteError: unknown) {
-                    const error = noteError as {
-                        response?: {
-                            data?: {
-                                errors?: Record<string, string[]>;
-                                message?: string;
-                            };
-                        };
-                    };
-
-                    // Show specific validation error if available
-                    const validationErrors = error?.response?.data?.errors;
-                    if (
-                        validationErrors &&
-                        Object.keys(validationErrors).length > 0
-                    ) {
-                        const errorMessages = Object.entries(validationErrors)
-                            .map(
-                                ([field, messages]) =>
-                                    `${field}: ${messages.join(', ')}`,
-                            )
-                            .join(' | ');
-                        toast.error(`Note validation failed: ${errorMessages}`);
-                    } else if (error?.response?.data?.message) {
-                        toast.error(
-                            `Failed to sync note: ${error.response.data.message}`,
-                        );
-                    } else {
-                        toast.error('Failed to sync note. Please try again.');
-                    }
-                    console.error('Note sync error:', error);
-                }
-            }
-
-            // Then handle staged custom fields
-            const stagedCustomFields = customFields.filter(
-                (field) =>
-                    field._isNew || field._isModified || field._isDeleted,
+            await processAndReport<CustomField>(
+                customFields,
+                {
+                    isNew: (f) => Boolean(f._isNew),
+                    isModified: (f) => Boolean(f._isModified),
+                    isDeleted: (f) => Boolean(f._isDeleted),
+                    create: (f) =>
+                        CustomFieldsApi.createCustomField(employee.id, {
+                            employee_id: employee.id,
+                            field_key: f.field_key,
+                            field_value: f.field_value,
+                            field_type: f.field_type,
+                            section: f.section,
+                        }),
+                    update: (f) =>
+                        CustomFieldsApi.updateCustomField(employee.id, f.id, {
+                            field_key: f.field_key,
+                            field_value: f.field_value,
+                            field_type: f.field_type,
+                            section: f.section,
+                        }),
+                    remove: (f) =>
+                        CustomFieldsApi.deleteCustomField(employee.id, f.id),
+                },
+                {
+                    label: 'custom field',
+                    getItemLabel: (f) => f.field_key || 'field',
+                },
             );
-
-            for (const field of stagedCustomFields) {
-                try {
-                    // Skip fields that are both new and deleted
-                    if (field._isNew && field._isDeleted) {
-                        continue;
-                    }
-
-                    if (field._isDeleted && !field._isNew) {
-                        // Delete existing custom field
-                        await axios.delete(
-                            `/dashboard/employees/${employee.id}/custom-fields/${field.id}`,
-                        );
-                    } else if (field._isNew && !field._isDeleted) {
-                        // Create new custom field
-                        await axios.post(
-                            `/dashboard/employees/${employee.id}/custom-fields`,
-                            {
-                                employee_id: employee.id,
-                                field_key: field.field_key,
-                                field_value: field.field_value,
-                                field_type: field.field_type,
-                                section: field.section,
-                            },
-                        );
-                    } else if (field._isModified) {
-                        // Update existing custom field
-                        await axios.put(
-                            `/dashboard/employees/${employee.id}/custom-fields/${field.id}`,
-                            {
-                                field_key: field.field_key,
-                                field_value: field.field_value,
-                                field_type: field.field_type,
-                                section: field.section,
-                            },
-                        );
-                    }
-                } catch (customFieldError: unknown) {
-                    const error = customFieldError as {
-                        response?: {
-                            data?: {
-                                errors?: Record<string, string[]>;
-                                message?: string;
-                            };
-                        };
-                    };
-
-                    // Show specific validation error if available
-                    const validationErrors = error?.response?.data?.errors;
-                    if (
-                        validationErrors &&
-                        Object.keys(validationErrors).length > 0
-                    ) {
-                        const errorMessages = Object.entries(validationErrors)
-                            .map(
-                                ([field, messages]) =>
-                                    `${field}: ${messages.join(', ')}`,
-                            )
-                            .join(' | ');
-                        toast.error(
-                            `Custom field validation failed: ${errorMessages}`,
-                        );
-                    } else if (error?.response?.data?.message) {
-                        toast.error(
-                            `Failed to sync custom field: ${error.response.data.message}`,
-                        );
-                    } else {
-                        toast.error(
-                            'Failed to sync custom field. Please try again.',
-                        );
-                    }
-                    console.error('Custom field sync error:', error);
-                }
-            }
 
             router.reload({
                 only: ['employee'],
@@ -652,11 +415,6 @@ export function EmployeeEditForm({
             console.error('Update failed:', error);
             toast.error('Failed to update employee. Please try again.');
         }
-    };
-
-    const handleReset = () => {
-        reset();
-        clearErrors();
     };
 
     const handleDeleteContact = (contactId: string) => {
@@ -784,6 +542,11 @@ export function EmployeeEditForm({
         handleTabChange('customFields');
     };
 
+    const handleReset = () => {
+        reset();
+        clearErrors();
+    };
+
     // Check if form has any changes
     const hasChanges =
         isDirty || // Form data has changed
@@ -861,7 +624,6 @@ export function EmployeeEditForm({
                             }}
                             setData={setData}
                             supervisors={supervisors}
-                            employmentTypes={employmentTypes}
                             isSuperAdminOrOwner={isSuperAdminOrOwner || false}
                         />
                     </TabsContent>
@@ -871,6 +633,7 @@ export function EmployeeEditForm({
                             data={{
                                 salary_detail: data.salary_detail,
                             }}
+                            currency={data.currency}
                             setData={setData}
                         />
                     </TabsContent>

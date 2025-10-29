@@ -39,6 +39,7 @@ interface Employee {
     employment_status: string;
     employment_type: string;
     joining_date: string;
+    currency?: string;
     department: {
         id: string;
         name: string;
@@ -62,7 +63,7 @@ interface Employee {
     };
     job_detail?: {
         job_title: string;
-        employment_type: string;
+        supervisor_id: string;
         work_shift: string;
         probation_end_date: string | null;
         contract_end_date: string | null;
@@ -137,10 +138,24 @@ interface Employee {
 
 interface EmployeeShowFormProps {
     employee: Employee;
+    supervisors: Array<{ id: string; name: string; employee_code: string }>;
     className?: string;
+    auth?: {
+        user?: {
+            id?: number;
+            name?: string;
+            roles?: Array<{ name: string }>;
+            is_super_admin?: boolean;
+        };
+    };
 }
 
-export function EmployeeShow({ employee, className }: EmployeeShowFormProps) {
+export function EmployeeShow({
+    employee,
+    supervisors,
+    className,
+    auth,
+}: EmployeeShowFormProps) {
     const [selectedPhoto, setSelectedPhoto] = useState<{
         url: string;
         name: string;
@@ -175,6 +190,7 @@ export function EmployeeShow({ employee, className }: EmployeeShowFormProps) {
                     <OverviewView
                         employee={employee}
                         onPhotoClick={setSelectedPhoto}
+                        auth={auth}
                     />
                 </TabsContent>
 
@@ -182,12 +198,18 @@ export function EmployeeShow({ employee, className }: EmployeeShowFormProps) {
                     <PersonalView personalDetail={employee.personal_detail} />
                 </TabsContent>
 
-                <TabsContent value="job" className="space-y-4">
-                    <JobView jobDetail={employee.job_detail} />
+                <TabsContent value="job" className="space-y-6">
+                    <JobView
+                        jobDetail={employee.job_detail}
+                        supervisors={supervisors}
+                    />
                 </TabsContent>
 
                 <TabsContent value="salary" className="space-y-4">
-                    <SalaryView salaryDetail={employee.salary_detail} />
+                    <SalaryView
+                        salaryDetail={employee.salary_detail}
+                        currency={employee.currency}
+                    />
                 </TabsContent>
 
                 <TabsContent value="contacts" className="space-y-4">

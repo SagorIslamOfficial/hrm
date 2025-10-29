@@ -1,4 +1,4 @@
-import { InfoCard } from '@/components/common';
+import { EmptyActionState, InfoCard } from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 import { Image } from 'lucide-react';
 
@@ -93,9 +93,10 @@ export function ContactsView({ contacts, onPhotoClick }: ContactsViewProps) {
                     ))}
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground">
-                    No contacts available
-                </p>
+                <EmptyActionState
+                    message="Add contact details to track employee information."
+                    buttonText="Add Contact Details"
+                />
             )}
         </InfoCard>
     );

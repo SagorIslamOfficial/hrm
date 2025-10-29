@@ -22,7 +22,7 @@ export function PageHeader({
     description,
     action,
     backUrl,
-    backLabel = 'Back',
+    backLabel = 'Cancel',
     actions,
     children,
 }: PageHeaderProps) {

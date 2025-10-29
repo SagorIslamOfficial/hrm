@@ -1,4 +1,4 @@
-import { FormActions, SelectField, TextareaField } from '@/components/common';
+import { FormActions, FormField } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
@@ -103,11 +103,12 @@ export function NoteForm({
 
     return (
         <div className="space-y-4">
-            <TextareaField
+            <FormField
+                type="textarea"
                 id="note"
                 label="Note"
                 value={formData.note}
-                onChange={(value) =>
+                onChange={(value: string) =>
                     setFormData((prev) => ({
                         ...prev,
                         note: value,
@@ -120,11 +121,12 @@ export function NoteForm({
             />
 
             <div className="grid grid-cols-2 gap-4">
-                <SelectField
+                <FormField
+                    type="select"
                     id="category"
                     label="Category"
                     value={formData.category}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         setFormData((prev) => ({
                             ...prev,
                             category: value,

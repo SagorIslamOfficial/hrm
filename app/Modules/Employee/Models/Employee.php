@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Log;
  * @property string $employment_status
  * @property string $employment_type
  * @property string $joining_date
+ * @property string $currency
  */
 class Employee extends Model
 {
@@ -46,6 +47,7 @@ class Employee extends Model
         'employment_status',
         'employment_type',
         'joining_date',
+        'currency',
     ];
 
     protected function casts(): array

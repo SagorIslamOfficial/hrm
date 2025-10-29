@@ -1,19 +1,15 @@
-import { CustomFieldDialog, DeleteDialog, InfoCard } from '@/components/common';
-import { Badge } from '@/components/ui/badge';
+import {
+    DataTableActions,
+    DeleteDialog,
+    EmptyActionState,
+    InfoCard,
+    ResourceDialog,
+} from '@/components/common';
+import { CustomFieldForm } from '@/components/common/CustomFieldForm';
+import { EntityHeader, GetBorderClass } from '@/components/common/EntityHeader';
+import type { CustomField } from '@/components/common/interfaces';
 import { Button } from '@/components/ui/button';
-import { SquarePen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-
-interface CustomField {
-    id: string;
-    field_key: string;
-    field_value: string;
-    field_type: string;
-    section: string;
-    _isNew?: boolean;
-    _isModified?: boolean;
-    _isDeleted?: boolean;
-}
 
 interface CustomFieldsEditProps {
     customFields: CustomField[];
@@ -100,14 +96,10 @@ export function CustomFieldsEdit({
                                     </h4>
                                     <div className="space-y-3">
                                         {fields.map((field) => {
-                                            let borderClass = 'border';
-                                            if (field._isNew) {
-                                                borderClass =
-                                                    'border-2 border-green-500';
-                                            } else if (field._isModified) {
-                                                borderClass =
-                                                    'border-2 border-yellow-500';
-                                            }
+                                            const borderClass = GetBorderClass(
+                                                field._isNew,
+                                                field._isModified,
+                                            );
 
                                             return (
                                                 <div
@@ -116,66 +108,56 @@ export function CustomFieldsEdit({
                                                 >
                                                     <div className="flex items-start gap-4">
                                                         <div className="flex-1">
-                                                            <div className="mb-1 flex items-center gap-2">
-                                                                <h5 className="font-medium">
-                                                                    {formatFieldKey(
-                                                                        field.field_key,
-                                                                    )}
-                                                                </h5>
-                                                                <Badge variant="secondary">
+                                                            <EntityHeader
+                                                                name={formatFieldKey(
+                                                                    field.field_key,
+                                                                )}
+                                                                badges={[
                                                                     {
-                                                                        field.field_type
-                                                                    }
-                                                                </Badge>
-                                                                {field._isNew && (
-                                                                    <Badge
-                                                                        className="border-green-500 bg-green-100 text-green-800 hover:bg-green-200"
-                                                                        variant="outline"
-                                                                    >
-                                                                        New
-                                                                    </Badge>
-                                                                )}
-                                                                {field._isModified && (
-                                                                    <Badge
-                                                                        className="border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                                                        variant="outline"
-                                                                    >
-                                                                        Modified
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
+                                                                        show: field._isNew,
+                                                                        label: 'New',
+                                                                        variant:
+                                                                            'outline',
+                                                                        className:
+                                                                            'border-green-500 bg-green-100 text-green-800 hover:bg-green-200',
+                                                                    },
+                                                                    {
+                                                                        show: field._isModified,
+                                                                        label: 'Modified',
+                                                                        variant:
+                                                                            'outline',
+                                                                        className:
+                                                                            'border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+                                                                    },
+                                                                ]}
+                                                            />
+
                                                             <p className="text-sm text-muted-foreground">
-                                                                {field.field_value ||
+                                                                {field.field_value ??
                                                                     'No value set'}
                                                             </p>
                                                         </div>
+
                                                         <div className="absolute top-1/2 right-4 flex -translate-y-1/2 gap-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="cursor-pointer"
-                                                                onClick={() =>
+                                                            <DataTableActions
+                                                                item={{
+                                                                    id: field.id,
+                                                                    name: formatFieldKey(
+                                                                        field.field_key,
+                                                                    ),
+                                                                }}
+                                                                onEdit={() =>
                                                                     openEditDialog(
                                                                         field,
                                                                     )
                                                                 }
-                                                            >
-                                                                <SquarePen className="h-4 w-4 text-primary" />
-                                                            </Button>
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="cursor-pointer"
-                                                                onClick={() =>
+                                                                onDelete={() =>
                                                                     setDeleteDialogOpen(
                                                                         field.id,
                                                                     )
                                                                 }
-                                                            >
-                                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                                            </Button>
+                                                                showView={false}
+                                                            />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -187,54 +169,53 @@ export function CustomFieldsEdit({
                         })}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <p className="mb-4 text-sm text-muted-foreground">
-                            Add custom fields to track employee information.
-                        </p>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            className="border"
-                            disabled
-                        >
-                            Add Field
-                        </Button>
-                    </div>
+                    <EmptyActionState
+                        message="Add custom fields to track employee information."
+                        buttonText="Add Custom Field"
+                    />
                 )}
             </InfoCard>
 
             {/* Add Custom Field Dialog */}
-            <CustomFieldDialog
+            <ResourceDialog
                 mode="add"
                 open={isAddDialogOpen}
-                onSuccess={(customFieldData: CustomField) => {
-                    onCustomFieldAdd(customFieldData);
-                    setIsAddDialogOpen(false);
-                }}
-                onCancel={() => setIsAddDialogOpen(false)}
                 resourceLabel="Custom Field"
                 subjectLabel="employee"
-            />
+            >
+                <CustomFieldForm
+                    onSuccess={(customFieldData: CustomField) => {
+                        onCustomFieldAdd(customFieldData);
+                        setIsAddDialogOpen(false);
+                    }}
+                    onCancel={() => setIsAddDialogOpen(false)}
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Edit Custom Field Dialog */}
-            <CustomFieldDialog
+            <ResourceDialog
                 mode="edit"
                 open={!!editDialogOpen}
-                customField={
-                    editDialogOpen
-                        ? (customFields || []).find(
-                              (f) => f.id === editDialogOpen,
-                          )
-                        : undefined
-                }
-                onSuccess={(customFieldData: CustomField) => {
-                    onCustomFieldEdit(customFieldData);
-                    setEditDialogOpen(null);
-                }}
-                onCancel={() => setEditDialogOpen(null)}
                 resourceLabel="Custom Field"
                 subjectLabel="employee"
-            />
+            >
+                <CustomFieldForm
+                    customField={
+                        editDialogOpen
+                            ? (customFields || []).find(
+                                  (f) => f.id === editDialogOpen,
+                              )
+                            : undefined
+                    }
+                    onSuccess={(customFieldData: CustomField) => {
+                        onCustomFieldEdit(customFieldData);
+                        setEditDialogOpen(null);
+                    }}
+                    onCancel={() => setEditDialogOpen(null)}
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Delete Custom Field Dialog */}
             <DeleteDialog

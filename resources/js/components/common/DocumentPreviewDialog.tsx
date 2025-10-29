@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -6,7 +5,52 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ExternalLink } from 'lucide-react';
+import { EmptyState } from './EmptyState';
+import { FormActions } from './FormActions';
+
+interface DocumentPreviewProps {
+    documentUrl: string;
+    documentName: string;
+    documentType: string;
+}
+
+function DocumentPreview({
+    documentUrl,
+    documentName,
+    documentType,
+}: DocumentPreviewProps) {
+    // Get file extension from document name or URL
+    const extension = documentName.split('.').pop()?.toLowerCase() || '';
+    const isPDF = extension === 'pdf' || documentType.includes('pdf');
+    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension);
+
+    if (isPDF) {
+        return (
+            <iframe
+                src={documentUrl}
+                className="h-[70vh] w-full rounded-lg"
+                title={documentName}
+            />
+        );
+    }
+
+    if (isImage) {
+        return (
+            <img
+                src={documentUrl}
+                alt={documentName}
+                className="max-h-[70vh] w-auto rounded-lg object-contain"
+            />
+        );
+    }
+
+    return (
+        <EmptyState
+            title="Preview not available"
+            description={`Preview not available for this file type. File: ${documentName}`}
+        />
+    );
+}
 
 interface DocumentPreviewDialogProps {
     open: boolean;
@@ -28,67 +72,34 @@ export function DocumentPreviewDialog({
 }: DocumentPreviewDialogProps) {
     if (!documentUrl) return null;
 
-    // Get file extension from document name or URL
-    const extension = documentName.split('.').pop()?.toLowerCase() || '';
-    const isPDF = extension === 'pdf' || documentType.includes('pdf');
-    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension);
-
     return (
         <Dialog open={open}>
-            <DialogContent className="h-[90vh] w-full !max-w-3xl overflow-hidden [&>button]:hidden">
+            <DialogContent className="h-[85vh] w-full !max-w-3xl overflow-hidden rounded-md border-primary/40 bg-gray-700 [&>button]:hidden">
                 <DialogHeader>
-                    <DialogTitle>{title || documentName}</DialogTitle>
-                    <DialogDescription>
-                        Document preview - {documentName}
-                    </DialogDescription>
+                    <DialogTitle className="text-white">
+                        {title || documentName}
+                    </DialogTitle>
+                    <div className="flex items-center justify-between">
+                        <DialogDescription className="text-white">
+                            Document preview - {documentName}
+                        </DialogDescription>
+                        <FormActions
+                            type="dialog"
+                            onSubmit={() => window.open(documentUrl, '_blank')}
+                            onCancel={() => onOpenChange(false)}
+                            submitLabel="Open in New Tab"
+                            cancelLabel="Cancel"
+                            showReset={false}
+                            className="flex justify-end gap-2 border-none"
+                        />
+                    </div>
                 </DialogHeader>
 
-                <div className="relative flex flex-col gap-4">
-                    {/* Preview Area */}
-                    <div className="flex items-center justify-center overflow-auto rounded-lg border bg-muted/30">
-                        {isPDF ? (
-                            <iframe
-                                src={documentUrl}
-                                className="h-[70vh] w-full rounded-lg"
-                                title={documentName}
-                            />
-                        ) : isImage ? (
-                            <img
-                                src={documentUrl}
-                                alt={documentName}
-                                className="max-h-[70vh] w-auto rounded-lg object-contain"
-                            />
-                        ) : (
-                            <div className="flex h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
-                                <p className="text-muted-foreground">
-                                    Preview not available for this file type.
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                    File: {documentName}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex justify-between border-t pt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => window.open(documentUrl, '_blank')}
-                            className="cursor-pointer gap-2"
-                        >
-                            <ExternalLink className="h-4 w-4" />
-                            Open in New Tab
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                            className="cursor-pointer"
-                        >
-                            Cancel
-                        </Button>
-                    </div>
-                </div>
+                <DocumentPreview
+                    documentUrl={documentUrl}
+                    documentName={documentName}
+                    documentType={documentType}
+                />
             </DialogContent>
         </Dialog>
     );

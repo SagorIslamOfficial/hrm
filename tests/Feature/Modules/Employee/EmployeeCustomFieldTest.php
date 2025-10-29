@@ -395,4 +395,3 @@ test('requires authentication', function () {
 
     $response->assertUnauthorized();
 });
-

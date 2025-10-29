@@ -30,6 +30,7 @@ export function DataTableActions<T>({
         <div className="flex items-center gap-2">
             {showView && onView && (
                 <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => onView(item)}
@@ -41,6 +42,7 @@ export function DataTableActions<T>({
             )}
             {showEdit && onEdit && (
                 <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => onEdit(item)}
@@ -52,6 +54,7 @@ export function DataTableActions<T>({
             )}
             {showDelete && onDelete && (
                 <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => onDelete(item)}

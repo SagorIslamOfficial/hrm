@@ -2,8 +2,8 @@
 
 namespace App\Modules\Employee\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateEmploymentTypeRequest extends FormRequest
 {
@@ -12,7 +12,7 @@ class UpdateEmploymentTypeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Add authorization logic as needed
+        return true;
     }
 
     /**

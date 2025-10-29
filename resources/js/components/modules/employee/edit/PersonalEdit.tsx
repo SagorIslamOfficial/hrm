@@ -1,9 +1,4 @@
-import {
-    DateField,
-    InfoCard,
-    SelectField,
-    TextField,
-} from '@/components/common';
+import { FormField, InfoCard } from '@/components/common';
 
 interface PersonalTabProps {
     data: {
@@ -37,33 +32,38 @@ export function PersonalEdit({ data, setData }: PersonalTabProps) {
     return (
         <InfoCard title="Personal Details">
             <div className="grid gap-6 md:grid-cols-2">
-                <DateField
+                <FormField
+                    type="date"
                     id="date_of_birth"
                     label="Date of Birth"
                     value={data.personal_detail.date_of_birth}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updatePersonalDetail('date_of_birth', value)
                     }
                 />
 
-                <SelectField
+                <FormField
+                    type="select"
                     id="gender"
                     label="Gender"
                     required
                     value={data.personal_detail.gender}
-                    onChange={(value) => updatePersonalDetail('gender', value)}
+                    onChange={(value: string) =>
+                        updatePersonalDetail('gender', value)
+                    }
                     options={[
                         { value: 'male', label: 'Male' },
                         { value: 'female', label: 'Female' },
                     ]}
                 />
 
-                <SelectField
+                <FormField
+                    type="select"
                     id="marital_status"
                     label="Marital Status"
                     required
                     value={data.personal_detail.marital_status}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updatePersonalDetail('marital_status', value)
                     }
                     options={[
@@ -74,11 +74,12 @@ export function PersonalEdit({ data, setData }: PersonalTabProps) {
                     ]}
                 />
 
-                <SelectField
+                <FormField
+                    type="select"
                     id="blood_group"
                     label="Blood Group"
                     value={data.personal_detail.blood_group}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updatePersonalDetail('blood_group', value)
                     }
                     options={[
@@ -93,51 +94,62 @@ export function PersonalEdit({ data, setData }: PersonalTabProps) {
                     ]}
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="national_id"
                     label="National ID"
                     required
                     value={data.personal_detail.national_id}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updatePersonalDetail('national_id', value)
                     }
                     placeholder="e.g., 12345678901234"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="passport_number"
                     label="Passport Number"
                     value={data.personal_detail.passport_number}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updatePersonalDetail('passport_number', value)
                     }
                     placeholder="e.g., A123456789"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="address"
                     label="Address"
                     required
                     value={data.personal_detail.address}
-                    onChange={(value) => updatePersonalDetail('address', value)}
+                    onChange={(value: string) =>
+                        updatePersonalDetail('address', value)
+                    }
                     placeholder="e.g., 123 Main St, Apt 4B"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="city"
                     label="City"
                     required
                     value={data.personal_detail.city}
-                    onChange={(value) => updatePersonalDetail('city', value)}
+                    onChange={(value: string) =>
+                        updatePersonalDetail('city', value)
+                    }
                     placeholder="e.g., Dhaka"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="country"
                     label="Country"
                     required
                     value={data.personal_detail.country}
-                    onChange={(value) => updatePersonalDetail('country', value)}
+                    onChange={(value: string) =>
+                        updatePersonalDetail('country', value)
+                    }
                     placeholder="e.g., Bangladesh"
                 />
             </div>

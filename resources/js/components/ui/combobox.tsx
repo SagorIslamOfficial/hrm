@@ -39,6 +39,28 @@ export function Combobox({
     className,
 }: ComboboxProps) {
     const [open, setOpen] = React.useState(false);
+    const [search, setSearch] = React.useState('');
+    const [showAll, setShowAll] = React.useState(false);
+    const PAGE_SIZE = 10; // limit items rendered initially to keep the popover snappy
+
+    // debounce the search input slightly to avoid re-filtering on every keystroke
+    const debouncedSearch = React.useMemo(() => {
+        return search.trim().toLowerCase();
+    }, [search]);
+
+    const filteredOptions = React.useMemo(() => {
+        if (!debouncedSearch) return options;
+        const s = debouncedSearch;
+        return options.filter((opt) => {
+            const v = opt.label.toLowerCase();
+            return v.startsWith(s) || v.includes(` ${s}`) || v.includes(s);
+        });
+    }, [options, debouncedSearch]);
+
+    const visibleOptions = React.useMemo(() => {
+        if (showAll) return filteredOptions;
+        return filteredOptions.slice(0, PAGE_SIZE);
+    }, [filteredOptions, showAll]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -47,7 +69,7 @@ export function Combobox({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className={cn('w-[200px] justify-between', className)}
+                    className={cn('w-full justify-between', className)}
                 >
                     {value
                         ? options.find((option) => option.value === value)
@@ -56,21 +78,27 @@ export function Combobox({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-                <Command>
-                    <CommandInput placeholder={searchPlaceholder} />
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                <Command
+                    filter={() => 1 /* use our own filtering for performance */}
+                >
+                    <CommandInput
+                        placeholder={searchPlaceholder}
+                        onValueChange={(v) => setSearch(v)}
+                        value={search}
+                    />
                     <CommandList>
                         <CommandEmpty>{emptyText}</CommandEmpty>
                         <CommandGroup>
-                            {options.map((option) => (
+                            {visibleOptions.map((option) => (
                                 <CommandItem
                                     key={option.value}
-                                    value={option.value}
-                                    onSelect={(currentValue) => {
+                                    value={option.label} // Use label for keyboard selection/search
+                                    onSelect={() => {
                                         onValueChange?.(
-                                            currentValue === value
+                                            option.value === value
                                                 ? ''
-                                                : currentValue,
+                                                : option.value,
                                         );
                                         setOpen(false);
                                     }}
@@ -86,6 +114,31 @@ export function Combobox({
                                     {option.label}
                                 </CommandItem>
                             ))}
+
+                            {filteredOptions.length > PAGE_SIZE && !showAll && (
+                                <CommandItem
+                                    key="show-more"
+                                    value="__show_more__"
+                                    onSelect={() => setShowAll(true)}
+                                >
+                                    <div className="w-full text-center text-sm text-muted-foreground">
+                                        Show all {filteredOptions.length}{' '}
+                                        results
+                                    </div>
+                                </CommandItem>
+                            )}
+
+                            {filteredOptions.length > PAGE_SIZE && showAll && (
+                                <CommandItem
+                                    key="show-less"
+                                    value="__show_less__"
+                                    onSelect={() => setShowAll(false)}
+                                >
+                                    <div className="w-full text-center text-sm text-muted-foreground">
+                                        Show less
+                                    </div>
+                                </CommandItem>
+                            )}
                         </CommandGroup>
                     </CommandList>
                 </Command>

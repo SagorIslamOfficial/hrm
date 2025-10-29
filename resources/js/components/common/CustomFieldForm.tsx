@@ -1,9 +1,4 @@
-import {
-    FormActions,
-    SelectField,
-    TextareaField,
-    TextField,
-} from '@/components/common';
+import { FormActions, FormField } from '@/components/common';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -129,11 +124,12 @@ export function CustomFieldForm({
         switch (formData.field_type) {
             case 'textarea':
                 return (
-                    <TextareaField
+                    <FormField
+                        type="textarea"
                         id="field_value"
                         label="Value"
                         value={formData.field_value}
-                        onChange={(value) =>
+                        onChange={(value: string) =>
                             setFormData((prev) => ({
                                 ...prev,
                                 field_value: value,
@@ -219,12 +215,12 @@ export function CustomFieldForm({
                 );
             case 'email':
                 return (
-                    <TextField
+                    <FormField
+                        type="email"
                         id="field_value"
                         label="Value"
-                        type="email"
                         value={formData.field_value}
-                        onChange={(value) =>
+                        onChange={(value: string) =>
                             setFormData((prev) => ({
                                 ...prev,
                                 field_value: value,
@@ -236,12 +232,12 @@ export function CustomFieldForm({
                 );
             case 'phone':
                 return (
-                    <TextField
+                    <FormField
+                        type="tel"
                         id="field_value"
                         label="Value"
-                        type="tel"
                         value={formData.field_value}
-                        onChange={(value) =>
+                        onChange={(value: string) =>
                             setFormData((prev) => ({
                                 ...prev,
                                 field_value: value,
@@ -253,12 +249,12 @@ export function CustomFieldForm({
                 );
             case 'url':
                 return (
-                    <TextField
+                    <FormField
+                        type="url"
                         id="field_value"
                         label="Value"
-                        type="url"
                         value={formData.field_value}
-                        onChange={(value) =>
+                        onChange={(value: string) =>
                             setFormData((prev) => ({
                                 ...prev,
                                 field_value: value,
@@ -270,12 +266,12 @@ export function CustomFieldForm({
                 );
             default:
                 return (
-                    <TextField
+                    <FormField
+                        type="text"
                         id="field_value"
                         label="Value"
-                        type="text"
                         value={formData.field_value}
-                        onChange={(value) =>
+                        onChange={(value: string) =>
                             setFormData((prev) => ({
                                 ...prev,
                                 field_value: value,
@@ -310,11 +306,12 @@ export function CustomFieldForm({
                 </p>
             </div>
 
-            <SelectField
+            <FormField
+                type="select"
                 id="field_type"
                 label="Field Type"
                 value={formData.field_type}
-                onChange={(value) =>
+                onChange={(value: string) =>
                     setFormData((prev) => ({
                         ...prev,
                         field_type: value,
@@ -328,11 +325,12 @@ export function CustomFieldForm({
 
             {renderValueInput()}
 
-            <SelectField
+            <FormField
+                type="select"
                 id="section"
                 label="Section"
                 value={formData.section}
-                onChange={(value) =>
+                onChange={(value: string) =>
                     setFormData((prev) => ({
                         ...prev,
                         section: value,

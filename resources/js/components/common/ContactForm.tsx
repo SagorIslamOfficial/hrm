@@ -1,16 +1,4 @@
-import { FormActions } from '@/components/common';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { FormActions, FormField } from '@/components/common';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -120,9 +108,13 @@ export function ContactForm({
         }
     };
 
-    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const handlePhotoChange = (file: File | null) => {
+        if (!file) {
+            setPhoto(null);
+            setPhotoPreview(contact?.photo_url || null);
+            if (photoInputRef.current) photoInputRef.current.value = '';
+            return;
+        }
 
         // Validate file size (max 2MB)
         if (file.size > 2 * 1024 * 1024) {
@@ -170,197 +162,128 @@ export function ContactForm({
         img.src = objectUrl;
     };
 
-    const handlePhotoRemove = () => {
-        setPhoto(null);
-        setPhotoPreview(contact?.photo_url || null);
-        if (photoInputRef.current) {
-            photoInputRef.current.value = '';
-        }
-    };
-
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label htmlFor="contact_name">Contact Name *</Label>
-                    <Input
-                        id="contact_name"
-                        value={formData.contact_name}
-                        onChange={(e) =>
-                            setFormData((prev) => ({
-                                ...prev,
-                                contact_name: e.target.value,
-                            }))
-                        }
-                        className={
-                            errors.contact_name ? 'border-destruction' : ''
-                        }
-                        placeholder="e.g., Uzzal Islam"
-                    />
-                    {errors.contact_name && (
-                        <p className="text-destruction mt-1 text-sm">
-                            {errors.contact_name}
-                        </p>
-                    )}
-                </div>
-                <div>
-                    <Label htmlFor="relationship">Relationship *</Label>
-                    <Select
-                        value={formData.relationship}
-                        onValueChange={(value) =>
-                            setFormData((prev) => ({
-                                ...prev,
-                                relationship: value,
-                            }))
-                        }
-                    >
-                        <SelectTrigger
-                            className={
-                                errors.relationship ? 'border-destruction' : ''
-                            }
-                        >
-                            <SelectValue placeholder="Select relationship" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="spouse">Spouse</SelectItem>
-                            <SelectItem value="parent">Parent</SelectItem>
-                            <SelectItem value="child">Child</SelectItem>
-                            <SelectItem value="sibling">Sibling</SelectItem>
-                            <SelectItem value="relative">Relative</SelectItem>
-                            <SelectItem value="friend">Friend</SelectItem>
-                            <SelectItem value="colleague">Colleague</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    {errors.relationship && (
-                        <p className="text-destruction mt-1 text-sm">
-                            {errors.relationship}
-                        </p>
-                    )}
-                </div>
+                <FormField
+                    type="text"
+                    id="contact_name"
+                    label="Contact Name"
+                    value={formData.contact_name}
+                    onChange={(value: string) =>
+                        setFormData((prev) => ({
+                            ...prev,
+                            contact_name: value,
+                        }))
+                    }
+                    error={errors.contact_name}
+                    placeholder="e.g., Uzzal Islam"
+                    required
+                />
+                <FormField
+                    type="select"
+                    id="relationship"
+                    label="Relationship"
+                    value={formData.relationship}
+                    onChange={(value: string) =>
+                        setFormData((prev) => ({
+                            ...prev,
+                            relationship: value,
+                        }))
+                    }
+                    options={[
+                        { value: 'spouse', label: 'Spouse' },
+                        { value: 'parent', label: 'Parent' },
+                        { value: 'child', label: 'Child' },
+                        { value: 'sibling', label: 'Sibling' },
+                        { value: 'relative', label: 'Relative' },
+                        { value: 'friend', label: 'Friend' },
+                        { value: 'colleague', label: 'Colleague' },
+                        { value: 'other', label: 'Other' },
+                    ]}
+                    error={errors.relationship}
+                    placeholder="Select relationship"
+                    required
+                />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
-                    <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) =>
-                            setFormData((prev) => ({
-                                ...prev,
-                                phone: e.target.value,
-                            }))
-                        }
-                        className={errors.phone ? 'border-destruction' : ''}
-                        placeholder="e.g., +8801933126160"
-                    />
-                    {errors.phone && (
-                        <p className="text-destruction mt-1 text-sm">
-                            {errors.phone}
-                        </p>
-                    )}
-                </div>
-                <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) =>
-                            setFormData((prev) => ({
-                                ...prev,
-                                email: e.target.value,
-                            }))
-                        }
-                        className={errors.email ? 'border-destruction' : ''}
-                        placeholder="e.g., uzzal@sagorislam.dev"
-                    />
-                    {errors.email && (
-                        <p className="text-destruction mt-1 text-sm">
-                            {errors.email}
-                        </p>
-                    )}
-                </div>
-            </div>
-
-            <div>
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) =>
+                <FormField
+                    type="tel"
+                    id="phone"
+                    label="Phone Number"
+                    value={formData.phone}
+                    onChange={(value: string) =>
                         setFormData((prev) => ({
                             ...prev,
-                            address: e.target.value,
+                            phone: value,
                         }))
                     }
-                    className={errors.address ? 'border-destruction' : ''}
-                    rows={3}
-                    placeholder="e.g., 123 Main Street, Apt 4B, City, State, ZIP"
+                    error={errors.phone}
+                    placeholder="e.g., +8801933126160"
+                    required
                 />
-                {errors.address && (
-                    <p className="text-destruction mt-1 text-sm">
-                        {errors.address}
-                    </p>
-                )}
-            </div>
-
-            <div>
-                <Label htmlFor="photo">{resourceLabel} Photo</Label>
-                <div className="space-y-4">
-                    {photoPreview && (
-                        <div className="flex items-center gap-4">
-                            <img
-                                src={photoPreview}
-                                alt="Contact preview"
-                                className="size-16 rounded-full"
-                            />
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={handlePhotoRemove}
-                            >
-                                Remove Photo
-                            </Button>
-                        </div>
-                    )}
-                    <Input
-                        ref={photoInputRef}
-                        id="photo"
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        className={errors.photo ? 'border-destruction' : ''}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                        Upload a photo of the {resourceLabel.toLowerCase()} (max
-                        2MB, 100x100 to 1000x1000 pixels)
-                    </p>
-                    {errors.photo && (
-                        <p className="text-destruction text-sm">
-                            {errors.photo}
-                        </p>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-                <Checkbox
-                    id="is_primary"
-                    checked={formData.is_primary}
-                    onCheckedChange={(checked) =>
+                <FormField
+                    type="email"
+                    id="email"
+                    label="Email Address"
+                    value={formData.email}
+                    onChange={(value: string) =>
                         setFormData((prev) => ({
                             ...prev,
-                            is_primary: !!checked,
+                            email: value,
                         }))
                     }
+                    error={errors.email}
+                    placeholder="e.g., uzzal@sagorislam.dev"
                 />
-                <Label htmlFor="is_primary">
-                    Primary {resourceLabel.toLowerCase()}
-                </Label>
             </div>
+
+            <FormField
+                type="textarea"
+                id="address"
+                label="Address"
+                value={formData.address}
+                onChange={(value: string) =>
+                    setFormData((prev) => ({
+                        ...prev,
+                        address: value,
+                    }))
+                }
+                error={errors.address}
+                placeholder="e.g., 123 Main Street, Apt 4B, City, State, ZIP"
+                rows={3}
+            />
+
+            <div>
+                <FormField
+                    type="file"
+                    id="photo"
+                    label={`${resourceLabel} Photo`}
+                    value={photo?.name || null}
+                    onChange={handlePhotoChange}
+                    accept="image/*"
+                    previewUrl={photoPreview || undefined}
+                    error={errors.photo}
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                    Upload a photo of the {resourceLabel.toLowerCase()} (max
+                    2MB, 100x100 to 1000x1000 pixels)
+                </p>
+            </div>
+
+            <FormField
+                type="checkbox"
+                id="is_primary"
+                label={`Primary ${resourceLabel.toLowerCase()}`}
+                value={formData.is_primary}
+                onChange={(value: boolean) =>
+                    setFormData((prev) => ({
+                        ...prev,
+                        is_primary: value,
+                    }))
+                }
+            />
 
             <FormActions
                 type="dialog"

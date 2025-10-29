@@ -1,6 +1,7 @@
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -22,16 +23,17 @@ export function PhotoDialog({
 }: PhotoDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl rounded-md border-primary/40 bg-gray-700 text-white [&>button]:cursor-pointer">
                 <DialogHeader>
                     <DialogTitle>{title || `${photoName} - Photo`}</DialogTitle>
+                    <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-center">
                     {photoUrl && (
                         <img
                             src={photoUrl}
                             alt={photoName}
-                            className="max-h-96 max-w-full rounded-lg border object-contain"
+                            className="max-h-full max-w-full rounded-sm border-none object-contain"
                         />
                     )}
                 </div>

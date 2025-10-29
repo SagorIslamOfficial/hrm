@@ -14,7 +14,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $name
  * @property string $email
  */
-
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */

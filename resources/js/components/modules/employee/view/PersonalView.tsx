@@ -1,4 +1,4 @@
-import { InfoCard } from '@/components/common';
+import { EmptyActionState, InfoCard } from '@/components/common';
 
 interface PersonalDetail {
     date_of_birth: string;
@@ -97,9 +97,10 @@ export function PersonalView({ personalDetail }: PersonalViewProps) {
                     </div>
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground">
-                    No personal details available
-                </p>
+                <EmptyActionState
+                    message="Add personal details to employee profile."
+                    buttonText="Add Personal Details"
+                />
             )}
         </InfoCard>
     );

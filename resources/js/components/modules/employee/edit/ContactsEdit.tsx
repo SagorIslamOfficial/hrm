@@ -1,30 +1,17 @@
-import { InfoCard } from '@/components/common';
-import { ContactDialog } from '@/components/common/ContactDialog';
-import { DeleteDialog } from '@/components/common/DeleteDialog';
+import {
+    DataTableActions,
+    DeleteDialog,
+    InfoCard,
+    ResourceDialog,
+} from '@/components/common';
+import { ContactForm } from '@/components/common/ContactForm';
+import DetailRow from '@/components/common/DetailRow';
+import { EmptyActionState } from '@/components/common/EmptyActionState';
+import { EntityHeader, GetBorderClass } from '@/components/common/EntityHeader';
+import type { Contact } from '@/components/common/interfaces';
 import { PhotoDialog } from '@/components/common/PhotoDialog';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Image, SquarePen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-
-interface Contact {
-    id: string;
-    contact_name: string;
-    relationship: string;
-    phone: string;
-    email?: string;
-    address?: string;
-    photo?: string;
-    photo_url?: string;
-    is_primary: boolean;
-    created_at: string;
-    updated_at: string;
-    // Staging properties for pending changes
-    _photoFile?: File;
-    _isNew?: boolean;
-    _isModified?: boolean;
-    _isDeleted?: boolean;
-}
 
 interface ContactsTabProps {
     contacts: Contact[];
@@ -89,155 +76,165 @@ export function ContactsEdit({
                     </Button>
                 }
             >
-                <div className="space-y-4">
-                    {contacts
-                        .filter((contact) => !contact._isDeleted)
-                        .map((contact) => {
-                            // Determine border color based on staging state
-                            let borderClass = 'border';
-                            if (contact._isNew) {
-                                borderClass = 'border-2 border-green-500';
-                            } else if (contact._isModified) {
-                                borderClass = 'border-2 border-yellow-500';
-                            }
+                {(contacts || []).length > 0 ? (
+                    <div className="space-y-4">
+                        {contacts
+                            .filter((contact) => !contact._isDeleted)
+                            .map((contact) => {
+                                const borderClass = GetBorderClass(
+                                    contact._isNew,
+                                    contact._isModified,
+                                );
 
-                            return (
-                                <div
-                                    key={contact.id}
-                                    className={`relative rounded-lg ${borderClass} p-4`}
-                                >
-                                    <div className="flex items-start gap-4">
-                                        {contact.photo_url && (
-                                            <div className="group relative">
-                                                <img
-                                                    src={contact.photo_url}
-                                                    alt={contact.contact_name}
-                                                    className="size-20 cursor-pointer rounded-full border object-cover transition-opacity hover:opacity-80"
-                                                    onClick={() =>
+                                return (
+                                    <div
+                                        key={contact.id}
+                                        className={`relative rounded-lg ${borderClass} p-4`}
+                                    >
+                                        <div className="flex items-start gap-4">
+                                            {contact.photo_url && (
+                                                <DetailRow
+                                                    label="Photo"
+                                                    value={contact.contact_name}
+                                                    imageSrc={contact.photo_url}
+                                                    imageAlt={
+                                                        contact.contact_name
+                                                    }
+                                                    imageClassName="size-20 cursor-pointer rounded-full border object-cover transition-opacity hover:opacity-80"
+                                                    imageWrapperClassName="group relative"
+                                                    onImageClick={() =>
                                                         setSelectedPhoto({
                                                             url: contact.photo_url!,
                                                             name: contact.contact_name,
                                                         })
                                                     }
+                                                    showValue={false}
                                                 />
-                                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full bg-black/20 opacity-0 transition-opacity group-hover:opacity-100">
-                                                    <Image className="size-6 text-white" />
-                                                </div>
-                                            </div>
-                                        )}
-                                        <div className="flex-1 space-y-2">
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="text-lg font-semibold">
-                                                    {contact.contact_name}
-                                                </h4>
-                                                {contact.is_primary && (
-                                                    <Badge variant="default">
-                                                        Primary
-                                                    </Badge>
-                                                )}
-                                                {contact._isNew && (
-                                                    <Badge
-                                                        className="border-green-500 bg-green-100 text-green-800 hover:bg-green-200"
-                                                        variant="outline"
-                                                    >
-                                                        New
-                                                    </Badge>
-                                                )}
-                                                {contact._isModified && (
-                                                    <Badge
-                                                        className="border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                                        variant="outline"
-                                                    >
-                                                        Modified
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <div className="space-y-1 text-sm">
-                                                <div>
-                                                    <span className="text-muted-foreground">
-                                                        Relationship:
-                                                    </span>{' '}
-                                                    <span className="mr-16 capitalize">
-                                                        {contact.relationship}
-                                                    </span>
-                                                    <span className="text-muted-foreground">
-                                                        Phone:
-                                                    </span>{' '}
-                                                    {contact.phone}
-                                                </div>
-                                                {contact.email && (
+                                            )}
+
+                                            <div className="flex-1 space-y-2">
+                                                <EntityHeader
+                                                    name={contact.contact_name}
+                                                    badges={[
+                                                        {
+                                                            show: contact.is_primary,
+                                                            label: 'Primary',
+                                                            variant: 'default',
+                                                        },
+                                                        {
+                                                            show: contact._isNew,
+                                                            label: 'New',
+                                                            variant: 'outline',
+                                                            className:
+                                                                'border-green-500 bg-green-100 text-green-800 hover:bg-green-200',
+                                                        },
+                                                        {
+                                                            show: contact._isModified,
+                                                            label: 'Modified',
+                                                            variant: 'outline',
+                                                            className:
+                                                                'border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+                                                        },
+                                                    ]}
+                                                />
+
+                                                <div className="space-y-1 text-sm">
                                                     <div>
                                                         <span className="text-muted-foreground">
-                                                            Email:
+                                                            Relationship:
                                                         </span>{' '}
-                                                        {contact.email}
-                                                    </div>
-                                                )}
-                                                {contact.address && (
-                                                    <div>
+                                                        <span className="mr-16 capitalize">
+                                                            {
+                                                                contact.relationship
+                                                            }
+                                                        </span>
                                                         <span className="text-muted-foreground">
-                                                            Address:
+                                                            Phone:
                                                         </span>{' '}
-                                                        {contact.address}
+                                                        {contact.phone}
                                                     </div>
-                                                )}
+
+                                                    {contact.email && (
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Email:
+                                                            </span>{' '}
+                                                            {contact.email}
+                                                        </div>
+                                                    )}
+
+                                                    {contact.address && (
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Address:
+                                                            </span>{' '}
+                                                            {contact.address}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="absolute top-1/2 right-4 flex -translate-y-1/2 gap-2">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                className="cursor-pointer"
-                                                onClick={() =>
-                                                    setEditContactDialogOpen(
-                                                        contact.id,
-                                                    )
-                                                }
-                                            >
-                                                <SquarePen className="h-4 w-4 text-primary" />
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                className="cursor-pointer"
-                                                onClick={() =>
-                                                    setDeleteContactDialogOpen(
-                                                        contact.id,
-                                                    )
-                                                }
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
+
+                                            <div className="absolute top-1/2 right-4 flex -translate-y-1/2 gap-2">
+                                                <DataTableActions
+                                                    item={contact}
+                                                    onEdit={() =>
+                                                        setEditContactDialogOpen(
+                                                            contact.id,
+                                                        )
+                                                    }
+                                                    onDelete={() =>
+                                                        setDeleteContactDialogOpen(
+                                                            contact.id,
+                                                        )
+                                                    }
+                                                    showView={false}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
-                </div>
+                                );
+                            })}
+                    </div>
+                ) : (
+                    <EmptyActionState
+                        message="Add contact details to track employee information."
+                        buttonText="Add Contact Details"
+                    />
+                )}
             </InfoCard>
 
             {/* Add Contact Dialog */}
-            <ContactDialog
+            <ResourceDialog
                 mode="add"
                 open={isAddContactDialogOpen}
-                onSuccess={handleContactAdd}
-                onCancel={handleContactAddCancel}
                 resourceLabel="Emergency Contact"
                 subjectLabel="employee"
-            />
+            >
+                <ContactForm
+                    onSuccess={handleContactAdd}
+                    onCancel={handleContactAddCancel}
+                    resourceLabel="Emergency Contact"
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Edit Contact Dialog */}
-            <ContactDialog
+            <ResourceDialog
                 mode="edit"
                 open={!!editContactDialogOpen}
-                contact={contacts.find((c) => c.id === editContactDialogOpen)}
-                onSuccess={handleContactEdit}
-                onCancel={handleContactEditCancel}
                 resourceLabel="Emergency Contact"
                 subjectLabel="employee"
-            />
+            >
+                <ContactForm
+                    contact={contacts.find(
+                        (c) => c.id === editContactDialogOpen,
+                    )}
+                    onSuccess={handleContactEdit}
+                    onCancel={handleContactEditCancel}
+                    resourceLabel="Emergency Contact"
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Delete Contact Dialog */}
             <DeleteDialog

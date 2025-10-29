@@ -1,11 +1,13 @@
-import { PageHeader } from '@/components/common';
 import {
-    EmployeeDeleteDialog,
-    EmployeeEmptyState,
+    DeleteDialog,
+    EmptyActionState,
+    PageHeader,
+} from '@/components/common';
+import { TableBlueprint } from '@/components/common/TableBlueprint';
+import {
     UseEmployeeColumns,
     type Employee,
 } from '@/components/modules/employee';
-import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import {
     create as employeesCreate,
@@ -76,26 +78,46 @@ export default function Index({ employees = [] }: Props) {
 
                 <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     {employees.length === 0 ? (
-                        <EmployeeEmptyState />
+                        <EmptyActionState
+                            message="No employees found"
+                            buttonText="Add Employee"
+                            onButtonClick={() =>
+                                router.get(employeesCreate().url)
+                            }
+                            buttonIcon={<FilePlus className="mr-1 size-4" />}
+                        />
                     ) : (
-                        <DataTable
+                        <TableBlueprint
                             columns={columns}
                             data={employees}
                             searchPlaceholder="Search employees..."
+                            globalSearchKeys={[
+                                'first_name',
+                                'last_name',
+                                'email',
+                                'employee_code',
+                            ]}
                         />
                     )}
                 </div>
             </div>
 
             {/* Delete Confirmation Dialog */}
-            <EmployeeDeleteDialog
+            <DeleteDialog
                 open={deleteDialogOpen}
-                employee={employeeToDelete}
                 onOpenChange={(open) => {
                     setDeleteDialogOpen(open);
                     if (!open) setEmployeeToDelete(null);
                 }}
                 onConfirm={handleDeleteConfirm}
+                title="Delete Employee"
+                description={
+                    employeeToDelete
+                        ? `Are you sure you want to delete "${employeeToDelete.first_name} ${employeeToDelete.last_name}"? This action cannot be undone and may affect related records.`
+                        : 'Are you sure you want to delete this item?'
+                }
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
             />
         </AppLayout>
     );

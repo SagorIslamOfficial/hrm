@@ -1,4 +1,5 @@
-import { InfoCard, NumberField, TextField } from '@/components/common';
+import { FormField, InfoCard } from '@/components/common';
+import { SUPPORTED_CURRENCIES } from '@/config/currency';
 
 interface SalaryTabProps {
     data: {
@@ -13,6 +14,7 @@ interface SalaryTabProps {
             tax_id: string;
         };
     };
+    currency?: string;
     setData: (
         key: string,
         value:
@@ -25,19 +27,63 @@ interface SalaryTabProps {
     ) => void;
 }
 
-export function SalaryEdit({ data, setData }: SalaryTabProps) {
+export function SalaryEdit({ data, setData, currency }: SalaryTabProps) {
     // Helper function to update nested salary_detail object
     const updateSalaryDetail = (field: string, value: string | number) => {
-        setData('salary_detail', {
+        const updatedDetail = {
             ...data.salary_detail,
             [field]: value,
-        });
+        };
+
+        // Auto-calculate net salary when basic, allowances, or deductions change
+        if (
+            field === 'basic_salary' ||
+            field === 'allowances' ||
+            field === 'deductions'
+        ) {
+            const basicSalary =
+                field === 'basic_salary'
+                    ? Number(value)
+                    : Number(updatedDetail.basic_salary);
+            const allowances =
+                field === 'allowances'
+                    ? Number(value)
+                    : Number(updatedDetail.allowances);
+            const deductions =
+                field === 'deductions'
+                    ? Number(value)
+                    : Number(updatedDetail.deductions);
+
+            updatedDetail.net_salary = basicSalary + allowances - deductions;
+        }
+
+        setData('salary_detail', updatedDetail);
+    };
+
+    const handleCurrencyChange = (newCurrency: string) => {
+        setData('currency', newCurrency);
     };
 
     return (
         <InfoCard title="Salary & Banking Details">
             <div className="grid gap-6 md:grid-cols-2">
-                <NumberField
+                <FormField
+                    type="combobox"
+                    id="currency"
+                    label="Currency"
+                    required
+                    value={currency || ''}
+                    onChange={handleCurrencyChange}
+                    options={SUPPORTED_CURRENCIES.map((curr) => ({
+                        value: curr.code,
+                        label: `${curr.code} - ${curr.name}`,
+                    }))}
+                    searchPlaceholder="Search currencies..."
+                    emptyText="No currency found."
+                />
+
+                <FormField
+                    type="number"
                     id="basic_salary"
                     label="Basic Salary"
                     required
@@ -49,7 +95,8 @@ export function SalaryEdit({ data, setData }: SalaryTabProps) {
                     min={0}
                 />
 
-                <NumberField
+                <FormField
+                    type="number"
                     id="allowances"
                     label="Allowances"
                     value={data.salary_detail.allowances}
@@ -60,7 +107,8 @@ export function SalaryEdit({ data, setData }: SalaryTabProps) {
                     min={0}
                 />
 
-                <NumberField
+                <FormField
+                    type="number"
                     id="deductions"
                     label="Deductions"
                     value={data.salary_detail.deductions}
@@ -71,7 +119,8 @@ export function SalaryEdit({ data, setData }: SalaryTabProps) {
                     min={0}
                 />
 
-                <NumberField
+                <FormField
+                    type="number"
                     id="net_salary"
                     label="Net Salary"
                     value={data.salary_detail.net_salary}
@@ -80,41 +129,50 @@ export function SalaryEdit({ data, setData }: SalaryTabProps) {
                     }
                     placeholder="e.g., 55000"
                     min={0}
+                    disabled
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="bank_name"
                     label="Bank Name"
                     value={data.salary_detail.bank_name}
-                    onChange={(value) => updateSalaryDetail('bank_name', value)}
+                    onChange={(value: string) =>
+                        updateSalaryDetail('bank_name', value)
+                    }
                     placeholder="e.g., BRAC Bank"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="bank_account_number"
                     label="Bank Account Number"
                     value={data.salary_detail.bank_account_number}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updateSalaryDetail('bank_account_number', value)
                     }
                     placeholder="e.g., 0123456789"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="bank_branch"
                     label="Bank Branch"
                     value={data.salary_detail.bank_branch}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updateSalaryDetail('bank_branch', value)
                     }
                     placeholder="e.g., Dhanmondi Branch"
                 />
 
-                <TextField
+                <FormField
+                    type="text"
                     id="tax_id"
                     label="Tax ID"
                     value={data.salary_detail.tax_id}
-                    onChange={(value) => updateSalaryDetail('tax_id', value)}
+                    onChange={(value: string) =>
+                        updateSalaryDetail('tax_id', value)
+                    }
                     placeholder="e.g., TAX123456"
                 />
             </div>

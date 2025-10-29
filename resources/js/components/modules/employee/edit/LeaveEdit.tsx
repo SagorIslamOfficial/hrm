@@ -1,17 +1,12 @@
-import { InfoCard } from '@/components/common';
-import { Button } from '@/components/ui/button';
+import { EmptyActionState, InfoCard } from '@/components/common';
 
 export function LeaveEdit() {
     return (
         <InfoCard title="Leave History">
-            <div className="py-8 text-center">
-                <p className="mb-4 text-sm text-muted-foreground">
-                    View and manage employee leave requests and balances.
-                </p>
-                <Button variant="outline" disabled>
-                    View Leave Records
-                </Button>
-            </div>
+            <EmptyActionState
+                message="View and manage employee leave requests."
+                buttonText="Add Leave Record"
+            />
         </InfoCard>
     );
 }

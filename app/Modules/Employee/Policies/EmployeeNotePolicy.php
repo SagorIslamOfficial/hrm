@@ -4,7 +4,6 @@ namespace App\Modules\Employee\Policies;
 
 use App\Models\User;
 use App\Modules\Employee\Models\EmployeeNote;
-use Illuminate\Auth\Access\Response;
 
 class EmployeeNotePolicy
 {

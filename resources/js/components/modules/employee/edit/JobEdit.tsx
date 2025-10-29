@@ -1,15 +1,9 @@
-import {
-    DateField,
-    InfoCard,
-    SelectField,
-    TextField,
-} from '@/components/common';
+import { FormField, InfoCard } from '@/components/common';
 
 interface JobTabProps {
     data: {
         job_detail: {
             job_title: string;
-            employment_type: string;
             supervisor_id: string;
             work_shift: string;
             probation_end_date: string;
@@ -27,7 +21,6 @@ interface JobTabProps {
             | Record<string, unknown>,
     ) => void;
     supervisors: Array<{ id: string; name: string; employee_code: string }>;
-    employmentTypes: Array<{ code: string; name: string }>;
     isSuperAdminOrOwner: boolean;
 }
 
@@ -35,7 +28,6 @@ export function JobEdit({
     data,
     setData,
     supervisors,
-    employmentTypes,
     isSuperAdminOrOwner,
 }: JobTabProps) {
     // Helper function to update nested job_detail object
@@ -49,34 +41,24 @@ export function JobEdit({
     return (
         <InfoCard title="Job Details">
             <div className="grid gap-6 md:grid-cols-2">
-                <TextField
+                <FormField
+                    type="text"
                     id="job_title"
                     label="Job Title"
                     required
                     value={data.job_detail.job_title}
-                    onChange={(value) => updateJobDetail('job_title', value)}
+                    onChange={(value: string) =>
+                        updateJobDetail('job_title', value)
+                    }
                     placeholder="e.g., Software Engineer"
                 />
 
-                <SelectField
-                    id="employment_type"
-                    label="Employment Type"
-                    required
-                    value={data.job_detail.employment_type}
-                    onChange={(value) =>
-                        updateJobDetail('employment_type', value)
-                    }
-                    options={employmentTypes.map((type) => ({
-                        value: type.code,
-                        label: type.name,
-                    }))}
-                />
-
-                <SelectField
+                <FormField
+                    type="combobox"
                     id="supervisor_id"
                     label="Supervisor"
                     value={data.job_detail.supervisor_id}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updateJobDetail('supervisor_id', value)
                     }
                     options={supervisors.map((supervisor) => ({
@@ -84,14 +66,19 @@ export function JobEdit({
                         label: `${supervisor.name} (${supervisor.employee_code})`,
                     }))}
                     required={!isSuperAdminOrOwner}
+                    searchPlaceholder="Search supervisors..."
+                    emptyText="No supervisors found."
                 />
 
-                <SelectField
+                <FormField
+                    type="select"
                     id="work_shift"
                     label="Work Shift"
                     required
                     value={data.job_detail.work_shift}
-                    onChange={(value) => updateJobDetail('work_shift', value)}
+                    onChange={(value: string) =>
+                        updateJobDetail('work_shift', value)
+                    }
                     options={[
                         { value: 'day', label: 'Day' },
                         { value: 'night', label: 'Night' },
@@ -100,22 +87,24 @@ export function JobEdit({
                     ]}
                 />
 
-                <DateField
+                <FormField
+                    type="date"
                     id="probation_end_date"
                     label="Probation End Date"
                     required
                     value={data.job_detail.probation_end_date}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updateJobDetail('probation_end_date', value)
                     }
                 />
 
-                <DateField
+                <FormField
+                    type="date"
                     id="contract_end_date"
                     label="Contract End Date"
                     required
                     value={data.job_detail.contract_end_date}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         updateJobDetail('contract_end_date', value)
                     }
                 />

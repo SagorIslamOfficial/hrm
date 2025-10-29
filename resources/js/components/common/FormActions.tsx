@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { ReactNode } from 'react';
 
 interface FormActionsProps {
     // Actions
@@ -7,13 +8,13 @@ interface FormActionsProps {
     onSubmit?: () => void;
 
     // Labels
-    submitLabel?: string;
-    cancelLabel?: string;
-    resetLabel?: string;
+    submitLabel?: ReactNode;
+    cancelLabel?: ReactNode;
+    resetLabel?: ReactNode;
 
     // State
     processing?: boolean;
-    submitting?: boolean; // Alias for processing
+    submitting?: boolean;
     disabled?: boolean;
 
     // Visibility
@@ -66,6 +67,7 @@ export function FormActions({
                     type="button"
                     variant="outline"
                     onClick={onCancel}
+                    className="cursor-pointer"
                     disabled={isProcessing || disabled}
                 >
                     {cancelLabel}
@@ -78,6 +80,7 @@ export function FormActions({
                     type="button"
                     variant="outline"
                     onClick={onReset}
+                    className="cursor-pointer"
                     disabled={isProcessing || disabled}
                 >
                     {resetLabel}
@@ -88,6 +91,7 @@ export function FormActions({
             <Button
                 type={onSubmit ? 'button' : 'submit'}
                 onClick={onSubmit}
+                className="cursor-pointer"
                 disabled={isProcessing || disabled}
                 variant={variant}
             >

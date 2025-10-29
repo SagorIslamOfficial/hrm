@@ -36,6 +36,7 @@ class EmployeeService implements EmployeeServiceInterface
                 'employment_status' => $data['employment_status'],
                 'employment_type' => $data['employment_type'],
                 'joining_date' => $data['joining_date'],
+                'currency' => $data['currency'] ?? 'BDT',
             ]);
 
             // Create related records if data provided
@@ -68,6 +69,7 @@ class EmployeeService implements EmployeeServiceInterface
                 'employment_status' => $data['employment_status'] ?? null,
                 'employment_type' => $data['employment_type'] ?? null,
                 'joining_date' => $data['joining_date'] ?? null,
+                'currency' => $data['currency'] ?? null,
             ], fn ($value) => $value !== null);
 
             if (! empty($employeeData)) {

@@ -125,8 +125,22 @@ class EmployeeController
             'customFields',
         ]);
 
+        $supervisors = $this->employeeRepository->all()
+            ->where('id', '!=', $id)
+            ->map(fn ($emp) => [
+                'id' => $emp->id,
+                'name' => $emp->full_name,
+                'employee_code' => $emp->employee_code,
+            ])
+            ->values();
+
         return Inertia::render('modules/employee/show', [
             'employee' => $employee,
+            'supervisors' => $supervisors,
+            'currency' => $employee->currency ?? 'BDT',
+            'auth' => [
+                'user' => Auth::user()->load('roles'),
+            ],
         ]);
     }
 
@@ -168,6 +182,7 @@ class EmployeeController
             'designations' => $designations,
             'employmentTypes' => $employmentTypes,
             'supervisors' => $supervisors,
+            'currency' => $employee->currency ?? 'BDT',
             'auth' => [
                 'user' => Auth::user()->load('roles'),
             ],

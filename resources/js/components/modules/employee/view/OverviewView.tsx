@@ -1,7 +1,6 @@
 import { InfoCard } from '@/components/common';
-import { Badge } from '@/components/ui/badge';
+import DetailRow from '@/components/common/DetailRow';
 import { Separator } from '@/components/ui/separator';
-import { Image } from 'lucide-react';
 
 interface Employee {
     id: string;
@@ -24,166 +23,145 @@ interface Employee {
         title: string;
         code: string;
     };
+    creator?: { name: string };
+    created_at?: string;
+    updated_at?: string;
 }
 
 interface OverviewViewProps {
     employee: Employee;
     onPhotoClick: (photo: { url: string; name: string }) => void;
+    auth?: {
+        user?: {
+            id?: number;
+            name?: string;
+            roles?: Array<{ name: string }>;
+            is_super_admin?: boolean;
+        };
+    };
 }
 
-export function OverviewView({ employee, onPhotoClick }: OverviewViewProps) {
+export function OverviewView({
+    employee,
+    onPhotoClick,
+    auth,
+}: OverviewViewProps) {
     return (
         <div className="grid gap-6 md:grid-cols-2">
             <InfoCard title="Employee Information">
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                Employee Code
-                            </label>
-                            <p className="text-sm font-medium">
-                                {employee.employee_code}
-                            </p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                Status
-                            </label>
-                            <div className="mt-1">
-                                <Badge
-                                    className={`text-[13px] ${
-                                        employee.employment_status ===
-                                        'on_leave'
-                                            ? 'border-rose-200 bg-rose-100 text-rose-800 hover:bg-rose-200'
-                                            : ''
-                                    }`}
-                                    variant={
-                                        employee.employment_status === 'active'
-                                            ? 'default'
-                                            : employee.employment_status ===
-                                                'inactive'
-                                              ? 'secondary'
-                                              : employee.employment_status ===
-                                                  'on_leave'
-                                                ? 'outline'
-                                                : 'destructive'
-                                    }
-                                >
-                                    {employee.employment_status === 'inactive'
-                                        ? 'InActive'
-                                        : employee.employment_status
-                                              .split('_')
-                                              .map(
-                                                  (word) =>
-                                                      word
-                                                          .charAt(0)
-                                                          .toUpperCase() +
-                                                      word.slice(1),
-                                              )
-                                              .join(' ')}
-                                </Badge>
-                            </div>
-                        </div>
+                        <DetailRow
+                            label="Employee Code"
+                            value={employee.employee_code}
+                        />
+
+                        <DetailRow
+                            label="Status"
+                            statusValue={employee.employment_status}
+                        />
                     </div>
 
                     <Separator />
 
                     <div className="grid grid-cols-2 gap-4">
-                        {/* Basic Info Section */}
                         <div className="space-y-3">
-                            <div>
-                                <label className="text-sm font-medium text-muted-foreground">
-                                    Full Name
-                                </label>
-                                <p className="text-sm font-medium">
-                                    {employee.first_name} {employee.last_name}
-                                </p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-muted-foreground">
-                                    Email
-                                </label>
-                                <p className="text-sm font-medium">
-                                    {employee.email}
-                                </p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-muted-foreground">
-                                    Phone
-                                </label>
-                                <p className="text-sm font-medium">
-                                    {employee.phone || 'Not provided'}
-                                </p>
-                            </div>
+                            <DetailRow
+                                label="Full Name"
+                                value={`${employee.first_name} ${employee.last_name}`}
+                            />
+
+                            <DetailRow label="Email" value={employee.email} />
+
+                            <DetailRow
+                                label="Phone"
+                                value={employee.phone || 'N/A'}
+                            />
                         </div>
 
-                        {/* Photo Section */}
                         {employee.photo_url && (
-                            <div>
-                                <label className="text-sm font-medium text-muted-foreground">
-                                    Photo
-                                </label>
-                                <div className="mt-2">
-                                    <div className="group relative w-fit">
-                                        <img
-                                            src={employee.photo_url}
-                                            alt={`${employee.first_name} ${employee.last_name}`}
-                                            className="size-30 cursor-pointer rounded-lg transition-opacity hover:opacity-80"
-                                            onClick={() =>
-                                                onPhotoClick({
-                                                    url: employee.photo_url!,
-                                                    name: `${employee.first_name} ${employee.last_name}`,
-                                                })
-                                            }
-                                        />
-                                        <div className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                            <Image className="size-6 text-white" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <DetailRow
+                                label="Photo"
+                                value={`${employee.first_name} ${employee.last_name}`}
+                                imageSrc={employee.photo_url}
+                                imageAlt={`${employee.first_name} ${employee.last_name}`}
+                                imageClassName="size-30 cursor-pointer rounded-lg transition-opacity hover:opacity-80"
+                                imageWrapperClassName=""
+                                onImageClick={() =>
+                                    onPhotoClick({
+                                        url: employee.photo_url!,
+                                        name: `${employee.first_name} ${employee.last_name}`,
+                                    })
+                                }
+                                showValue={false}
+                            />
                         )}
                     </div>
                 </div>
             </InfoCard>
 
             <InfoCard title="Employment Details">
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="space-y-3">
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                Department
-                            </label>
-                            <p className="text-sm font-medium">
-                                {employee.department.name}
-                            </p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                Designation
-                            </label>
-                            <p className="text-sm font-medium">
-                                {employee.designation.title}
-                            </p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                Employment Type
-                            </label>
-                            <p className="text-sm font-medium capitalize">
-                                {employee.employment_type.replace('_', ' ')}
-                            </p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">
-                                Joining Date
-                            </label>
-                            <p className="text-sm font-medium">
-                                {new Date(
-                                    employee.joining_date,
-                                ).toLocaleDateString()}
-                            </p>
-                        </div>
+                        <DetailRow
+                            label="Department"
+                            value={employee.department.name}
+                        />
+                        <DetailRow
+                            label="Designation"
+                            value={employee.designation.title}
+                        />
+                        <DetailRow
+                            label="Employment Type"
+                            value={employee.employment_type.replace('_', ' ')}
+                        />
+
+                        <DetailRow
+                            label="Joining Date"
+                            value={new Date(
+                                employee.joining_date,
+                            ).toLocaleDateString()}
+                        />
+                    </div>
+
+                    <div className="space-y-3">
+                        {(auth?.user?.is_super_admin ||
+                            auth?.user?.roles?.some(
+                                (r) => r.name === 'Admin',
+                            )) && (
+                            <>
+                                <DetailRow
+                                    label="Created By"
+                                    value={
+                                        employee.creator?.name ??
+                                        auth?.user?.name ??
+                                        '—'
+                                    }
+                                />
+
+                                <DetailRow
+                                    label="Created At"
+                                    value={
+                                        employee.created_at
+                                            ? new Date(
+                                                  employee.created_at,
+                                              ).toLocaleString()
+                                            : '—'
+                                    }
+                                />
+
+                                <DetailRow
+                                    label="Updated At"
+                                    value={
+                                        employee.updated_at
+                                            ? new Date(
+                                                  employee.updated_at,
+                                              ).toLocaleString()
+                                            : '—'
+                                    }
+                                />
+                            </>
+                        )}
                     </div>
                 </div>
             </InfoCard>

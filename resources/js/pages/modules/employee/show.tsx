@@ -46,7 +46,7 @@ interface Employee {
     };
     job_detail?: {
         job_title: string;
-        employment_type: string;
+        supervisor_id: string;
         work_shift: string;
         probation_end_date: string | null;
         contract_end_date: string | null;
@@ -131,9 +131,18 @@ interface Employee {
 
 interface Props {
     employee: Employee;
+    supervisors: Array<{ id: string; name: string; employee_code: string }>;
+    auth?: {
+        user?: {
+            id?: number;
+            name?: string;
+            roles?: Array<{ name: string }>;
+            is_super_admin?: boolean;
+        };
+    };
 }
 
-export default function Show({ employee }: Props) {
+export default function Show({ employee, supervisors, auth }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Employees',
@@ -167,6 +176,8 @@ export default function Show({ employee }: Props) {
                 {/* Employee Show */}
                 <EmployeeShow
                     employee={employee}
+                    supervisors={supervisors}
+                    auth={auth}
                     className="rounded-xl border border-sidebar-border/70 p-6"
                 />
             </div>

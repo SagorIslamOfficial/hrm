@@ -1,26 +1,16 @@
-import { DeleteDialog, InfoCard, NoteDialog } from '@/components/common';
-import { Badge } from '@/components/ui/badge';
+import {
+    DeleteDialog,
+    EmptyActionState,
+    InfoCard,
+    ResourceDialog,
+} from '@/components/common';
+import { DataTableActions } from '@/components/common/DataTableActions';
+import { EntityHeader, GetBorderClass } from '@/components/common/EntityHeader';
+import { NoteForm } from '@/components/common/NoteForm';
+import { NoteMeta } from '@/components/common/NoteMeta';
+import type { Note } from '@/components/common/interfaces';
 import { Button } from '@/components/ui/button';
-import { Lock, SquarePen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-
-interface Note {
-    id: string;
-    note: string;
-    category: string;
-    is_private: boolean;
-    created_at: string;
-    creator?: {
-        name?: string;
-    };
-    updated_at?: string;
-    updater?: {
-        name?: string;
-    };
-    _isNew?: boolean;
-    _isModified?: boolean;
-    _isDeleted?: boolean;
-}
 
 interface NotesEditProps {
     notes: Note[];
@@ -84,12 +74,10 @@ export function NotesEdit({
                 {activeNotes.length > 0 ? (
                     <div className="space-y-4">
                         {activeNotes.map((note) => {
-                            let borderClass = 'border';
-                            if (note._isNew) {
-                                borderClass = 'border-2 border-green-500';
-                            } else if (note._isModified) {
-                                borderClass = 'border-2 border-yellow-500';
-                            }
+                            const borderClass = GetBorderClass(
+                                note._isNew,
+                                note._isModified,
+                            );
 
                             return (
                                 <div
@@ -98,143 +86,64 @@ export function NotesEdit({
                                 >
                                     <div className="flex items-start gap-4">
                                         <div className="flex-1">
-                                            <div className="mb-2 flex gap-2">
-                                                <Badge variant="secondary">
-                                                    {formatCategory(
-                                                        note.category,
-                                                    )}
-                                                </Badge>
-                                                {note.is_private && (
-                                                    <Badge variant="destructive">
-                                                        <Lock className="mr-1 size-3" />
-                                                        Private
-                                                    </Badge>
+                                            <EntityHeader
+                                                name={formatCategory(
+                                                    note.category,
                                                 )}
-                                                {note._isNew && (
-                                                    <Badge
-                                                        className="border-green-500 bg-green-100 text-green-800 hover:bg-green-200"
-                                                        variant="outline"
-                                                    >
-                                                        New
-                                                    </Badge>
-                                                )}
-                                                {note._isModified && (
-                                                    <Badge
-                                                        className="border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                                        variant="outline"
-                                                    >
-                                                        Modified
-                                                    </Badge>
-                                                )}
-                                                {!note._isNew &&
-                                                    !note._isModified &&
-                                                    note.updated_at &&
-                                                    note.updated_at !==
-                                                        note.created_at && (
-                                                        <Badge
-                                                            className="border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                                            variant="outline"
-                                                        >
-                                                            Modified
-                                                        </Badge>
-                                                    )}
-                                            </div>
-                                            <p className="text-xs text-muted-foreground">
-                                                By{' '}
-                                                {note.creator?.name ??
-                                                    currentUser?.name}{' '}
-                                                •{' '}
-                                                {new Date(
-                                                    note.created_at,
-                                                ).toLocaleDateString()}{' '}
-                                                •{' '}
-                                                {new Date(note.created_at)
-                                                    .toLocaleTimeString([], {
-                                                        hour: 'numeric',
-                                                        minute: '2-digit',
-                                                    })
-                                                    .toLowerCase()}
-                                                {note._isModified &&
-                                                    currentUser?.name && (
-                                                        <>
-                                                            {' '}
-                                                            • Updated by{' '}
-                                                            {
-                                                                currentUser.name
-                                                            } •{' '}
-                                                            {new Date().toLocaleDateString()}{' '}
-                                                            •{' '}
-                                                            {new Date()
-                                                                .toLocaleTimeString(
-                                                                    [],
-                                                                    {
-                                                                        hour: 'numeric',
-                                                                        minute: '2-digit',
-                                                                    },
-                                                                )
-                                                                .toLowerCase()}
-                                                        </>
-                                                    )}
-                                                {!note._isModified &&
-                                                    note.updated_at &&
-                                                    note.updated_at !==
-                                                        note.created_at && (
-                                                        <>
-                                                            {' '}
-                                                            - Updated by{' '}
-                                                            {note.updater
-                                                                ?.name ??
-                                                                note.creator
-                                                                    ?.name ??
-                                                                currentUser?.name ??
-                                                                'Unknown'}{' '}
-                                                            {new Date(
-                                                                note.updated_at,
-                                                            ).toLocaleDateString()}{' '}
-                                                            •{' '}
-                                                            {new Date(
-                                                                note.updated_at,
-                                                            )
-                                                                .toLocaleTimeString(
-                                                                    [],
-                                                                    {
-                                                                        hour: 'numeric',
-                                                                        minute: '2-digit',
-                                                                    },
-                                                                )
-                                                                .toLowerCase()}
-                                                        </>
-                                                    )}
-                                            </p>
+                                                className="mb-2"
+                                                nameClassName="text-sm font-medium"
+                                                badges={[
+                                                    {
+                                                        show: note.is_private,
+                                                        label: 'Private',
+                                                        variant: 'destructive',
+                                                    },
+                                                    {
+                                                        show: note._isNew,
+                                                        label: 'New',
+                                                        variant: 'outline',
+                                                        className:
+                                                            'border-green-500 bg-green-100 text-green-800 hover:bg-green-200',
+                                                    },
+                                                    {
+                                                        show: !!(
+                                                            note._isModified ||
+                                                            (!note._isNew &&
+                                                                note.updated_at &&
+                                                                note.updated_at !==
+                                                                    note.created_at)
+                                                        ),
+                                                        label: 'Modified',
+                                                        variant: 'outline',
+                                                        className:
+                                                            'border-yellow-500 bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+                                                    },
+                                                ]}
+                                            />
+
+                                            <NoteMeta
+                                                note={note}
+                                                currentUser={currentUser}
+                                            />
+
                                             <p className="mt-2 text-sm">
                                                 {note.note}
                                             </p>
                                         </div>
+
                                         <div className="absolute top-1/2 right-4 flex -translate-y-1/2 gap-2">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                className="cursor-pointer"
-                                                onClick={() =>
+                                            <DataTableActions
+                                                item={note}
+                                                onEdit={() =>
                                                     openEditDialog(note)
                                                 }
-                                            >
-                                                <SquarePen className="h-4 w-4 text-primary" />
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                className="cursor-pointer"
-                                                onClick={() =>
+                                                onDelete={() =>
                                                     setDeleteNoteDialogOpen(
                                                         note.id,
                                                     )
                                                 }
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
+                                                showView={false}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -242,54 +151,55 @@ export function NotesEdit({
                         })}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <p className="mb-4 text-sm text-muted-foreground">
-                            Add internal notes and comments about what matters.
-                        </p>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            className="border"
-                            disabled
-                        >
-                            Add Note
-                        </Button>
-                    </div>
+                    <EmptyActionState
+                        message="Add internal notes and comments about what matters."
+                        buttonText="Add Note"
+                    />
                 )}
             </InfoCard>
 
             {/* Add Note Dialog */}
-            <NoteDialog
+            <ResourceDialog
                 mode="add"
                 open={isAddNoteDialogOpen}
-                onSuccess={(noteData) => {
-                    onNoteAdd(noteData);
-                    setIsAddNoteDialogOpen(false);
-                }}
-                onCancel={() => setIsAddNoteDialogOpen(false)}
-                currentUser={currentUser}
                 resourceLabel="Note"
                 subjectLabel="employee"
-            />
+            >
+                <NoteForm
+                    onSuccess={(noteData: Note) => {
+                        onNoteAdd(noteData);
+                        setIsAddNoteDialogOpen(false);
+                    }}
+                    onCancel={() => setIsAddNoteDialogOpen(false)}
+                    currentUser={currentUser}
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Edit Note Dialog */}
-            <NoteDialog
+            <ResourceDialog
                 mode="edit"
                 open={!!editNoteDialogOpen}
-                note={
-                    editNoteDialogOpen
-                        ? (notes || []).find((n) => n.id === editNoteDialogOpen)
-                        : undefined
-                }
-                onSuccess={(noteData) => {
-                    onNoteEdit(noteData);
-                    setEditNoteDialogOpen(null);
-                }}
-                onCancel={() => setEditNoteDialogOpen(null)}
-                currentUser={currentUser}
                 resourceLabel="Note"
                 subjectLabel="employee"
-            />
+            >
+                <NoteForm
+                    note={
+                        editNoteDialogOpen
+                            ? (notes || []).find(
+                                  (n) => n.id === editNoteDialogOpen,
+                              )
+                            : undefined
+                    }
+                    onSuccess={(noteData: Note) => {
+                        onNoteEdit(noteData);
+                        setEditNoteDialogOpen(null);
+                    }}
+                    onCancel={() => setEditNoteDialogOpen(null)}
+                    currentUser={currentUser}
+                    subjectLabel="employee"
+                />
+            </ResourceDialog>
 
             {/* Delete Note Dialog */}
             <DeleteDialog

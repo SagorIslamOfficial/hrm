@@ -1,10 +1,8 @@
 import {
-    DateField,
     FileUploadField,
     FormActions,
+    FormField,
     formatDateForInput,
-    SelectField,
-    TextField,
 } from '@/components/common';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -135,11 +133,12 @@ export function DocumentForm({
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-                <SelectField
+                <FormField
+                    type="select"
                     id="doc_type"
                     label="Document Type"
                     value={formData.doc_type}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         setFormData((prev) => ({
                             ...prev,
                             doc_type: value,
@@ -150,11 +149,12 @@ export function DocumentForm({
                     placeholder="Select document type"
                     required
                 />
-                <TextField
+                <FormField
+                    type="text"
                     id="title"
                     label="Title"
                     value={formData.title}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                         setFormData((prev) => ({
                             ...prev,
                             title: value,
@@ -166,11 +166,12 @@ export function DocumentForm({
                 />
             </div>
 
-            <DateField
+            <FormField
+                type="date"
                 id="expiry_date"
                 label="Expiry Date (Optional)"
                 value={formData.expiry_date}
-                onChange={(value) =>
+                onChange={(value: string) =>
                     setFormData((prev) => ({
                         ...prev,
                         expiry_date: value,

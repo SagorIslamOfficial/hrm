@@ -1,4 +1,4 @@
-import { InfoCard } from '@/components/common';
+import { EmptyActionState, InfoCard } from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 
 interface Leave {
@@ -77,9 +77,10 @@ export function LeavesView({ leaves }: LeavesViewProps) {
                     ))}
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground">
-                    No leave records available
-                </p>
+                <EmptyActionState
+                    message="View and manage employee leave requests."
+                    buttonText="Add Leave Record"
+                />
             )}
         </InfoCard>
     );
