@@ -3,7 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Modules\Department\Database\Seeders\DepartmentSeeder;
+use App\Modules\Department\Database\Seeders\DesignationSeeder;
+use App\Modules\Employee\Database\Seeders\EmployeeSeeder;
+use App\Modules\Employee\Database\Seeders\EmploymentTypeSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -38,5 +41,17 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        // Seed departments and designations first
+        $this->call([
+            DepartmentSeeder::class,
+            DesignationSeeder::class,
+        ]);
+
+        // Seed employees with all related data
+        $this->call([
+            EmploymentTypeSeeder::class,
+            EmployeeSeeder::class,
+        ]);
     }
 }

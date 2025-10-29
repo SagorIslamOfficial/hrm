@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -35,6 +35,9 @@ class RolePermissionSeeder extends Seeder
 
             // Settings
             'manage settings', 'manage users', 'manage roles',
+
+            // Employee Notes
+            'view-private-notes', 'manage-private-notes',
         ];
 
         foreach ($permissions as $permission) {
@@ -53,6 +56,7 @@ class RolePermissionSeeder extends Seeder
             'view leave', 'approve leave', 'reject leave',
             'view payroll', 'create payroll', 'process payroll',
             'view reports', 'export reports',
+            'view-private-notes', 'manage-private-notes',
         ]);
 
         $managerRole = Role::firstOrCreate(['name' => 'Manager']);
@@ -61,6 +65,7 @@ class RolePermissionSeeder extends Seeder
             'view attendance', 'approve attendance',
             'view leave', 'approve leave',
             'view reports',
+            'view-private-notes', // Managers can view private notes for their team
         ]);
 
         $employeeRole = Role::firstOrCreate(['name' => 'Employee']);

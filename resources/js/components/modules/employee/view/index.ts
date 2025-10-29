@@ -1,0 +1,10 @@
+export { AttendanceView } from './AttendanceView';
+export { ContactsView } from './ContactsView';
+export { CustomFieldsView } from './CustomFieldsView';
+export { DocumentsView } from './DocumentsView';
+export { JobView } from './JobView';
+export { LeavesView } from './LeavesView';
+export { NotesView } from './NotesView';
+export { OverviewView } from './OverviewView';
+export { PersonalView } from './PersonalView';
+export { SalaryView } from './SalaryView';

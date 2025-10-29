@@ -11,9 +11,21 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as attendance } from '@/routes/attendance/index';
+import { index as departments } from '@/routes/departments/index';
+import { index as employees } from '@/routes/employees/index';
+import { index as employmentTypes } from '@/routes/employment-types/index';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import {
+    BookOpen,
+    Building,
+    Clock,
+    Folder,
+    LayoutGrid,
+    UserCheck,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +33,33 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Employees',
+        href: employees(),
+        icon: Users,
+        items: [
+            {
+                title: 'All Employees',
+                href: employees(),
+                icon: Users,
+            },
+            {
+                title: 'Employment Types',
+                href: employmentTypes(),
+                icon: UserCheck,
+            },
+        ],
+    },
+    {
+        title: 'Departments',
+        href: departments(),
+        icon: Building,
+    },
+    {
+        title: 'Attendance',
+        href: attendance(),
+        icon: Clock,
     },
 ];
 

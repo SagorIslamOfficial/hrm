@@ -1,0 +1,10 @@
+export { AttendanceEdit } from './AttendanceEdit';
+export { BasicEdit } from './BasicEdit';
+export { ContactsEdit } from './ContactsEdit';
+export { CustomFieldsEdit } from './CustomFieldsEdit';
+export { DocumentsEdit } from './DocumentsEdit';
+export { JobEdit } from './JobEdit';
+export { LeaveEdit } from './LeaveEdit';
+export { NotesEdit } from './NotesEdit';
+export { PersonalEdit } from './PersonalEdit';
+export { SalaryEdit } from './SalaryEdit';
