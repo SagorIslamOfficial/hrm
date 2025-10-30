@@ -32,8 +32,8 @@
 
 ### Week 2: Database Design & Migrations
 
-- [ ] Design full schema (ERD), plan relationships, soft deletes, and indexing.
-- [ ] Write migrations for key entities, use UUID primary keys.
+- [x] Design full schema (ERD), plan relationships, soft deletes, and indexing.
+- [x] Write migrations for key entities, use UUID primary keys.
 - [x] Create seeders/factories for users and roles.
 - [x] Set up backup (spatie/laravel-backup).
 
@@ -43,10 +43,10 @@
 
 ### Week 3: Employee Database & Profiles
 
-- [ ] Build Employee model (personal, contact, job, bank details).
-- [ ] Set up relations: department, manager, emergency contacts.
-- [ ] CRUD via repositories; add validation, list/search UI, and profile views.
-- [ ] Profile picture/document upload & import/export (CSV).
+- [x] Build Employee model (basic, personal, job, salary, contact, documents, notes, attendance, leaves and custom fields - attendance and leaves are not completed).
+- [x] Set up relations: department, manager, emergency contacts.
+- [x] CRUD via repositories; add validation, list/search UI, and profile views.
+- [x] Profile picture/document upload & import/export.
 - [ ] Version and audit important fields.
 
 ### Week 3: Organization Structure
