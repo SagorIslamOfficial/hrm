@@ -8,5 +8,5 @@ Route::middleware(['attendance.access'])->group(function () {
     Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
     Route::post('attendance/{id}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
     Route::get('attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
-    Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::resource('attendance', AttendanceController::class)->names('attendance');
 });
