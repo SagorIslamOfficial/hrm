@@ -3,12 +3,12 @@ import { FormActions } from '@/components/common/FormActions';
 import { PageHeader } from '@/components/common/PageHeader';
 import EmploymentTypeForm from '@/components/modules/employee/EmploymentTypeEditForm';
 import AppLayout from '@/layouts/app-layout';
+import { index as employeesIndex } from '@/routes/employees/index';
 import {
     edit as employmentTypesEdit,
     index as employmentTypesIndex,
     update as employmentTypesUpdate,
 } from '@/routes/employment-types/index';
-import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
 import { toast } from 'sonner';
@@ -26,21 +26,6 @@ interface EmploymentType {
 interface Props {
     employmentType: EmploymentType;
 }
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Employees',
-        href: '/dashboard/hr/employee',
-    },
-    {
-        title: 'Employment Types',
-        href: employmentTypesIndex().url,
-    },
-    {
-        title: 'Edit Employment Type',
-        href: employmentTypesEdit('').url,
-    },
-];
 
 export default function Edit({ employmentType }: Props) {
     const { data, setData, put, processing, errors, clearErrors } = useForm({
@@ -84,11 +69,23 @@ export default function Edit({ employmentType }: Props) {
         });
     };
 
-    // Update breadcrumb with actual employment type name
-    breadcrumbs[2] = {
-        title: `Edit ${employmentType.name}`,
-        href: employmentTypesEdit(employmentType.id).url,
-    };
+    // Compute breadcrumbs reactively without mutating module state
+    const breadcrumbs = useMemo(() => {
+        return [
+            {
+                title: 'Employees',
+                href: employeesIndex().url,
+            },
+            {
+                title: 'Employment Types',
+                href: employmentTypesIndex().url,
+            },
+            {
+                title: employmentType.name,
+                href: employmentTypesEdit(employmentType.id).url,
+            },
+        ];
+    }, [employmentType.id, employmentType.name]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
