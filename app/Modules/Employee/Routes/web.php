@@ -22,21 +22,25 @@ Route::middleware(['employee.access'])->group(function () {
 
         // Nested resources under specific employee
         Route::resource('{employee}/contacts', EmployeeContactController::class)
-            ->except(['create', 'edit']);
-
-        Route::resource('{employee}/documents', EmployeeDocumentController::class)
+            ->names('employees.contacts')
             ->except(['create', 'edit']);
 
         Route::get('{employee}/documents/{document}/download', [EmployeeDocumentController::class, 'download'])
             ->name('employees.documents.download');
 
-        Route::resource('{employee}/notes', EmployeeNoteController::class)
+        Route::resource('{employee}/documents', EmployeeDocumentController::class)
+            ->names('employees.documents')
             ->except(['create', 'edit']);
 
-        Route::resource('{employee}/custom-fields', EmployeeCustomFieldController::class)
+        Route::resource('{employee}/notes', EmployeeNoteController::class)
+            ->names('employees.notes')
             ->except(['create', 'edit']);
 
         Route::post('{employee}/custom-fields/sync', [EmployeeCustomFieldController::class, 'sync'])
             ->name('employees.custom-fields.sync');
+
+        Route::resource('{employee}/custom-fields', EmployeeCustomFieldController::class)
+            ->names('employees.custom-fields')
+            ->except(['create', 'edit']);
     });
 });
