@@ -35,6 +35,29 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import AppLogo from './app-logo';
 
+function basePath(href?: unknown): string | undefined {
+    let n: string | undefined;
+    if (typeof href === 'string') n = href;
+    else if (typeof href === 'object' && href !== null) {
+        const hrefObj = href as Record<string, unknown>;
+        if (typeof hrefObj.url === 'string') n = hrefObj.url;
+        else {
+            const str = String(href);
+            if (str && str !== '[object Object]') n = str;
+        }
+    }
+    if (!n || n === '#') return undefined;
+    try {
+        const path = new URL(n, window.location.origin).pathname.replace(
+            /\/+$/,
+            '',
+        );
+        return path === '' ? '/' : path;
+    } catch {
+        return undefined;
+    }
+}
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -94,67 +117,185 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+type RenderMenuProps = {
+    items: NavItem[];
+    level: 'main' | 'sub' | 'nested';
+    openStates: Record<string, boolean>;
+    onOpenChange: (key: string, open: boolean) => void;
+    getActiveClass: (href?: unknown) => string;
+    currentPath: string;
+    parentKey?: string;
+};
+
+function RenderMenu({
+    items,
+    level,
+    openStates,
+    onOpenChange,
+    getActiveClass,
+    currentPath,
+    parentKey = '',
+}: RenderMenuProps) {
+    const isMain = level === 'main';
+    const Item = isMain ? SidebarMenuItem : SidebarMenuSubItem;
+    const Button = isMain ? SidebarMenuButton : SidebarMenuSubButton;
+    const chevronSize = isMain ? '' : 'h-4 w-4';
+
+    return (
+        <>
+            {items.map((item) => {
+                const key = parentKey
+                    ? `${parentKey}.${item.title}`
+                    : item.title;
+                const isOpen = openStates[key] ?? false;
+                const hasSubItems = !!item.items?.length;
+
+                if (hasSubItems) {
+                    return (
+                        <Collapsible
+                            key={key}
+                            open={isOpen}
+                            onOpenChange={(open) => onOpenChange(key, open)}
+                            className="group"
+                        >
+                            <Item>
+                                <CollapsibleTrigger asChild>
+                                    <Button
+                                        className={getActiveClass(item.href)}
+                                    >
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                        <ChevronDown
+                                            className={`ml-auto transition-transform group-data-[state=open]:rotate-180 ${chevronSize}`}
+                                        />
+                                    </Button>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        <RenderMenu
+                                            items={item.items!}
+                                            level={isMain ? 'sub' : 'nested'}
+                                            openStates={openStates}
+                                            onOpenChange={onOpenChange}
+                                            getActiveClass={getActiveClass}
+                                            currentPath={currentPath}
+                                            parentKey={key}
+                                        />
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </Item>
+                        </Collapsible>
+                    );
+                }
+
+                return (
+                    <Item key={key}>
+                        <Button asChild className={getActiveClass(item.href)}>
+                            <Link href={item.href} prefetch>
+                                {item.icon && <item.icon />}
+                                <span>{item.title}</span>
+                            </Link>
+                        </Button>
+                    </Item>
+                );
+            })}
+        </>
+    );
+}
+
 export function AppSidebar() {
     const { url } = usePage();
-    const [manualOpenParent, setManualOpenParent] = useState<string | null>(
-        null,
+    const currentPath = useMemo(
+        () => new URL(url, window.location.origin).pathname,
+        [url],
     );
-    const [manualOpenSub, setManualOpenSub] = useState<string | null>(null);
 
-    // Centralized helper: determines whether `href` should be considered parent of `currentPath`.
-    // Matches when exact, or when the remainder starts with an id/uuid or 'create'/'new'.
-    const isChildPath = (href?: string, currentPathInner?: string): boolean => {
-        if (!href || href === '#') return false;
-        const base = new URL(href, window.location.origin).pathname;
-        if (!currentPathInner) return false;
-        if (currentPathInner === base) return true;
-        const normalized = base.endsWith('/') ? base : base + '/';
-        if (!currentPathInner.startsWith(normalized)) return false;
-        const rest = currentPathInner.slice(normalized.length);
-        const first = rest.split('/')[0];
-        const isCreateLike = first === 'create' || first === 'new';
-        const isDynamicId =
-            /^[0-9]+$/.test(first) || /^[0-9a-fA-F-]{36}$/.test(first);
-        return isCreateLike || isDynamicId;
+    const bestMatchHref = useMemo(() => {
+        let best: string | undefined = undefined;
+        let bestLen = -1;
+
+        const consider = (href?: unknown) => {
+            const base = basePath(href);
+            if (!base || !currentPath) return;
+            const isMatch =
+                currentPath === base ||
+                (base !== '/' && currentPath.startsWith(base + '/'));
+            if (isMatch && base.length > bestLen) {
+                bestLen = base.length;
+                best = base;
+            }
+        };
+
+        const traverse = (items: NavItem[]) => {
+            for (const item of items) {
+                consider(item.href);
+                if (item.items) traverse(item.items);
+            }
+        };
+
+        traverse(mainNavItems);
+        return best;
+    }, [currentPath]);
+
+    const getActiveClass = (href?: unknown): string => {
+        const base = basePath(href);
+        return base === bestMatchHref ? 'bg-accent text-accent-foreground' : '';
     };
 
-    const { activeParent, activeSub } = useMemo(() => {
-        let activeParentResult: string | null = null;
-        let activeSubResult: string | null = null;
+    const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
 
-        const currentPath = new URL(url, window.location.origin).pathname;
-
-        for (const parent of mainNavItems) {
-            if (parent.items) {
-                for (const sub of parent.items) {
-                    if (sub.items) {
-                        for (const nested of sub.items) {
-                            const href =
-                                typeof nested.href === 'string'
-                                    ? nested.href
-                                    : nested.href.url;
-                            if (isChildPath(href, currentPath)) {
-                                activeParentResult = parent.title;
-                                activeSubResult = sub.title;
-                                break;
-                            }
-                        }
-                        if (activeParentResult) break;
-                    }
-                }
-                if (activeParentResult) break;
-            }
+    const handleOpenChange = (key: string, open: boolean) => {
+        setOpenStates((prev) => ({ ...prev, [key]: open }));
+        if (!open) {
+            // Close all descendants
+            setOpenStates((prev) => {
+                const updated = { ...prev };
+                Object.keys(updated).forEach((k) => {
+                    if (k.startsWith(key + '.')) delete updated[k];
+                });
+                return updated;
+            });
         }
-
-        return { activeParent: activeParentResult, activeSub: activeSubResult };
-    }, [url]);
+    };
 
     useEffect(() => {
-        if (!activeParent) {
-            setManualOpenParent(null);
-            setManualOpenSub(null);
+        if (!bestMatchHref) {
+            setOpenStates({});
+            return;
         }
-    }, [activeParent]);
+
+        const newOpenStates: Record<string, boolean> = {};
+
+        const traverse = (items: NavItem[], parentKey = '') => {
+            for (const item of items) {
+                const key = parentKey
+                    ? `${parentKey}.${item.title}`
+                    : item.title;
+                const base = basePath(item.href);
+                if (
+                    base &&
+                    (currentPath === base || currentPath.startsWith(base + '/'))
+                ) {
+                    newOpenStates[key] = true;
+                }
+                if (item.items) traverse(item.items, key);
+            }
+        };
+
+        traverse(mainNavItems);
+
+        // Open all ancestors of active items
+        Object.keys(newOpenStates).forEach((key) => {
+            const parts = key.split('.');
+            parts.reduce((acc, part, idx) => {
+                const ancestorKey = parts.slice(0, idx + 1).join('.');
+                newOpenStates[ancestorKey] = true;
+                return ancestorKey;
+            }, '');
+        });
+
+        setOpenStates((prev) => ({ ...prev, ...newOpenStates }));
+    }, [bestMatchHref, currentPath]);
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -172,224 +313,14 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <SidebarMenu className="p-2">
-                    {mainNavItems.map((item) =>
-                        item.items ? (
-                            <Collapsible
-                                key={item.title}
-                                open={
-                                    activeParent === item.title
-                                        ? true
-                                        : manualOpenParent === item.title
-                                }
-                                onOpenChange={(open) => {
-                                    setManualOpenParent(
-                                        open ? item.title : null,
-                                    );
-                                    if (!open) setManualOpenSub(null);
-                                }}
-                                className="group/collapsible"
-                            >
-                                <SidebarMenuItem>
-                                    <CollapsibleTrigger asChild>
-                                        <SidebarMenuButton>
-                                            {item.icon && <item.icon />}
-                                            <span>{item.title}</span>
-                                            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                                        </SidebarMenuButton>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent>
-                                        <SidebarMenuSub>
-                                            {item.items.map((subItem) => (
-                                                <div key={subItem.title}>
-                                                    {subItem.items ? (
-                                                        <Collapsible
-                                                            open={
-                                                                activeParent ===
-                                                                    item.title &&
-                                                                activeSub ===
-                                                                    subItem.title
-                                                                    ? true
-                                                                    : manualOpenSub ===
-                                                                      subItem.title
-                                                            }
-                                                            onOpenChange={(
-                                                                open,
-                                                            ) =>
-                                                                setManualOpenSub(
-                                                                    open
-                                                                        ? subItem.title
-                                                                        : null,
-                                                                )
-                                                            }
-                                                            className="group/collapsible-sub"
-                                                        >
-                                                            <SidebarMenuSubItem>
-                                                                <CollapsibleTrigger
-                                                                    asChild
-                                                                >
-                                                                    <SidebarMenuSubButton>
-                                                                        {subItem.icon && (
-                                                                            <subItem.icon />
-                                                                        )}
-                                                                        <span>
-                                                                            {
-                                                                                subItem.title
-                                                                            }
-                                                                        </span>
-                                                                        <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible-sub:rotate-180" />
-                                                                    </SidebarMenuSubButton>
-                                                                </CollapsibleTrigger>
-                                                            </SidebarMenuSubItem>
-                                                            <CollapsibleContent>
-                                                                <SidebarMenuSub>
-                                                                    {subItem.items.map(
-                                                                        (
-                                                                            nestedItem,
-                                                                        ) => (
-                                                                            <SidebarMenuSubItem
-                                                                                key={
-                                                                                    nestedItem.title
-                                                                                }
-                                                                            >
-                                                                                <SidebarMenuSubButton
-                                                                                    asChild
-                                                                                    className={(() => {
-                                                                                        const href =
-                                                                                            typeof nestedItem.href ===
-                                                                                            'string'
-                                                                                                ? nestedItem.href
-                                                                                                : nestedItem
-                                                                                                      .href
-                                                                                                      ?.url;
-                                                                                        const currentPath =
-                                                                                            new URL(
-                                                                                                url,
-                                                                                                window.location.origin,
-                                                                                            )
-                                                                                                .pathname;
-                                                                                        if (
-                                                                                            !href ||
-                                                                                            href ===
-                                                                                                '#'
-                                                                                        )
-                                                                                            return '';
-                                                                                        return isChildPath(
-                                                                                            href,
-                                                                                            currentPath,
-                                                                                        )
-                                                                                            ? 'bg-accent text-accent-foreground'
-                                                                                            : '';
-                                                                                    })()}
-                                                                                >
-                                                                                    <Link
-                                                                                        href={
-                                                                                            nestedItem.href
-                                                                                        }
-                                                                                        prefetch
-                                                                                    >
-                                                                                        {nestedItem.icon && (
-                                                                                            <nestedItem.icon />
-                                                                                        )}
-                                                                                        <span>
-                                                                                            {
-                                                                                                nestedItem.title
-                                                                                            }
-                                                                                        </span>
-                                                                                    </Link>
-                                                                                </SidebarMenuSubButton>
-                                                                            </SidebarMenuSubItem>
-                                                                        ),
-                                                                    )}
-                                                                </SidebarMenuSub>
-                                                            </CollapsibleContent>
-                                                        </Collapsible>
-                                                    ) : (
-                                                        <SidebarMenuSubItem>
-                                                            <SidebarMenuSubButton
-                                                                asChild
-                                                                className={(() => {
-                                                                    const href =
-                                                                        typeof subItem.href ===
-                                                                        'string'
-                                                                            ? subItem.href
-                                                                            : subItem
-                                                                                  .href
-                                                                                  ?.url;
-                                                                    const currentPath =
-                                                                        new URL(
-                                                                            url,
-                                                                            window.location.origin,
-                                                                        )
-                                                                            .pathname;
-                                                                    if (
-                                                                        !href ||
-                                                                        href ===
-                                                                            '#'
-                                                                    )
-                                                                        return '';
-                                                                    return isChildPath(
-                                                                        href,
-                                                                        currentPath,
-                                                                    )
-                                                                        ? 'bg-accent text-accent-foreground'
-                                                                        : '';
-                                                                })()}
-                                                            >
-                                                                <Link
-                                                                    href={
-                                                                        subItem.href
-                                                                    }
-                                                                    prefetch
-                                                                >
-                                                                    {subItem.icon && (
-                                                                        <subItem.icon />
-                                                                    )}
-                                                                    <span>
-                                                                        {
-                                                                            subItem.title
-                                                                        }
-                                                                    </span>
-                                                                </Link>
-                                                            </SidebarMenuSubButton>
-                                                        </SidebarMenuSubItem>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </SidebarMenuSub>
-                                    </CollapsibleContent>
-                                </SidebarMenuItem>
-                            </Collapsible>
-                        ) : (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton
-                                    asChild
-                                    className={(() => {
-                                        const href =
-                                            typeof item.href === 'string'
-                                                ? item.href
-                                                : item.href?.url;
-                                        const currentPath = new URL(
-                                            url,
-                                            window.location.origin,
-                                        ).pathname;
-                                        const itemPath = new URL(
-                                            href || '',
-                                            window.location.origin,
-                                        ).pathname;
-                                        if (!href || href === '#') return '';
-                                        return currentPath === itemPath
-                                            ? 'bg-accent text-accent-foreground'
-                                            : '';
-                                    })()}
-                                >
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ),
-                    )}
+                    <RenderMenu
+                        items={mainNavItems}
+                        level="main"
+                        openStates={openStates}
+                        onOpenChange={handleOpenChange}
+                        getActiveClass={getActiveClass}
+                        currentPath={currentPath}
+                    />
                 </SidebarMenu>
             </SidebarContent>
 
