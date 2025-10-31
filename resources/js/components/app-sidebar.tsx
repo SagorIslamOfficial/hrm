@@ -24,6 +24,7 @@ import { index as employees } from '@/routes/employees/index';
 import { index as employmentTypes } from '@/routes/employment-types/index';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
+import clsx from 'clsx';
 import {
     BookOpen,
     ChevronDown,
@@ -32,7 +33,7 @@ import {
     LayoutGrid,
     Users,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import AppLogo from './app-logo';
 
 function basePath(href?: unknown): string | undefined {
@@ -41,10 +42,6 @@ function basePath(href?: unknown): string | undefined {
     else if (typeof href === 'object' && href !== null) {
         const hrefObj = href as Record<string, unknown>;
         if (typeof hrefObj.url === 'string') n = hrefObj.url;
-        else {
-            const str = String(href);
-            if (str && str !== '[object Object]') n = str;
-        }
     }
     if (!n || n === '#') return undefined;
     try {
@@ -127,7 +124,7 @@ type RenderMenuProps = {
     parentKey?: string;
 };
 
-function RenderMenu({
+const RenderMenu = React.memo(function RenderMenu({
     items,
     level,
     openStates,
@@ -166,7 +163,10 @@ function RenderMenu({
                                         {item.icon && <item.icon />}
                                         <span>{item.title}</span>
                                         <ChevronDown
-                                            className={`ml-auto transition-transform group-data-[state=open]:rotate-180 ${chevronSize}`}
+                                            className={clsx(
+                                                'ml-auto transition-transform group-data-[state=open]:rotate-180',
+                                                chevronSize,
+                                            )}
                                         />
                                     </Button>
                                 </CollapsibleTrigger>
@@ -190,18 +190,28 @@ function RenderMenu({
 
                 return (
                     <Item key={key}>
-                        <Button asChild className={getActiveClass(item.href)}>
-                            <Link href={item.href} prefetch>
+                        {item.href && item.href !== '#' ? (
+                            <Button
+                                asChild
+                                className={getActiveClass(item.href)}
+                            >
+                                <Link href={item.href} prefetch>
+                                    {item.icon && <item.icon />}
+                                    <span>{item.title}</span>
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button className={getActiveClass(item.href)}>
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
-                            </Link>
-                        </Button>
+                            </Button>
+                        )}
                     </Item>
                 );
             })}
         </>
     );
-}
+});
 
 export function AppSidebar() {
     const { url } = usePage();
@@ -237,26 +247,30 @@ export function AppSidebar() {
         return best;
     }, [currentPath]);
 
-    const getActiveClass = (href?: unknown): string => {
-        const base = basePath(href);
-        return base === bestMatchHref ? 'bg-accent text-accent-foreground' : '';
-    };
+    const getActiveClass = useCallback(
+        (href?: unknown): string => {
+            const base = basePath(href);
+            return base === bestMatchHref
+                ? 'bg-accent text-accent-foreground'
+                : '';
+        },
+        [bestMatchHref],
+    );
 
     const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
 
-    const handleOpenChange = (key: string, open: boolean) => {
-        setOpenStates((prev) => ({ ...prev, [key]: open }));
-        if (!open) {
-            // Close all descendants
-            setOpenStates((prev) => {
-                const updated = { ...prev };
+    const handleOpenChange = useCallback((key: string, open: boolean) => {
+        setOpenStates((prev) => {
+            const updated = { ...prev, [key]: open };
+            if (!open) {
+                // Close all descendants
                 Object.keys(updated).forEach((k) => {
                     if (k.startsWith(key + '.')) delete updated[k];
                 });
-                return updated;
-            });
-        }
-    };
+            }
+            return updated;
+        });
+    }, []);
 
     useEffect(() => {
         if (!bestMatchHref) {
@@ -287,14 +301,13 @@ export function AppSidebar() {
         // Open all ancestors of active items
         Object.keys(newOpenStates).forEach((key) => {
             const parts = key.split('.');
-            parts.reduce((acc, part, idx) => {
+            for (let idx = 0; idx < parts.length; idx++) {
                 const ancestorKey = parts.slice(0, idx + 1).join('.');
                 newOpenStates[ancestorKey] = true;
-                return ancestorKey;
-            }, '');
+            }
         });
 
-        setOpenStates((prev) => ({ ...prev, ...newOpenStates }));
+        setOpenStates(newOpenStates);
     }, [bestMatchHref, currentPath]);
 
     return (
