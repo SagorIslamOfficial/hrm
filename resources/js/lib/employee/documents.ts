@@ -22,7 +22,7 @@ export async function createDocument(
     }
 
     return axios.post(
-        `/dashboard/employees/${employeeId}/documents`,
+        `/dashboard/hr/employee/${employeeId}/documents`,
         formData,
         {
             headers: {
@@ -49,7 +49,7 @@ export async function updateDocument(
     }
 
     return axios.post(
-        `/dashboard/employees/${employeeId}/documents/${documentId}`,
+        `/dashboard/hr/employee/${employeeId}/documents/${documentId}`,
         formData,
         {
             headers: {
@@ -64,7 +64,7 @@ export async function deleteDocument(
     documentId: string | number,
 ) {
     return axios.delete(
-        `/dashboard/employees/${employeeId}/documents/${documentId}`,
+        `/dashboard/hr/employee/${employeeId}/documents/${documentId}`,
     );
 }
 

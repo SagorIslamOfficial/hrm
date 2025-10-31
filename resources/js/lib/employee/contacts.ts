@@ -26,7 +26,7 @@ export async function createContact(
         formData.append('photo', payload._photoFile);
     }
 
-    return axios.post(`/dashboard/employees/${employeeId}/contacts`, formData, {
+    return axios.post(`/dashboard/hr/employee/${employeeId}/contacts`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -52,7 +52,7 @@ export async function updateContact(
     }
 
     return axios.post(
-        `/dashboard/employees/${employeeId}/contacts/${contactId}`,
+        `/dashboard/hr/employee/${employeeId}/contacts/${contactId}`,
         formData,
         {
             headers: {
@@ -67,7 +67,7 @@ export async function deleteContact(
     contactId: string | number,
 ) {
     return axios.delete(
-        `/dashboard/employees/${employeeId}/contacts/${contactId}`,
+        `/dashboard/hr/employee/${employeeId}/contacts/${contactId}`,
     );
 }
 

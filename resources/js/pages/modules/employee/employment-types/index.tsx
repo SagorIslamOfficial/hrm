@@ -33,7 +33,7 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Employees',
-        href: '/dashboard/employees',
+        href: '/dashboard/hr/employee',
     },
     {
         title: 'Employment Types',
