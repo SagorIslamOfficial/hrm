@@ -1,4 +1,9 @@
-import { EmptyActionState, InfoCard } from '@/components/common';
+import {
+    EmptyActionState,
+    formatDateForDisplay,
+    formatTimeForDisplay,
+    InfoCard,
+} from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 import { Lock } from 'lucide-react';
 
@@ -35,26 +40,22 @@ export function NotesView({ notes }: NotesViewProps) {
                             note.updated_at &&
                             note.updated_at !== note.created_at;
 
-                        const createdDate = new Date(note.created_at);
-                        const createdDateStr = createdDate.toLocaleDateString();
-                        const createdTimeStr = createdDate
-                            .toLocaleTimeString([], {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                            })
-                            .toLowerCase();
+                        const createdDateStr = formatDateForDisplay(
+                            note.created_at,
+                        );
+                        const createdTimeStr = formatTimeForDisplay(
+                            note.created_at,
+                        );
 
                         let updatedDateStr = '';
                         let updatedTimeStr = '';
                         if (isUpdated && note.updated_at) {
-                            const updatedDate = new Date(note.updated_at);
-                            updatedDateStr = updatedDate.toLocaleDateString();
-                            updatedTimeStr = updatedDate
-                                .toLocaleTimeString([], {
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                })
-                                .toLowerCase();
+                            updatedDateStr = formatDateForDisplay(
+                                note.updated_at,
+                            );
+                            updatedTimeStr = formatTimeForDisplay(
+                                note.updated_at,
+                            );
                         }
 
                         return (

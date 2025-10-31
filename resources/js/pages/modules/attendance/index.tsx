@@ -1,3 +1,7 @@
+import {
+    formatDateForDisplay,
+    formatTimeForDisplay,
+} from '@/components/common';
 import { Head, Link } from '@inertiajs/react';
 
 interface Attendance {
@@ -31,17 +35,6 @@ interface Props {
 }
 
 export default function Index({ attendances, todayStats }: Props) {
-    const formatTime = (dateString: string) => {
-        return new Date(dateString).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString();
-    };
-
     return (
         <>
             <Head title="Attendance Records" />
@@ -151,18 +144,18 @@ export default function Index({ attendances, todayStats }: Props) {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-2">
-                                                    {formatDate(
+                                                    {formatDateForDisplay(
                                                         attendance.check_in,
                                                     )}
                                                 </td>
                                                 <td className="px-4 py-2">
-                                                    {formatTime(
+                                                    {formatTimeForDisplay(
                                                         attendance.check_in,
                                                     )}
                                                 </td>
                                                 <td className="px-4 py-2">
                                                     {attendance.check_out
-                                                        ? formatTime(
+                                                        ? formatTimeForDisplay(
                                                               attendance.check_out,
                                                           )
                                                         : 'Not checked out'}

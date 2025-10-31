@@ -1,5 +1,6 @@
 import { InfoCard } from '@/components/common';
 import DetailRow from '@/components/common/DetailRow';
+import { formatDateForDisplay } from '@/components/common/utils/dateUtils';
 import { Separator } from '@/components/ui/separator';
 
 interface Employee {
@@ -118,9 +119,7 @@ export function OverviewView({
 
                         <DetailRow
                             label="Joining Date"
-                            value={new Date(
-                                employee.joining_date,
-                            ).toLocaleDateString()}
+                            value={formatDateForDisplay(employee.joining_date)}
                         />
                     </div>
 

@@ -1,4 +1,5 @@
 import { EmptyActionState, InfoCard } from '@/components/common';
+import { formatDateForDisplay } from '@/components/common/utils/dateUtils';
 
 interface PersonalDetail {
     date_of_birth: string;
@@ -26,9 +27,7 @@ export function PersonalView({ personalDetail }: PersonalViewProps) {
                             Date of Birth
                         </label>
                         <p className="text-sm font-medium">
-                            {new Date(
-                                personalDetail.date_of_birth,
-                            ).toLocaleDateString()}
+                            {formatDateForDisplay(personalDetail.date_of_birth)}
                         </p>
                     </div>
                     <div>

@@ -2,6 +2,7 @@ import {
     DataTableActions,
     DeleteDialog,
     EmptyActionState,
+    formatDateForDisplay,
     InfoCard,
     ResourceDialog,
 } from '@/components/common';
@@ -176,9 +177,9 @@ export function DocumentsEdit({
                                                                 <span className="text-muted-foreground">
                                                                     Expiry:
                                                                 </span>{' '}
-                                                                {new Date(
+                                                                {formatDateForDisplay(
                                                                     doc.expiry_date,
-                                                                ).toLocaleDateString()}
+                                                                )}
                                                             </>
                                                         )}
                                                     </div>

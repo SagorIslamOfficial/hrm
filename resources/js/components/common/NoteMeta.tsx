@@ -1,3 +1,7 @@
+import {
+    formatDateForDisplay,
+    formatTimeForDisplay,
+} from '@/components/common';
 import type { Note } from '@/components/common/interfaces/Note';
 
 export interface NoteMetaProps {
@@ -8,29 +12,16 @@ export interface NoteMetaProps {
 export function NoteMeta({ note, currentUser }: NoteMetaProps) {
     const creatorName = note.creator?.name ?? currentUser?.name ?? 'Unknown';
 
-    const formatDate = (iso?: string) =>
-        iso ? new Date(iso).toLocaleDateString() : '';
-
-    const formatTime = (iso?: string) =>
-        iso
-            ? new Date(iso)
-                  .toLocaleTimeString([], {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                  })
-                  .toLowerCase()
-            : '';
-
     return (
         <p className="text-xs text-muted-foreground">
-            By {creatorName} • {formatDate(note.created_at)} •{' '}
-            {formatTime(note.created_at)}
+            By {creatorName} • {formatDateForDisplay(note.created_at)} •{' '}
+            {formatTimeForDisplay(note.created_at)}
             {note._isModified && currentUser?.name ? (
                 <>
                     {' '}
                     • Updated by {currentUser.name} •{' '}
-                    {formatDate(new Date().toISOString())} •{' '}
-                    {formatTime(new Date().toISOString())}
+                    {formatDateForDisplay(new Date().toISOString())} •{' '}
+                    {formatTimeForDisplay(new Date().toISOString())}
                 </>
             ) : null}
             {!note._isModified &&
@@ -43,8 +34,8 @@ export function NoteMeta({ note, currentUser }: NoteMetaProps) {
                         note.creator?.name ??
                         currentUser?.name ??
                         'Unknown'}{' '}
-                    {formatDate(note.updated_at)} •{' '}
-                    {formatTime(note.updated_at)}
+                    {formatDateForDisplay(note.updated_at)} •{' '}
+                    {formatTimeForDisplay(note.updated_at)}
                 </>
             ) : null}
         </p>
