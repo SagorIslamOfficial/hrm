@@ -32,7 +32,7 @@ test('can list employee notes', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -73,7 +73,7 @@ it('can create an employee note', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/notes", $noteData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/notes", $noteData);
 
     $response->assertCreated()
         ->assertJsonStructure([
@@ -117,7 +117,7 @@ it('can create a private employee note', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/notes", $noteData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/notes", $noteData);
 
     $response->assertCreated()
         ->assertJson([
@@ -145,7 +145,7 @@ it('can show a specific employee note', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes/{$note->id}");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes/{$note->id}");
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -194,7 +194,7 @@ it('cannot show note that belongs to different employee', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee2->id}/notes/{$note->id}");
+        ->getJson("/dashboard/hr/employee/{$employee2->id}/notes/{$note->id}");
 
     $response->assertNotFound()
         ->assertJson([
@@ -228,7 +228,7 @@ it('can update an employee note', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$note->id}", $updateData);
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$note->id}", $updateData);
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -303,7 +303,7 @@ it('sets updated_by to current user when updating note', function () {
     ];
 
     $response = $this->actingAs($updater)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$note->id}", $updateData);
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$note->id}", $updateData);
 
     $response->assertSuccessful();
 
@@ -341,7 +341,7 @@ it('cannot update note that belongs to different employee', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee2->id}/notes/{$note->id}", $updateData);
+        ->putJson("/dashboard/hr/employee/{$employee2->id}/notes/{$note->id}", $updateData);
 
     $response->assertNotFound()
         ->assertJson([
@@ -366,7 +366,7 @@ it('can delete an employee note', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee->id}/notes/{$note->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/notes/{$note->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -399,7 +399,7 @@ it('cannot delete note that belongs to different employee', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee2->id}/notes/{$note->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee2->id}/notes/{$note->id}");
 
     $response->assertNotFound()
         ->assertJson([
@@ -423,7 +423,7 @@ it('validates required note field when creating', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/notes", [
+        ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
             'category' => 'general',
             'is_private' => false,
             // Missing 'note' field
@@ -449,7 +449,7 @@ it('validates required note field when updating', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$note->id}", [
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$note->id}", [
             'category' => 'general',
             'is_private' => false,
             // Missing 'note' field
@@ -470,7 +470,7 @@ it('validates category enum values', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/notes", [
+        ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
             'note' => 'Test note',
             'category' => 'invalid_category',
             'is_private' => false,
@@ -494,7 +494,7 @@ it('accepts valid category values', function () {
 
     foreach ($validCategories as $category) {
         $response = $this->actingAs($user)
-            ->postJson("/dashboard/employees/{$employee->id}/notes", [
+            ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
                 'note' => "Test note for {$category}",
                 'category' => $category,
                 'is_private' => false,
@@ -521,7 +521,7 @@ it('validates is_private is boolean', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/notes", [
+        ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
             'note' => 'Test note',
             'category' => 'general',
             'is_private' => 'not_boolean',
@@ -629,7 +629,7 @@ it('handles database errors during creation', function () {
     // We'll test the error handling by ensuring the response structure is correct
     // In a real scenario, we might mock the service to throw an exception
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/notes", $noteData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/notes", $noteData);
 
     // If successful, verify the structure
     if ($response->getStatusCode() === 201) {
@@ -651,7 +651,7 @@ it('requires authentication', function () {
         'designation_id' => $designation->id,
     ]);
 
-    $response = $this->getJson("/dashboard/employees/{$employee->id}/notes");
+    $response = $this->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertUnauthorized();
 });

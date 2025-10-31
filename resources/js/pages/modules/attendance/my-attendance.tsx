@@ -1,3 +1,7 @@
+import {
+    formatDateForDisplay,
+    formatTimeForDisplay,
+} from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,17 +60,6 @@ export default function MyAttendance({
     const { post, processing: checkInProcessing } = useForm();
     const { put, processing: checkOutProcessing } = useForm();
 
-    const formatTime = (dateString: string) => {
-        return new Date(dateString).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString();
-    };
-
     const handleCheckIn = () => {
         post('/attendance/check-in');
     };
@@ -116,7 +109,7 @@ export default function MyAttendance({
                                                 Check-in:
                                             </span>
                                             <Badge variant="default">
-                                                {formatTime(
+                                                {formatTimeForDisplay(
                                                     todayAttendance.check_in,
                                                 )}
                                             </Badge>
@@ -127,7 +120,7 @@ export default function MyAttendance({
                                                     Check-out:
                                                 </span>
                                                 <Badge variant="secondary">
-                                                    {formatTime(
+                                                    {formatTimeForDisplay(
                                                         todayAttendance.check_out,
                                                     )}
                                                 </Badge>
@@ -233,21 +226,21 @@ export default function MyAttendance({
                                     >
                                         <div className="space-y-1">
                                             <p className="font-medium">
-                                                {formatDate(
+                                                {formatDateForDisplay(
                                                     attendance.check_in,
                                                 )}
                                             </p>
                                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                                 <span>
                                                     Check-in:{' '}
-                                                    {formatTime(
+                                                    {formatTimeForDisplay(
                                                         attendance.check_in,
                                                     )}
                                                 </span>
                                                 {attendance.check_out && (
                                                     <span>
                                                         Check-out:{' '}
-                                                        {formatTime(
+                                                        {formatTimeForDisplay(
                                                             attendance.check_out,
                                                         )}
                                                     </span>

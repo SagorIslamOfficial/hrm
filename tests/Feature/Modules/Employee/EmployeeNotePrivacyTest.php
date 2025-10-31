@@ -49,7 +49,7 @@ test('admin can view all private notes', function () {
     ]);
 
     $response = $this->actingAs($admin)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 
@@ -78,7 +78,7 @@ test('HR can view all private notes', function () {
     ]);
 
     $response = $this->actingAs($hr)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 
@@ -107,7 +107,7 @@ test('manager can view private notes with permission', function () {
     ]);
 
     $response = $this->actingAs($manager)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 
@@ -137,7 +137,7 @@ test('regular user cannot view other users private notes', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 
@@ -164,7 +164,7 @@ test('user can view their own private notes', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 
@@ -191,7 +191,7 @@ test('all users can view public notes', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 
@@ -219,7 +219,7 @@ test('admin can view private note details', function () {
     ]);
 
     $response = $this->actingAs($admin)
-        ->getJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -250,7 +250,7 @@ test('regular user cannot view other users private note details', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}");
 
     $response->assertForbidden();
 });
@@ -274,7 +274,7 @@ test('note creator can update their own private note', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$myPrivateNote->id}", [
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$myPrivateNote->id}", [
             'note' => 'Updated private note',
             'category' => 'performance',
             'is_private' => true,
@@ -310,7 +310,7 @@ test('regular user cannot update other users private note', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}", [
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}", [
             'note' => 'Attempted update',
             'category' => 'general',
             'is_private' => true,
@@ -340,7 +340,7 @@ test('admin can update any private note', function () {
     ]);
 
     $response = $this->actingAs($admin)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}", [
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}", [
             'note' => 'Admin updated note',
             'category' => 'general',
             'is_private' => true,
@@ -376,7 +376,7 @@ test('HR can update any private note with manage permission', function () {
     ]);
 
     $response = $this->actingAs($hr)
-        ->putJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}", [
+        ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}", [
             'note' => 'HR updated note',
             'category' => 'general',
             'is_private' => true,
@@ -409,7 +409,7 @@ test('note creator can delete their own private note', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee->id}/notes/{$myPrivateNote->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/notes/{$myPrivateNote->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -441,7 +441,7 @@ test('regular user cannot delete other users private note', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}");
 
     $response->assertForbidden();
 
@@ -468,7 +468,7 @@ test('admin can delete any private note', function () {
     ]);
 
     $response = $this->actingAs($admin)
-        ->deleteJson("/dashboard/employees/{$employee->id}/notes/{$privateNote->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -517,7 +517,7 @@ test('mixing private and public notes filters correctly for regular users', func
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/notes");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/notes");
 
     $response->assertSuccessful();
 

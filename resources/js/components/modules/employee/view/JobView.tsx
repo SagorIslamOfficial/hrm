@@ -1,4 +1,5 @@
 import { EmptyActionState, InfoCard } from '@/components/common';
+import { formatDateForDisplay } from '@/components/common/utils/dateUtils';
 
 interface JobDetail {
     job_title: string;
@@ -54,9 +55,7 @@ export function JobView({ jobDetail, supervisors }: JobViewProps) {
                         </label>
                         <p className="text-sm font-medium">
                             {jobDetail.probation_end_date
-                                ? new Date(
-                                      jobDetail.probation_end_date,
-                                  ).toLocaleDateString()
+                                ? formatDateForDisplay(jobDetail.probation_end_date)
                                 : 'N/A'}
                         </p>
                     </div>
@@ -66,9 +65,7 @@ export function JobView({ jobDetail, supervisors }: JobViewProps) {
                         </label>
                         <p className="text-sm font-medium">
                             {jobDetail.contract_end_date
-                                ? new Date(
-                                      jobDetail.contract_end_date,
-                                  ).toLocaleDateString()
+                                ? formatDateForDisplay(jobDetail.contract_end_date)
                                 : 'N/A'}
                         </p>
                     </div>

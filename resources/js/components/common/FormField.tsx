@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/common/DatePicker';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Combobox } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
@@ -213,15 +214,11 @@ export function FormField(props: FormFieldProps) {
             case 'date': {
                 const dateProps = props as DateFieldProps;
                 return (
-                    <Input
-                        id={id}
-                        type="date"
+                    <DatePicker
                         value={dateProps.value}
-                        onChange={(e) => dateProps.onChange(e.target.value)}
-                        className={error ? 'border-destructive' : ''}
-                        placeholder={placeholder}
-                        min={dateProps.min}
-                        max={dateProps.max}
+                        onChange={dateProps.onChange}
+                        placeholder={placeholder || 'Pick a date'}
+                        error={!!error}
                         disabled={disabled}
                     />
                 );

@@ -24,7 +24,7 @@ test('can list employee custom fields', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/custom-fields");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/custom-fields");
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -61,7 +61,7 @@ test('can create a custom field', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/custom-fields", $customFieldData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/custom-fields", $customFieldData);
 
     $response->assertCreated()
         ->assertJson([
@@ -91,7 +91,7 @@ test('can show a specific custom field', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/custom-fields/{$customField->id}");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/custom-fields/{$customField->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -122,7 +122,7 @@ test('cannot show custom field that belongs to different employee', function () 
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee1->id}/custom-fields/{$customField->id}");
+        ->getJson("/dashboard/hr/employee/{$employee1->id}/custom-fields/{$customField->id}");
 
     $response->assertNotFound();
 });
@@ -148,7 +148,7 @@ test('can update a custom field', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/custom-fields/{$customField->id}", $updateData);
+        ->putJson("/dashboard/hr/employee/{$employee->id}/custom-fields/{$customField->id}", $updateData);
 
     $response->assertSuccessful()
         ->assertJson([
@@ -180,7 +180,7 @@ test('cannot update custom field that belongs to different employee', function (
     ]);
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee1->id}/custom-fields/{$customField->id}", [
+        ->putJson("/dashboard/hr/employee/{$employee1->id}/custom-fields/{$customField->id}", [
             'field_value' => 'Updated',
         ]);
 
@@ -202,7 +202,7 @@ test('can delete a custom field', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee->id}/custom-fields/{$customField->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/custom-fields/{$customField->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -235,7 +235,7 @@ test('cannot delete custom field that belongs to different employee', function (
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee1->id}/custom-fields/{$customField->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee1->id}/custom-fields/{$customField->id}");
 
     $response->assertNotFound();
 });
@@ -273,7 +273,7 @@ test('can sync custom fields for an employee', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/custom-fields/sync", $syncData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/custom-fields/sync", $syncData);
 
     $response->assertSuccessful()
         ->assertJson([
@@ -304,7 +304,7 @@ test('validates required fields when creating custom field', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/custom-fields", []);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/custom-fields", []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['employee_id', 'field_key', 'field_type']);
@@ -321,7 +321,7 @@ test('validates field_type enum values', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/custom-fields", [
+        ->postJson("/dashboard/hr/employee/{$employee->id}/custom-fields", [
             'employee_id' => $employee->id,
             'field_key' => 'test-field',
             'field_type' => 'invalid-type',
@@ -342,7 +342,7 @@ test('validates field_key format', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/custom-fields", [
+        ->postJson("/dashboard/hr/employee/{$employee->id}/custom-fields", [
             'employee_id' => $employee->id,
             'field_key' => 'Invalid Field Key!',
             'field_type' => 'text',
@@ -391,7 +391,7 @@ test('enforces unique constraint on employee_id and field_key combination', func
 test('requires authentication', function () {
     $employee = Employee::factory()->create();
 
-    $response = $this->getJson("/dashboard/employees/{$employee->id}/custom-fields");
+    $response = $this->getJson("/dashboard/hr/employee/{$employee->id}/custom-fields");
 
     $response->assertUnauthorized();
 });

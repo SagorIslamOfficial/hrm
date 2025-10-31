@@ -28,6 +28,7 @@ export type { Contact, CustomField, Document, Note } from './interfaces';
 export {
     formatDateForDisplay,
     formatDateForInput,
+    formatTimeForDisplay,
     getTodayDate,
     isValidDate,
 } from './utils/dateUtils';

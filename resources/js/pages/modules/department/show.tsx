@@ -1,3 +1,4 @@
+import { formatDateForDisplay } from '@/components/common';
 import { Head, Link } from '@inertiajs/react';
 
 interface Employee {
@@ -138,9 +139,9 @@ export default function Show({ department }: Props) {
                                                 Created
                                             </label>
                                             <p className="mt-1 text-sm text-gray-900">
-                                                {new Date(
+                                                {formatDateForDisplay(
                                                     department.created_at,
-                                                ).toLocaleDateString()}
+                                                )}
                                             </p>
                                         </div>
                                         <div>
@@ -148,9 +149,9 @@ export default function Show({ department }: Props) {
                                                 Last Updated
                                             </label>
                                             <p className="mt-1 text-sm text-gray-900">
-                                                {new Date(
+                                                {formatDateForDisplay(
                                                     department.updated_at,
-                                                ).toLocaleDateString()}
+                                                )}
                                             </p>
                                         </div>
                                     </div>
@@ -204,9 +205,9 @@ export default function Show({ department }: Props) {
                                                                 }
                                                             </td>
                                                             <td className="px-4 py-2">
-                                                                {new Date(
+                                                                {formatDateForDisplay(
                                                                     employee.hire_date,
-                                                                ).toLocaleDateString()}
+                                                                )}
                                                             </td>
                                                         </tr>
                                                     ),

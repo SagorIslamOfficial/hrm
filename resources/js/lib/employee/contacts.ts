@@ -10,27 +10,47 @@ export interface ContactPayload {
     _photoFile?: File | null;
 }
 
+// Helper function to build FormData from ContactPayload
+function buildContactFormData(payload: ContactPayload): FormData {
+    const formData = new FormData();
+    if (payload.contact_name !== undefined && payload.contact_name !== null) {
+        formData.append('contact_name', payload.contact_name);
+    }
+    if (payload.relationship !== undefined && payload.relationship !== null) {
+        formData.append('relationship', payload.relationship);
+    }
+    if (payload.phone !== undefined && payload.phone !== null) {
+        formData.append('phone', payload.phone);
+    }
+    if (payload.email !== undefined && payload.email !== null) {
+        formData.append('email', payload.email);
+    }
+    if (payload.address !== undefined && payload.address !== null) {
+        formData.append('address', payload.address);
+    }
+    if (payload.is_primary !== undefined) {
+        formData.append('is_primary', payload.is_primary ? '1' : '0');
+    }
+    if (payload._photoFile) {
+        formData.append('photo', payload._photoFile);
+    }
+    return formData;
+}
+
 export async function createContact(
     employeeId: string | number,
     payload: ContactPayload,
 ) {
-    const formData = new FormData();
-    formData.append('contact_name', payload.contact_name);
-    formData.append('relationship', payload.relationship || '');
-    formData.append('phone', payload.phone || '');
-    formData.append('email', payload.email || '');
-    formData.append('address', payload.address || '');
-    formData.append('is_primary', payload.is_primary ? '1' : '0');
-
-    if (payload._photoFile) {
-        formData.append('photo', payload._photoFile);
-    }
-
-    return axios.post(`/dashboard/employees/${employeeId}/contacts`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
+    const formData = buildContactFormData(payload);
+    return axios.post(
+        `/dashboard/hr/employee/${employeeId}/contacts`,
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         },
-    });
+    );
 }
 
 export async function updateContact(
@@ -38,21 +58,10 @@ export async function updateContact(
     contactId: string | number,
     payload: ContactPayload,
 ) {
-    const formData = new FormData();
-    formData.append('contact_name', payload.contact_name);
-    formData.append('relationship', payload.relationship || '');
-    formData.append('phone', payload.phone || '');
-    formData.append('email', payload.email || '');
-    formData.append('address', payload.address || '');
-    formData.append('is_primary', payload.is_primary ? '1' : '0');
+    const formData = buildContactFormData(payload);
     formData.append('_method', 'put');
-
-    if (payload._photoFile) {
-        formData.append('photo', payload._photoFile);
-    }
-
     return axios.post(
-        `/dashboard/employees/${employeeId}/contacts/${contactId}`,
+        `/dashboard/hr/employee/${employeeId}/contacts/${contactId}`,
         formData,
         {
             headers: {
@@ -67,7 +76,7 @@ export async function deleteContact(
     contactId: string | number,
 ) {
     return axios.delete(
-        `/dashboard/employees/${employeeId}/contacts/${contactId}`,
+        `/dashboard/hr/employee/${employeeId}/contacts/${contactId}`,
     );
 }
 

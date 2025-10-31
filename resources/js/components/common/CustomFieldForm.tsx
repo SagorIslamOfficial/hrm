@@ -1,4 +1,5 @@
 import { FormActions, FormField } from '@/components/common';
+import { DatePicker } from '@/components/common/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -172,16 +173,16 @@ export function CustomFieldForm({
                 return (
                     <div className="space-y-2">
                         <Label htmlFor="field_value">Value</Label>
-                        <Input
-                            id="field_value"
-                            type="date"
+                        <DatePicker
                             value={formData.field_value}
-                            onChange={(e) =>
+                            onChange={(value: string) =>
                                 setFormData((prev) => ({
                                     ...prev,
-                                    field_value: e.target.value,
+                                    field_value: value,
                                 }))
                             }
+                            error={!!errors.field_value}
+                            placeholder="Pick a date"
                         />
                         {errors.field_value && (
                             <p className="text-sm text-destructive">
@@ -261,7 +262,7 @@ export function CustomFieldForm({
                             }))
                         }
                         error={errors.field_value}
-                        placeholder="https://example.com"
+                        placeholder="https://sagorislam.dev"
                     />
                 );
             default:

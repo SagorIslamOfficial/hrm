@@ -1,6 +1,7 @@
 import {
     DocumentPreviewDialog,
     EmptyActionState,
+    formatDateForDisplay,
     InfoCard,
 } from '@/components/common';
 import { Badge } from '@/components/ui/badge';
@@ -103,9 +104,9 @@ export function DocumentsView({ documents, employeeId }: DocumentsViewProps) {
                                     {doc.expiry_date && (
                                         <p className="text-sm text-muted-foreground">
                                             Expires:{' '}
-                                            {new Date(
+                                            {formatDateForDisplay(
                                                 doc.expiry_date,
-                                            ).toLocaleDateString()}
+                                            )}
                                         </p>
                                     )}
                                     {doc.uploader && (

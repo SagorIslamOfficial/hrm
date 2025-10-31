@@ -1,4 +1,9 @@
-import { EmptyActionState, InfoCard } from '@/components/common';
+import {
+    EmptyActionState,
+    formatDateForDisplay,
+    formatTimeForDisplay,
+    InfoCard,
+} from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 
 interface Attendance {
@@ -27,9 +32,7 @@ export function AttendanceView({ attendance }: AttendanceViewProps) {
                             <div className="flex items-center gap-4">
                                 <div className="min-w-24">
                                     <p className="font-medium">
-                                        {new Date(
-                                            att.date,
-                                        ).toLocaleDateString()}
+                                        {formatDateForDisplay(att.date)}
                                     </p>
                                 </div>
                                 <div>
@@ -48,24 +51,13 @@ export function AttendanceView({ attendance }: AttendanceViewProps) {
                                 </div>
                                 {att.check_in && (
                                     <div className="text-sm text-muted-foreground">
-                                        In:{' '}
-                                        {new Date(
-                                            att.check_in,
-                                        ).toLocaleTimeString([], {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        })}
+                                        In: {formatTimeForDisplay(att.check_in)}
                                     </div>
                                 )}
                                 {att.check_out && (
                                     <div className="text-sm text-muted-foreground">
                                         Out:{' '}
-                                        {new Date(
-                                            att.check_out,
-                                        ).toLocaleTimeString([], {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        })}
+                                        {formatTimeForDisplay(att.check_out)}
                                     </div>
                                 )}
                             </div>

@@ -38,6 +38,31 @@ export const formatDateForDisplay = (
 };
 
 /**
+ * Format a date string for display in a readable time format
+ * @param date - Date string in ISO format
+ * @param locale - Locale string (default: 'en-US')
+ * @returns Formatted time string for display (e.g., "2:30 PM")
+ */
+export const formatTimeForDisplay = (
+    date: string | undefined | null,
+    locale: string = 'en-US',
+): string => {
+    if (!date) {
+        return '';
+    }
+
+    try {
+        const dateObj = new Date(date);
+        return dateObj.toLocaleTimeString(locale, {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    } catch {
+        return date;
+    }
+};
+
+/**
  * Check if a date string is valid
  * @param date - Date string to validate
  * @returns True if date is valid, false otherwise

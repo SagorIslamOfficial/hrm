@@ -24,7 +24,7 @@ test('can list employee documents', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/documents");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/documents");
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -57,7 +57,7 @@ it('can create an employee document', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/documents", $documentData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/documents", $documentData);
 
     $response->assertCreated()
         ->assertJsonStructure([
@@ -96,7 +96,7 @@ it('can update an employee document', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/documents/{$document->id}", $updateData);
+        ->putJson("/dashboard/hr/employee/{$employee->id}/documents/{$document->id}", $updateData);
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -128,7 +128,7 @@ it('can delete an employee document', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee->id}/documents/{$document->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/documents/{$document->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -150,7 +150,7 @@ it('validates required fields when creating document', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/documents", []);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/documents", []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['doc_type', 'title']);
@@ -176,7 +176,7 @@ it('prevents access to documents of other employees', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/documents/{$document->id}");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/documents/{$document->id}");
 
     $response->assertNotFound();
 });
@@ -197,7 +197,7 @@ it('tracks uploader when document is created', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/documents", $documentData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/documents", $documentData);
 
     $response->assertCreated();
 

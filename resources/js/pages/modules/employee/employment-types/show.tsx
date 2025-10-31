@@ -2,6 +2,7 @@ import { PageHeader } from '@/components/common';
 import EmploymentTypeShow from '@/components/modules/employee/EmploymentTypeShow';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import { index as employeesIndex } from '@/routes/employees/index';
 import {
     edit as employmentTypesEdit,
     index as employmentTypesIndex,
@@ -9,6 +10,7 @@ import {
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Edit } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface EmploymentType {
     id: string;
@@ -25,27 +27,24 @@ interface Props {
     employmentType: EmploymentType;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Employees',
-        href: '/dashboard/employees',
-    },
-    {
-        title: 'Employment Types',
-        href: employmentTypesIndex().url,
-    },
-    {
-        title: 'View Employment Type',
-        href: '', // Will be set dynamically
-    },
-];
-
 export default function Show({ employmentType }: Props) {
-    // Update breadcrumb with actual employment type name
-    breadcrumbs[2] = {
-        title: employmentType.name,
-        href: '', // Current page
-    };
+    const breadcrumbs: BreadcrumbItem[] = useMemo(
+        () => [
+            {
+                title: 'Employees',
+                href: employeesIndex().url,
+            },
+            {
+                title: 'Employment Types',
+                href: employmentTypesIndex().url,
+            },
+            {
+                title: employmentType.name,
+                href: '', // Current page
+            },
+        ],
+        [employmentType.name],
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

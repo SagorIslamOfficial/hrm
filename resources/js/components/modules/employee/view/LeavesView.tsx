@@ -1,4 +1,8 @@
-import { EmptyActionState, InfoCard } from '@/components/common';
+import {
+    EmptyActionState,
+    formatDateForDisplay,
+    InfoCard,
+} from '@/components/common';
 import { Badge } from '@/components/ui/badge';
 
 interface Leave {
@@ -56,13 +60,8 @@ export function LeavesView({ leaves }: LeavesViewProps) {
                                         <span className="text-muted-foreground">
                                             Duration:
                                         </span>{' '}
-                                        {new Date(
-                                            leave.start_date,
-                                        ).toLocaleDateString()}{' '}
-                                        -{' '}
-                                        {new Date(
-                                            leave.end_date,
-                                        ).toLocaleDateString()}{' '}
+                                        {formatDateForDisplay(leave.start_date)}{' '}
+                                        - {formatDateForDisplay(leave.end_date)}{' '}
                                         ({leave.total_days} days)
                                     </p>
                                     <p className="text-sm">

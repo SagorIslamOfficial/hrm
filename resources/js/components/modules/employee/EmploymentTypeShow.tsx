@@ -24,7 +24,7 @@ export default function EmploymentTypeShow({ employmentType }: Props) {
                     <DetailRow label="Name">{employmentType.name}</DetailRow>
 
                     <DetailRow label="Code">
-                        <code className="rounded bg-muted px-2 py-1 text-sm">
+                        <code className="rounded bg-muted px-2 py-1 text-sm lowercase">
                             {employmentType.code}
                         </code>
                     </DetailRow>
