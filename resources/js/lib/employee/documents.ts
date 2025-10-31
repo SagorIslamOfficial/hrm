@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 export interface DocumentPayload {
     doc_type: string;
@@ -10,7 +10,7 @@ export interface DocumentPayload {
 export async function createDocument(
     employeeId: string | number,
     payload: DocumentPayload,
-) {
+): Promise<AxiosResponse<DocumentPayload>> {
     const formData = new FormData();
     formData.append('doc_type', payload.doc_type);
     formData.append('title', payload.title);
@@ -22,13 +22,8 @@ export async function createDocument(
     }
 
     return axios.post(
-        `/dashboard/hr/employee/${employeeId}/documents`,
+        `/dashboard/hr/employee/${encodeURIComponent(employeeId)}/documents`,
         formData,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        },
     );
 }
 
@@ -36,7 +31,7 @@ export async function updateDocument(
     employeeId: string | number,
     documentId: string | number,
     payload: DocumentPayload,
-) {
+): Promise<AxiosResponse<DocumentPayload>> {
     const formData = new FormData();
     formData.append('doc_type', payload.doc_type);
     formData.append('title', payload.title);
@@ -49,22 +44,17 @@ export async function updateDocument(
     }
 
     return axios.post(
-        `/dashboard/hr/employee/${employeeId}/documents/${documentId}`,
+        `/dashboard/hr/employee/${encodeURIComponent(employeeId)}/documents/${encodeURIComponent(documentId)}`,
         formData,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        },
     );
 }
 
 export async function deleteDocument(
     employeeId: string | number,
     documentId: string | number,
-) {
+): Promise<AxiosResponse> {
     return axios.delete(
-        `/dashboard/hr/employee/${employeeId}/documents/${documentId}`,
+        `/dashboard/hr/employee/${encodeURIComponent(employeeId)}/documents/${encodeURIComponent(documentId)}`,
     );
 }
 
