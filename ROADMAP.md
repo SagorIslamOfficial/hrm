@@ -43,7 +43,10 @@
 
 ### Week 3: Employee Database & Profiles
 
-- [x] Build Employee model (basic, personal, job, salary, contact, documents, notes, attendance, leaves and custom fields - attendance and leaves are not completed).
+- [x] Build Employee model (basic, personal, job, salary, contact, documents, notes, custom fields)
+    - [ ] Attendance tracking integration
+    - [ ] Leaves management integration
+
 - [x] Set up relations: department, manager, emergency contacts.
 - [x] CRUD via repositories; add validation, list/search UI, and profile views.
 - [x] Profile picture/document upload & import/export.
