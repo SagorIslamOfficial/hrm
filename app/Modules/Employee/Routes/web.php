@@ -9,35 +9,34 @@ use App\Modules\Employee\Http\Controllers\EmploymentTypeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['employee.access'])->group(function () {
-    // Main Employee
-    Route::resource('employees', EmployeeController::class);
+    Route::prefix('employee')->group(function () {
+        // Employment Types
+        Route::resource('employment-types', EmploymentTypeController::class)
+            ->parameters(['employment-types' => 'employmentType'])
+            ->names('employment-types');
 
-    // Contact
-    Route::resource('employees.contacts', EmployeeContactController::class)
-        ->except(['create', 'edit']);
+        // Main Employee
+        Route::resource('', EmployeeController::class)
+            ->parameters(['' => 'employee'])
+            ->names('employees');
 
-    // Documents
-    Route::resource('employees.documents', EmployeeDocumentController::class)
-        ->except(['create', 'edit']);
+        // Nested resources under specific employee
+        Route::resource('{employee}/contacts', EmployeeContactController::class)
+            ->except(['create', 'edit']);
 
-    // Document Download
-    Route::get('employees/{employee}/documents/{document}/download', [EmployeeDocumentController::class, 'download'])
-        ->name('employees.documents.download');
+        Route::resource('{employee}/documents', EmployeeDocumentController::class)
+            ->except(['create', 'edit']);
 
-    // Notes
-    Route::resource('employees.notes', EmployeeNoteController::class)
-        ->except(['create', 'edit']);
+        Route::get('{employee}/documents/{document}/download', [EmployeeDocumentController::class, 'download'])
+            ->name('employees.documents.download');
 
-    // Custom Fields
-    Route::resource('employees.custom-fields', EmployeeCustomFieldController::class)
-        ->except(['create', 'edit']);
+        Route::resource('{employee}/notes', EmployeeNoteController::class)
+            ->except(['create', 'edit']);
 
-    // Sync Custom Fields
-    Route::post('employees/{employee}/custom-fields/sync', [EmployeeCustomFieldController::class, 'sync'])
-        ->name('employees.custom-fields.sync');
+        Route::resource('{employee}/custom-fields', EmployeeCustomFieldController::class)
+            ->except(['create', 'edit']);
 
-    // Type
-    Route::resource('employment-types', EmploymentTypeController::class)
-        ->parameters(['employment-types' => 'employmentType'])
-        ->names('employment-types');
+        Route::post('{employee}/custom-fields/sync', [EmployeeCustomFieldController::class, 'sync'])
+            ->name('employees.custom-fields.sync');
+    });
 });
