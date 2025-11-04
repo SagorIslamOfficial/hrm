@@ -18,6 +18,7 @@ class EmployeeNoteFactory extends Factory
     {
         return [
             'employee_id' => Employee::factory(),
+            'title' => $this->faker->sentence(4),
             'note' => $this->faker->sentences(3, true),
             'created_by' => User::factory(),
             'is_private' => $this->faker->boolean(30),
