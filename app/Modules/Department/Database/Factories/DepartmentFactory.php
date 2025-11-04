@@ -39,6 +39,9 @@ class DepartmentFactory extends Factory
             'description' => fake()->sentence(),
             'manager_id' => null,
             'is_active' => true,
+            'budget' => fake()->randomFloat(2, 0, 100000),
+            'location' => fake()->city(),
+            'status' => 'active',
         ];
     }
 
