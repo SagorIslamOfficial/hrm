@@ -1,4 +1,5 @@
 import { DataTableActions, StatusBadge } from '@/components/common';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     edit as employeesEdit,
     show as employeesShow,
@@ -14,6 +15,10 @@ interface UseEmployeeColumnsProps {
 export function UseEmployeeColumns({
     onDeleteClick,
 }: UseEmployeeColumnsProps): ColumnDef<Employee>[] {
+    const getInitials = (firstName: string, lastName: string) => {
+        return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    };
+
     const handleView = (employee: Employee) => {
         router.visit(employeesShow(employee.id).url);
     };
@@ -39,8 +44,22 @@ export function UseEmployeeColumns({
             accessorFn: (row) => `${row.first_name} ${row.last_name}`,
             header: 'Name',
             cell: ({ row }) => (
-                <div>
-                    {row.original.first_name} {row.original.last_name}
+                <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                        <AvatarImage
+                            src={row.original.photo_url}
+                            alt={`${row.original.first_name} ${row.original.last_name}`}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+                            {getInitials(
+                                row.original.first_name,
+                                row.original.last_name,
+                            )}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">
+                        {row.original.first_name} {row.original.last_name}
+                    </span>
                 </div>
             ),
         },
