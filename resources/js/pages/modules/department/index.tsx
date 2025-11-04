@@ -1,140 +1,118 @@
-import { Head, Link } from '@inertiajs/react';
-
-interface Department {
-    id: number;
-    name: string;
-    description: string;
-    manager?: {
-        id: number;
-        first_name: string;
-        last_name: string;
-    };
-    budget: number;
-    location: string;
-    status: string;
-    employee_count: number;
-}
+import {
+    DeleteDialog,
+    EmptyActionState,
+    PageHeader,
+} from '@/components/common';
+import { TableBlueprint } from '@/components/common/TableBlueprint';
+import {
+    UseDepartmentColumns,
+    type Department,
+} from '@/components/modules/department';
+import AppLayout from '@/layouts/app-layout';
+import {
+    create as departmentsCreate,
+    destroy as departmentsDestroy,
+    index as departmentsIndex,
+} from '@/routes/departments/index';
+import { type BreadcrumbItem } from '@/types';
+import { Head, router } from '@inertiajs/react';
+import { FilePlus } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
-    departments: {
-        data: Department[];
-        current_page: number;
-        last_page: number;
-        per_page: number;
-        total: number;
-    };
+    departments: Department[];
 }
 
-export default function Index({ departments }: Props) {
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Departments',
+        href: departmentsIndex().url,
+    },
+];
+
+export default function Index({ departments = [] }: Props) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [departmentToDelete, setDepartmentToDelete] =
+        useState<Department | null>(null);
+
+    const handleDeleteClick = (department: Department) => {
+        setDepartmentToDelete(department);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (!departmentToDelete) return;
+
+        router.delete(departmentsDestroy(departmentToDelete.id).url, {
+            onSuccess: () => {
+                toast.success(
+                    `Department "${departmentToDelete.name}" has been deleted successfully.`,
+                );
+                setDeleteDialogOpen(false);
+                setDepartmentToDelete(null);
+            },
+            onError: () => {
+                toast.error('Failed to delete department. Please try again.');
+            },
+        });
+    };
+
+    const columns = UseDepartmentColumns({ onDeleteClick: handleDeleteClick });
+
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Departments" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <div className="mb-6 flex items-center justify-between">
-                                <h1 className="text-2xl font-bold">
-                                    Departments
-                                </h1>
-                                <Link
-                                    href="/departments/create"
-                                    className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                                >
-                                    Add Department
-                                </Link>
-                            </div>
+            <div className="mx-auto flex h-full w-11/12 flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
+                <PageHeader
+                    title="Departments"
+                    description="Manage your departments"
+                    action={{
+                        label: 'Add',
+                        href: departmentsCreate().url,
+                        icon: <FilePlus className="mr-1 size-4" />,
+                    }}
+                />
 
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full table-auto">
-                                    <thead>
-                                        <tr className="bg-gray-50">
-                                            <th className="px-4 py-2 text-left">
-                                                Name
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                Manager
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                Employees
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                Budget
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                Location
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                Status
-                                            </th>
-                                            <th className="px-4 py-2 text-center">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {departments.data.map((department) => (
-                                            <tr
-                                                key={department.id}
-                                                className="border-t"
-                                            >
-                                                <td className="px-4 py-2 font-medium">
-                                                    {department.name}
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    {department.manager
-                                                        ? `${department.manager.first_name} ${department.manager.last_name}`
-                                                        : 'Not assigned'}
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    {department.employee_count}
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    $
-                                                    {department.budget?.toLocaleString()}
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    {department.location ||
-                                                        'N/A'}
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    <span
-                                                        className={`rounded px-2 py-1 text-xs ${
-                                                            department.status ===
-                                                            'active'
-                                                                ? 'bg-green-100 text-green-800'
-                                                                : 'bg-red-100 text-red-800'
-                                                        }`}
-                                                    >
-                                                        {department.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    <Link
-                                                        href={`/departments/${department.id}`}
-                                                        className="mr-2 text-blue-600 hover:text-blue-900"
-                                                    >
-                                                        View
-                                                    </Link>
-                                                    <Link
-                                                        href={`/departments/${department.id}/edit`}
-                                                        className="text-green-600 hover:text-green-900"
-                                                    >
-                                                        Edit
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Pagination can be added here */}
-                        </div>
-                    </div>
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    {departments.length === 0 ? (
+                        <EmptyActionState
+                            message="No departments found"
+                            buttonText="Add Department"
+                            onButtonClick={() =>
+                                router.get(departmentsCreate().url)
+                            }
+                            buttonIcon={<FilePlus className="mr-1 size-4" />}
+                        />
+                    ) : (
+                        <TableBlueprint
+                            columns={columns}
+                            data={departments}
+                            searchPlaceholder="Search departments..."
+                            globalSearchKeys={['name', 'code', 'location']}
+                        />
+                    )}
                 </div>
             </div>
-        </>
+
+            {/* Delete Confirmation Dialog */}
+            <DeleteDialog
+                open={deleteDialogOpen}
+                onOpenChange={(open) => {
+                    setDeleteDialogOpen(open);
+                    if (!open) setDepartmentToDelete(null);
+                }}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Department"
+                description={
+                    departmentToDelete
+                        ? `Are you sure you want to delete "${departmentToDelete.name}"? This action cannot be undone and may affect related records.`
+                        : 'Are you sure you want to delete this department?'
+                }
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+            />
+        </AppLayout>
     );
 }
