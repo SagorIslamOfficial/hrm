@@ -52,6 +52,27 @@ class DesignationSeeder extends Seeder
                 ['title' => 'Senior Engineer', 'code' => 'ENG-SR'],
                 ['title' => 'Junior Engineer', 'code' => 'ENG-JR'],
             ],
+            'LGL' => [
+                ['title' => 'Legal Manager', 'code' => 'LGL-MGR'],
+                ['title' => 'Legal Counsel', 'code' => 'LGL-COUNSEL'],
+                ['title' => 'Compliance Officer', 'code' => 'LGL-COMP'],
+            ],
+            'RND' => [
+                ['title' => 'R&D Manager', 'code' => 'RND-MGR'],
+                ['title' => 'Senior Researcher', 'code' => 'RND-SR'],
+                ['title' => 'Junior Researcher', 'code' => 'RND-JR'],
+                ['title' => 'Research Analyst', 'code' => 'RND-ANA'],
+            ],
+            'QA' => [
+                ['title' => 'QA Manager', 'code' => 'QA-MGR'],
+                ['title' => 'Senior QA Engineer', 'code' => 'QA-SR'],
+                ['title' => 'QA Tester', 'code' => 'QA-TESTER'],
+            ],
+            'BD' => [
+                ['title' => 'Business Development Manager', 'code' => 'BD-MGR'],
+                ['title' => 'Business Development Executive', 'code' => 'BD-EXE'],
+                ['title' => 'Partnership Specialist', 'code' => 'BD-PART'],
+            ],
         ];
 
         foreach ($designationsByDepartment as $deptCode => $designations) {
