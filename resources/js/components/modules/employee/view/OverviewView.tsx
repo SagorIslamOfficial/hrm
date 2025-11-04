@@ -1,6 +1,9 @@
 import { InfoCard } from '@/components/common';
 import DetailRow from '@/components/common/DetailRow';
-import { formatDateForDisplay } from '@/components/common/utils/dateUtils';
+import {
+    formatDateForDisplay,
+    formatDateTimeForDisplay,
+} from '@/components/common/utils/dateUtils';
 import { Separator } from '@/components/ui/separator';
 
 interface Employee {
@@ -140,24 +143,16 @@ export function OverviewView({
 
                                 <DetailRow
                                     label="Created At"
-                                    value={
-                                        employee.created_at
-                                            ? new Date(
-                                                  employee.created_at,
-                                              ).toLocaleString()
-                                            : '—'
-                                    }
+                                    value={formatDateTimeForDisplay(
+                                        employee.created_at,
+                                    )}
                                 />
 
                                 <DetailRow
                                     label="Updated At"
-                                    value={
-                                        employee.updated_at
-                                            ? new Date(
-                                                  employee.updated_at,
-                                              ).toLocaleString()
-                                            : '—'
-                                    }
+                                    value={formatDateTimeForDisplay(
+                                        employee.updated_at,
+                                    )}
                                 />
                             </>
                         )}
