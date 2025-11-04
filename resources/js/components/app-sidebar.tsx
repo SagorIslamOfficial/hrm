@@ -16,8 +16,8 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as attendance } from '@/routes/attendance';
-import { index as departments } from '@/routes/departments';
+import { index as attendance } from '@/routes/attendance/index';
+import { index as departments } from '@/routes/departments/index';
 import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
 import { index as employmentTypes } from '@/routes/employment-types';
