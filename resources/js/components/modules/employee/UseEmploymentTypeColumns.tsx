@@ -13,6 +13,7 @@ interface EmploymentType {
     code: string;
     description?: string;
     is_active: boolean;
+    employees_count?: number;
     created_at: string;
 }
 
@@ -60,6 +61,15 @@ export function UseEmploymentTypeColumns({
                 <div className="max-w-xs truncate">
                     {row.getValue('description') || 'No description'}
                 </div>
+            ),
+        },
+        {
+            accessorKey: 'employees_count',
+            header: 'Employees',
+            cell: ({ row }) => (
+                <span className="text-center">
+                    {row.original.employees_count || 0}
+                </span>
             ),
         },
         {
