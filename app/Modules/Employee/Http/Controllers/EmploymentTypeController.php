@@ -21,6 +21,7 @@ class EmploymentTypeController
                 'is_active',
                 'created_at',
             ])
+            ->withCount('employees')
             ->orderBy(column: 'created_at', direction: 'desc')
             ->get();
 
@@ -46,7 +47,28 @@ class EmploymentTypeController
 
     public function show(EmploymentType $employmentType)
     {
-        $employmentType->load(['employees' => fn ($query) => $query->select('id', 'first_name', 'last_name', 'employee_code')]);
+        $employmentType->load(['employees' => function ($query) {
+            $query->select([
+                'employees.id',
+                'employees.employee_code',
+                'employees.first_name',
+                'employees.last_name',
+                'employees.email',
+                'employees.phone',
+                'employees.photo',
+                'employees.employment_status',
+                'employees.employment_type',
+                'employees.joining_date',
+                'employees.created_at',
+                'employees.department_id',
+                'employees.designation_id',
+                'departments.name as department_name',
+                'designations.title as designation_title',
+            ])
+                ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+                ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+                ->orderBy('employees.created_at', 'desc');
+        }]);
         $employmentType->employees_count = $employmentType->employees()->count();
 
         return Inertia::render('modules/employee/employment-types/show', [
