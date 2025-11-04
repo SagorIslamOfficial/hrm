@@ -1,6 +1,7 @@
 # HRM Application Development Roadmap
 
 **Stack:** Laravel 12 + React + TypeScript (Inertia.js) + MySQL
+**Deployment:** Digital Ocean VPS, Cloudflare, SSH, Github Action (CI/CD)
 
 ---
 
@@ -32,10 +33,10 @@
 
 ### Week 2: Database Design & Migrations
 
-- [x] Design full schema (ERD), plan relationships, soft deletes, and indexing.
 - [x] Write migrations for key entities, use UUID primary keys.
 - [x] Create seeders/factories for users and roles.
 - [x] Set up backup (spatie/laravel-backup).
+- [x] Design full schema (ERD), plan relationships, soft deletes, and indexing.
 
 ---
 
@@ -43,22 +44,15 @@
 
 ### Week 3: Employee Database & Profiles
 
-- [x] Build Employee model (basic, personal, job, salary, contact, documents, notes, custom fields)
-    - [ ] Attendance tracking integration
-    - [ ] Leaves management integration
-
+- [x] Build Employee model (basic, personal, job, salary, contact, documents, notes, attendance, leaves, and custom fields (Attendance & leaves are not completed).
 - [x] Set up relations: department, manager, emergency contacts.
 - [x] CRUD via repositories; add validation, list/search UI, and profile views.
-- [x] Profile picture/document upload & import/export.
-- [ ] Version and audit important fields.
+- [x] Profile picture/document upload.
 
-### Week 3: Organization Structure
+### Week 4: Organization (Department & Designations)
 
-- [ ] Create Department, Team, and JobTitle models; define hierarchy.
-- [ ] Use nested sets/table for org chart and reporting lines.
-- [ ] Build management pages for structure editing.
-- [ ] Interactive React org chart (tree or drag/drop).
-- [ ] Add reporting line management/delegation.
+- [x] CRUD Department: basic info, details, settings, and notes
+- [x] CRUD Designation: complete all necessary fields with relationships
 
 ### Week 4: Employee Self-Service (ESS)
 
@@ -67,13 +61,6 @@
 - [ ] Download policies, handbooks, and company forms.
 - [ ] Submit change requests for restricted data (with approval).
 - [ ] Log all ESS actions.
-
-### Week 5: Document Management
-
-- [ ] Document storage with categories (local/cloud).
-- [ ] Access control (role-based), document versioning.
-- [ ] React file viewer/upload UI with progress, previews, and approval workflow.
-- [ ] Track expirations, automate renewal reminders.
 
 ---
 
