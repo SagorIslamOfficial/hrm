@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export interface NotePayload {
+    title: string;
     note: string;
     category?: string | null;
     is_private?: boolean;
