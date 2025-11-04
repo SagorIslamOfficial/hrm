@@ -15,7 +15,7 @@ export function EmptyActionState({
     onButtonClick,
 }: EmptyActionStateProps) {
     return (
-        <div className="flex flex-col items-center justify-center py-8 text-center">
+        <div className="flex h-48 flex-col items-center justify-center py-8 text-center">
             <p className="mb-4 text-sm text-muted-foreground">{message}</p>
             <Button
                 type="button"
