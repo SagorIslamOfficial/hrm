@@ -84,3 +84,34 @@ export const getTodayDate = (): string => {
     const today = new Date();
     return today.toISOString().split('T')[0];
 };
+
+/**
+ * Format a date string for display with both date and time
+ * @param date - Date string in ISO format
+ * @param locale - Locale string (default: 'en-US')
+ * @returns Formatted date and time string (e.g., "November 3, 2025 at 2:30 PM")
+ */
+export const formatDateTimeForDisplay = (
+    date: string | undefined | null,
+    locale: string = 'en-US',
+): string => {
+    if (!date) {
+        return '';
+    }
+
+    try {
+        const dateObj = new Date(date);
+        const formattedDate = dateObj.toLocaleDateString(locale, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+        const formattedTime = dateObj.toLocaleTimeString(locale, {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+        return `${formattedDate} - ${formattedTime}`;
+    } catch {
+        return date;
+    }
+};
