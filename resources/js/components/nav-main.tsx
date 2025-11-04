@@ -221,6 +221,9 @@ export function NavMain({
                                                             asChild
                                                         >
                                                             <SidebarMenuSubButton>
+                                                                {subItem.icon && (
+                                                                    <subItem.icon />
+                                                                )}
                                                                 <span>
                                                                     {
                                                                         subItem.title
@@ -278,6 +281,9 @@ export function NavMain({
                                                         <Link
                                                             href={subItem.url}
                                                         >
+                                                            {subItem.icon && (
+                                                                <subItem.icon />
+                                                            )}
                                                             <span>
                                                                 {subItem.title}
                                                             </span>
