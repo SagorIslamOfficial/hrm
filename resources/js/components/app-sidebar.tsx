@@ -20,6 +20,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as attendance } from '@/routes/attendance/index';
 import { index as departments } from '@/routes/departments/index';
+import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees/index';
 import { index as employmentTypes } from '@/routes/employment-types/index';
 import { type NavItem } from '@/types';
@@ -89,6 +90,10 @@ const mainNavItems: NavItem[] = [
                     {
                         title: 'Departments',
                         href: departments(),
+                    },
+                    {
+                        title: 'Designations',
+                        href: designations(),
                     },
                 ],
             },
