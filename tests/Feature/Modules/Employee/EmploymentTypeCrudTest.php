@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\User;
+use Inertia\Response;
+use Spatie\Permission\Models\Role;
+use Illuminate\Http\RedirectResponse;
 use App\Modules\Employee\Models\EmploymentType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
+use App\Modules\Employee\Http\Controllers\EmploymentTypeController;
 
 uses(RefreshDatabase::class);
 
@@ -21,7 +24,7 @@ test('user can view employment types index', function () {
         'is_active' => true,
     ]);
 
-    $controller = new \App\Modules\Employee\Http\Controllers\EmploymentTypeController;
+    $controller = new EmploymentTypeController;
     $request = new \Illuminate\Http\Request;
     $request->setUserResolver(function () use ($user) {
         return $user;
@@ -29,7 +32,7 @@ test('user can view employment types index', function () {
 
     $response = $controller->index($request);
 
-    expect($response)->toBeInstanceOf(\Inertia\Response::class);
+    expect($response)->toBeInstanceOf(Response::class);
     // Check that the response contains employment types data
     $this->assertDatabaseCount('employment_types', 1);
 });
@@ -60,10 +63,10 @@ test('user can view employment type details', function () {
 
     $employmentType = EmploymentType::factory()->create();
 
-    $controller = new \App\Modules\Employee\Http\Controllers\EmploymentTypeController;
+    $controller = new EmploymentTypeController;
     $response = $controller->show($employmentType);
 
-    expect($response)->toBeInstanceOf(\Inertia\Response::class);
+    expect($response)->toBeInstanceOf(Response::class);
     // Check that the response was created successfully
     $this->assertTrue(true);
 });
@@ -100,10 +103,10 @@ test('user can delete employment type', function () {
 
     $employmentType = EmploymentType::factory()->create();
 
-    $controller = new \App\Modules\Employee\Http\Controllers\EmploymentTypeController;
+    $controller = new EmploymentTypeController;
     $response = $controller->destroy($employmentType);
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
     $this->assertSoftDeleted($employmentType);
 });
 
@@ -118,9 +121,9 @@ test('cannot delete employment type with assigned employees', function () {
         'employment_type' => 'permanent',
     ]);
 
-    $controller = new \App\Modules\Employee\Http\Controllers\EmploymentTypeController;
+    $controller = new EmploymentTypeController;
     $response = $controller->destroy($employmentType);
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
     $this->assertDatabaseHas('employment_types', ['id' => $employmentType->id]);
 });

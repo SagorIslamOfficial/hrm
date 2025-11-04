@@ -38,7 +38,7 @@ export function UseEmploymentTypeColumns({
             cell: ({ row }) => (
                 <Link
                     href={employmentTypesShow(row.original.id).url}
-                    className="font-medium text-blue-600 hover:text-amber-600"
+                    className="font-medium text-primary hover:text-amber-600"
                 >
                     {row.getValue('name')}
                 </Link>

@@ -1,67 +1,91 @@
+'use client';
+
+import { BookOpen, Clock, Folder, Grid2x2Check, Users } from 'lucide-react';
+import type * as React from 'react';
+import AppLogo from './app-logo';
+
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { TeamSwitcher } from '@/components/team-switcher';
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
+    SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as attendance } from '@/routes/attendance/index';
-import { index as departments } from '@/routes/departments/index';
-import { index as employees } from '@/routes/employees/index';
-import { index as employmentTypes } from '@/routes/employment-types/index';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import {
-    BookOpen,
-    Building,
-    Clock,
-    Folder,
-    LayoutGrid,
-    UserCheck,
-    Users,
-} from 'lucide-react';
-import AppLogo from './app-logo';
+import { index as attendance } from '@/routes/attendance';
+import { index as departments } from '@/routes/departments';
+import { index as employees } from '@/routes/employees';
+import { index as employmentTypes } from '@/routes/employment-types';
+// This is sample data.
+const data = {
+    teams: [
+        {
+            name: 'Reverse Coders',
+            logo: AppLogo,
+            plan: 'Enterprise',
+        },
+    ],
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Employees',
-        href: employees(),
-        icon: Users,
-        items: [
-            {
-                title: 'All Employees',
-                href: employees(),
-                icon: Users,
-            },
-            {
-                title: 'Employment Types',
-                href: employmentTypes(),
-                icon: UserCheck,
-            },
-        ],
-    },
-    {
-        title: 'Departments',
-        href: departments(),
-        icon: Building,
-    },
-    {
-        title: 'Attendance',
-        href: attendance(),
-        icon: Clock,
-    },
-];
+    navMain: [
+        {
+            title: 'Dashboard',
+            url: dashboard().url,
+            icon: Grid2x2Check,
+            isActive: false,
+        },
+
+        {
+            title: 'HR Management',
+            url: '#',
+            icon: Users,
+            isActive: false,
+            items: [
+                {
+                    title: 'Employee',
+                    url: '#',
+                    icon: Folder,
+                    isActive: false,
+                    items: [
+                        {
+                            title: 'All Employees',
+                            url: employees().url,
+                            isActive: false,
+                        },
+                        {
+                            title: 'Employment Types',
+                            url: employmentTypes().url,
+                            isActive: false,
+                        },
+                    ],
+                },
+                {
+                    title: 'Organization',
+                    url: '#',
+                    icon: Folder,
+                    isActive: false,
+                    items: [
+                        {
+                            title: 'Departments',
+                            url: departments().url,
+                            isActive: false,
+                        },
+                    ],
+                },
+            ],
+        },
+
+        {
+            title: 'Attendance',
+            url: attendance().url,
+            icon: Clock,
+            isActive: false,
+        },
+    ],
+};
 
 const footerNavItems: NavItem[] = [
     {
@@ -76,29 +100,20 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <TeamSwitcher teams={data.teams} />
             </SidebarHeader>
-
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={data.navMain} />
             </SidebarContent>
-
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+                <NavUser user={data.user} />
             </SidebarFooter>
+            <SidebarRail />
         </Sidebar>
     );
 }

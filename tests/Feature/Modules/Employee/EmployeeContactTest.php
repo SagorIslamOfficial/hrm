@@ -15,7 +15,7 @@ test('can list employee contacts', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/contacts");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/contacts");
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -47,7 +47,7 @@ it('can create an employee contact', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/contacts", $contactData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/contacts", $contactData);
 
     $response->assertCreated()
         ->assertJsonStructure([
@@ -85,7 +85,7 @@ it('can update an employee contact', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->putJson("/dashboard/employees/{$employee->id}/contacts/{$contact->id}", $updateData);
+        ->putJson("/dashboard/hr/employee/{$employee->id}/contacts/{$contact->id}", $updateData);
 
     $response->assertSuccessful()
         ->assertJsonStructure([
@@ -113,7 +113,7 @@ it('can delete an employee contact', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson("/dashboard/employees/{$employee->id}/contacts/{$contact->id}");
+        ->deleteJson("/dashboard/hr/employee/{$employee->id}/contacts/{$contact->id}");
 
     $response->assertSuccessful()
         ->assertJson([
@@ -129,7 +129,7 @@ it('validates required fields when creating contact', function () {
     $employee = Employee::factory()->create();
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/contacts", []);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/contacts", []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['contact_name', 'relationship', 'phone']);
@@ -144,7 +144,7 @@ it('prevents access to contacts of other employees', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson("/dashboard/employees/{$employee->id}/contacts/{$contact->id}");
+        ->getJson("/dashboard/hr/employee/{$employee->id}/contacts/{$contact->id}");
 
     $response->assertNotFound();
 });
@@ -168,7 +168,7 @@ it('sets only one primary contact per employee', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/dashboard/employees/{$employee->id}/contacts", $contactData);
+        ->postJson("/dashboard/hr/employee/{$employee->id}/contacts", $contactData);
 
     $response->assertCreated();
 

@@ -1,6 +1,7 @@
 import { FormActions, InfoCard, PageHeader } from '@/components/common';
 import EmploymentTypeEditForm from '@/components/modules/employee/EmploymentTypeEditForm';
 import AppLayout from '@/layouts/app-layout';
+import { index as employeesIndex } from '@/routes/employees/index';
 import {
     create as employmentTypesCreate,
     index as employmentTypesIndex,
@@ -14,7 +15,7 @@ import { toast } from 'sonner';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Employees',
-        href: '/dashboard/employees',
+        href: employeesIndex().url,
     },
     {
         title: 'Employment Types',

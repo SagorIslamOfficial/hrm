@@ -13,7 +13,7 @@ export async function createCustomField(
     payload: CustomFieldPayload,
 ) {
     return axios.post(
-        `/dashboard/employees/${employeeId}/custom-fields`,
+        `/dashboard/hr/employee/${employeeId}/custom-fields`,
         payload,
     );
 }
@@ -24,7 +24,7 @@ export async function updateCustomField(
     payload: Partial<CustomFieldPayload>,
 ) {
     return axios.put(
-        `/dashboard/employees/${employeeId}/custom-fields/${fieldId}`,
+        `/dashboard/hr/employee/${employeeId}/custom-fields/${fieldId}`,
         payload,
     );
 }
@@ -34,7 +34,7 @@ export async function deleteCustomField(
     fieldId: string | number,
 ) {
     return axios.delete(
-        `/dashboard/employees/${employeeId}/custom-fields/${fieldId}`,
+        `/dashboard/hr/employee/${employeeId}/custom-fields/${fieldId}`,
     );
 }
 

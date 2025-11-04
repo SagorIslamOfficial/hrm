@@ -10,7 +10,7 @@ export async function createNote(
     employeeId: string | number,
     payload: NotePayload,
 ) {
-    return axios.post(`/dashboard/employees/${employeeId}/notes`, payload);
+    return axios.post(`/dashboard/hr/employee/${employeeId}/notes`, payload);
 }
 
 export async function updateNote(
@@ -19,7 +19,7 @@ export async function updateNote(
     payload: NotePayload,
 ) {
     return axios.put(
-        `/dashboard/employees/${employeeId}/notes/${noteId}`,
+        `/dashboard/hr/employee/${employeeId}/notes/${noteId}`,
         payload,
     );
 }
@@ -28,7 +28,7 @@ export async function deleteNote(
     employeeId: string | number,
     noteId: string | number,
 ) {
-    return axios.delete(`/dashboard/employees/${employeeId}/notes/${noteId}`);
+    return axios.delete(`/dashboard/hr/employee/${employeeId}/notes/${noteId}`);
 }
 
 export default { createNote, updateNote, deleteNote };

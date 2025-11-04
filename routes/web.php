@@ -13,7 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->middleware('throttle:web')->name('dashboard');
 
     // Added module routes with dashboard prefix
-    Route::prefix('dashboard')->group(function () {
+    Route::prefix('dashboard/hr')->group(function () {
         require __DIR__.'/../app/Modules/Employee/Routes/web.php';
         require __DIR__.'/../app/Modules/Department/Routes/web.php';
         require __DIR__.'/../app/Modules/Attendance/Routes/web.php';
