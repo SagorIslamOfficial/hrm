@@ -1,5 +1,7 @@
 import DetailRow from '@/components/common/DetailRow';
 import { InfoCard } from '@/components/common/InfoCard';
+import { MembersDrawer } from '@/components/common/MembersDrawer';
+import { useState } from 'react';
 
 interface EmploymentType {
     id: string;
@@ -10,6 +12,16 @@ interface EmploymentType {
     created_at: string;
     updated_at: string;
     employees_count?: number;
+    employees?: Array<{
+        id: string;
+        first_name: string;
+        last_name: string;
+        email: string;
+        employee_code?: string;
+        department_name?: string;
+        designation_title?: string;
+        employment_status?: string;
+    }>;
 }
 
 interface Props {
@@ -17,58 +29,100 @@ interface Props {
 }
 
 export default function EmploymentTypeShow({ employmentType }: Props) {
+    const [membersDrawerOpen, setMembersDrawerOpen] = useState(false);
+
+    const employeeCount = employmentType.employees_count ?? 0;
     return (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <InfoCard title="Employment Type Details" className="lg:col-span-2">
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <DetailRow label="Name">{employmentType.name}</DetailRow>
-
-                    <DetailRow label="Code">
-                        <code className="rounded bg-muted px-2 py-1 text-sm lowercase">
-                            {employmentType.code}
-                        </code>
-                    </DetailRow>
-                </div>
-
-                <div className="my-6">
-                    {employmentType.description && (
-                        <DetailRow
-                            label="Description"
-                            valueClassName="text-sm leading-relaxed"
-                        >
-                            <span className="text-black">
-                                {employmentType.description}
-                            </span>
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <InfoCard
+                    title="Employment Type Details"
+                    className="lg:col-span-2"
+                >
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <DetailRow label="Name">
+                            {employmentType.name}
                         </DetailRow>
-                    )}
-                </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <DetailRow
-                        label="Status"
-                        statusValue={
-                            employmentType.is_active ? 'active' : 'inactive'
-                        }
-                    />
+                        <DetailRow label="Code">
+                            <code className="rounded bg-muted px-2 py-1 text-sm lowercase">
+                                {employmentType.code}
+                            </code>
+                        </DetailRow>
+                    </div>
 
-                    <DetailRow label="Employees" className="text-primary">
-                        {employmentType.employees_count ?? 0}{' '}
-                        <span className="text-sm">employees</span>
-                    </DetailRow>
-                </div>
-            </InfoCard>
+                    <div className="my-6">
+                        {employmentType.description && (
+                            <DetailRow
+                                label="Description"
+                                valueClassName="text-sm leading-relaxed"
+                            >
+                                <span className="text-black">
+                                    {employmentType.description}
+                                </span>
+                            </DetailRow>
+                        )}
+                    </div>
 
-            <InfoCard title="Timestamps">
-                <div className="space-y-6">
-                    <DetailRow label="Created" valueClassName="text-sm">
-                        {new Date(employmentType.created_at).toLocaleString()}
-                    </DetailRow>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <DetailRow
+                            label="Status"
+                            statusValue={
+                                employmentType.is_active ? 'active' : 'inactive'
+                            }
+                        />
 
-                    <DetailRow label="Last Updated" valueClassName="text-sm">
-                        {new Date(employmentType.updated_at).toLocaleString()}
-                    </DetailRow>
-                </div>
-            </InfoCard>
+                        <DetailRow label="Employees" className="text-primary">
+                            <button
+                                onClick={() => setMembersDrawerOpen(true)}
+                                className="cursor-pointer text-primary underline underline-offset-2 transition-colors hover:text-primary/80"
+                            >
+                                {employeeCount}{' '}
+                                <span className="text-sm">employees</span>
+                            </button>
+                        </DetailRow>
+                    </div>
+                </InfoCard>
+
+                <InfoCard title="Timestamps">
+                    <div className="space-y-6">
+                        <DetailRow label="Created" valueClassName="text-sm">
+                            {new Date(
+                                employmentType.created_at,
+                            ).toLocaleString()}
+                        </DetailRow>
+
+                        <DetailRow
+                            label="Last Updated"
+                            valueClassName="text-sm"
+                        >
+                            {new Date(
+                                employmentType.updated_at,
+                            ).toLocaleString()}
+                        </DetailRow>
+                    </div>
+                </InfoCard>
+            </div>
+
+            {/* Members Drawer */}
+            <MembersDrawer
+                isOpen={membersDrawerOpen}
+                onClose={() => setMembersDrawerOpen(false)}
+                employees={(employmentType.employees || []).map((emp) => ({
+                    id: emp.id,
+                    employee_code: emp.employee_code || '',
+                    first_name: emp.first_name,
+                    last_name: emp.last_name,
+                    email: emp.email,
+                    department_name: emp.department_name || 'N/A',
+                    designation_title: emp.designation_title || 'N/A',
+                    employment_status: emp.employment_status || 'active',
+                    joining_date: '',
+                    created_at: '',
+                }))}
+                departmentName="All Departments"
+                title={`${employmentType.name} Employees`}
+            />
         </div>
     );
 }

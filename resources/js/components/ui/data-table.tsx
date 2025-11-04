@@ -1,16 +1,17 @@
 'use client';
 
+import { EmptyActionState } from '@/components/common';
 import {
     ColumnDef,
     ColumnFiltersState,
-    SortingState,
-    VisibilityState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    SortingState,
     useReactTable,
+    VisibilityState,
 } from '@tanstack/react-table';
 import { ChevronDown, ListFilterPlus } from 'lucide-react';
 import * as React from 'react';
@@ -187,11 +188,11 @@ export function DataTable<TData, TValue>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
+                                <TableCell colSpan={columns.length}>
+                                    <EmptyActionState
+                                        message="No data found! Try adjusting your search, filters or adding new data."
+                                        buttonText="Reset Filters, Search or Add"
+                                    />
                                 </TableCell>
                             </TableRow>
                         )}

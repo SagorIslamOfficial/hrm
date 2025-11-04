@@ -136,6 +136,7 @@ class EmployeeSeeder extends Seeder
             foreach (range(1, $faker->numberBetween(1, 3)) as $noteIndex) {
                 EmployeeNote::create([
                     'employee_id' => $employee->id,
+                    'title' => $faker->sentence(4),
                     'note' => $faker->paragraph(3),
                     'created_by' => $users->random()->id ?? null,
                     'is_private' => $faker->boolean(30),

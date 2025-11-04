@@ -31,6 +31,7 @@ class EmployeeController
             'employees.last_name',
             'employees.email',
             'employees.phone',
+            'employees.photo',
             'employees.employment_status',
             'employees.employment_type',
             'employees.joining_date',

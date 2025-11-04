@@ -16,11 +16,12 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as attendance } from '@/routes/attendance';
-import { index as departments } from '@/routes/departments';
+import { index as attendance } from '@/routes/attendance/index';
+import { index as departments } from '@/routes/departments/index';
+import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
 import { index as employmentTypes } from '@/routes/employment-types';
-// This is sample data.
+
 const data = {
     teams: [
         {
@@ -71,6 +72,11 @@ const data = {
                         {
                             title: 'Departments',
                             url: departments().url,
+                            isActive: false,
+                        },
+                        {
+                            title: 'Designations',
+                            url: designations().url,
                             isActive: false,
                         },
                     ],

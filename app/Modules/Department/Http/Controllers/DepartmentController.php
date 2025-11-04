@@ -5,43 +5,108 @@ namespace App\Modules\Department\Http\Controllers;
 use App\Modules\Department\Contracts\DepartmentRepositoryInterface;
 use App\Modules\Department\Http\Requests\StoreDepartmentRequest;
 use App\Modules\Department\Http\Requests\UpdateDepartmentRequest;
+use App\Modules\Department\Models\Department;
 use App\Modules\Department\Services\DepartmentService;
-use Illuminate\Http\Request;
+use App\Modules\Employee\Models\Employee;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DepartmentController
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private DepartmentService $departmentService,
         private DepartmentRepositoryInterface $departmentRepository,
     ) {}
 
-    public function index(Request $request)
+    public function index()
     {
-        $departments = $this->departmentRepository->paginate($request->get('per_page', 15));
+        $this->authorize('viewAny', Department::class);
+        $departments = Department::with('manager', 'employees')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return Inertia::render('modules/department/index', [
-            'departments' => $departments,
-        ]);
+        return Inertia::render('modules/department/index', compact('departments'));
     }
 
     public function create()
     {
-        return Inertia::render('modules/department/create');
+        $this->authorize('create', Department::class);
+
+        $employees = Employee::select('id', 'first_name', 'last_name', 'email')->get();
+
+        return Inertia::render('modules/department/create', [
+            'employees' => $employees,
+        ]);
     }
 
     public function store(StoreDepartmentRequest $request)
     {
+        $this->authorize('create', Department::class);
         $department = $this->departmentService->createDepartment($request->validated());
 
         return redirect()->route('departments.show', $department->id)
             ->with('success', 'Department created successfully.');
     }
 
-    public function show(int $id)
+    public function show(string $id)
     {
         $department = $this->departmentRepository->findById($id);
+        $this->authorize('view', $department);
         $stats = $this->departmentService->getDepartmentStats($id);
+
+        $department->load([
+            'detail',
+            'settings',
+            'notes.creator',
+            'notes.updater',
+            'designations',
+            'manager' => function ($query) {
+                $query->select([
+                    'employees.id',
+                    'employees.employee_code',
+                    'employees.first_name',
+                    'employees.last_name',
+                    'employees.email',
+                    'employees.phone',
+                    'employees.photo',
+                    'employees.employment_status',
+                    'employees.employment_type',
+                    'employees.joining_date',
+                    'employees.created_at',
+                    'employees.department_id',
+                    'employees.designation_id',
+                    'departments.name as department_name',
+                    'designations.title as designation_title',
+                ])
+                    ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+                    ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id');
+            },
+            'employees' => function ($query) {
+                $query->select([
+                    'employees.id',
+                    'employees.employee_code',
+                    'employees.first_name',
+                    'employees.last_name',
+                    'employees.email',
+                    'employees.phone',
+                    'employees.photo',
+                    'employees.employment_status',
+                    'employees.employment_type',
+                    'employees.joining_date',
+                    'employees.created_at',
+                    'employees.department_id',
+                    'employees.designation_id',
+                    'departments.name as department_name',
+                    'designations.title as designation_title',
+                ])
+                    ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+                    ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+                    ->orderBy('employees.created_at', 'desc');
+            },
+        ]);
 
         return Inertia::render('modules/department/show', [
             'department' => $department,
@@ -49,28 +114,65 @@ class DepartmentController
         ]);
     }
 
-    public function edit(int $id)
+    public function edit(string $id)
     {
         $department = $this->departmentRepository->findById($id);
+        $this->authorize('update', $department);
+
+        $department->load([
+            'detail',
+            'settings',
+            'notes.creator',
+            'notes.updater',
+            'designations',
+            'manager',
+        ]);
+
+        $employees = Employee::select('id', 'first_name', 'last_name', 'email')->get();
 
         return Inertia::render('modules/department/edit', [
             'department' => $department,
+            'employees' => $employees,
+            'currentUser' => Auth::user(),
         ]);
     }
 
-    public function update(UpdateDepartmentRequest $request, int $id)
+    public function update(UpdateDepartmentRequest $request, string $id)
     {
         $department = $this->departmentService->updateDepartment($id, $request->validated());
+        $this->authorize('update', $department);
 
         return redirect()->route('departments.show', $department->id)
             ->with('success', 'Department updated successfully.');
     }
 
-    public function destroy(int $id)
+    public function destroy(string $id)
     {
+        $department = $this->departmentRepository->findById($id);
+        $this->authorize('delete', $department);
         $this->departmentService->deleteDepartment($id);
 
         return redirect()->route('departments.index')
             ->with('success', 'Department deleted successfully.');
+    }
+
+    public function restore(string $id)
+    {
+        $department = Department::withTrashed()->findOrFail($id);
+        $this->authorize('restore', $department);
+        $this->departmentService->restoreDepartment($id);
+
+        return redirect()->route('departments.index')
+            ->with('success', 'Department restored successfully.');
+    }
+
+    public function forceDelete(string $id)
+    {
+        $department = Department::withTrashed()->findOrFail($id);
+        $this->authorize('forceDelete', $department);
+        $this->departmentService->forceDeleteDepartment($id);
+
+        return redirect()->route('departments.index')
+            ->with('success', 'Department permanently deleted.');
     }
 }

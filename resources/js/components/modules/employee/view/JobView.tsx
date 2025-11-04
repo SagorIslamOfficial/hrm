@@ -55,7 +55,9 @@ export function JobView({ jobDetail, supervisors }: JobViewProps) {
                         </label>
                         <p className="text-sm font-medium">
                             {jobDetail.probation_end_date
-                                ? formatDateForDisplay(jobDetail.probation_end_date)
+                                ? formatDateForDisplay(
+                                      jobDetail.probation_end_date,
+                                  )
                                 : 'N/A'}
                         </p>
                     </div>
@@ -65,7 +67,9 @@ export function JobView({ jobDetail, supervisors }: JobViewProps) {
                         </label>
                         <p className="text-sm font-medium">
                             {jobDetail.contract_end_date
-                                ? formatDateForDisplay(jobDetail.contract_end_date)
+                                ? formatDateForDisplay(
+                                      jobDetail.contract_end_date,
+                                  )
                                 : 'N/A'}
                         </p>
                     </div>

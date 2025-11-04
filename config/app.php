@@ -86,6 +86,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Currency
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the default currency used throughout the application.
+    | This can be overridden per user or entity as needed.
+    |
+    */
+
+    'currency' => env('APP_CURRENCY', 'BDT'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

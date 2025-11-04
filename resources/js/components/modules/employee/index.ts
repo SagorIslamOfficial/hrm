@@ -1,18 +1,19 @@
 // Common Employee interface for all employee components
 export interface Employee {
-    id: number;
+    id: string;
     employee_code: string;
     first_name: string;
     last_name: string;
     email: string;
     phone?: string;
-    department_id?: number;
-    designation_id?: number;
+    department_id?: string;
+    designation_id?: string;
     department_name: string;
     designation_title: string;
     employment_status: string;
     employment_type?: string;
     joining_date: string;
+    photo_url?: string;
     created_at: string;
     user?: {
         id: number;

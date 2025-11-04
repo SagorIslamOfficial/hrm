@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $employee_id
  * @property string $created_by
  * @property string $updated_by
+ * @property string $title
  * @property string $note
  * @property bool $is_private
  * @property string $category
@@ -26,6 +27,7 @@ class EmployeeNote extends Model
         'employee_id',
         'created_by',
         'updated_by',
+        'title',
         'note',
         'is_private',
         'category',
@@ -36,6 +38,7 @@ class EmployeeNote extends Model
         'employee_id',
         'created_by',
         'updated_by',
+        'title',
         'note',
         'is_private',
         'category',

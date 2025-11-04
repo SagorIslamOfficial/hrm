@@ -4,7 +4,6 @@ namespace App\Modules\Department\Repositories;
 
 use App\Modules\Department\Contracts\DepartmentRepositoryInterface;
 use App\Modules\Department\Models\Department;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class DepartmentRepository implements DepartmentRepositoryInterface
@@ -14,7 +13,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         return Department::create($data);
     }
 
-    public function findById(int $id): Department
+    public function findById(string $id): Department
     {
         return Department::findOrFail($id);
     }
@@ -29,14 +28,19 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         return $department->delete();
     }
 
+    public function restore(Department $department): bool
+    {
+        return $department->restore();
+    }
+
+    public function forceDelete(Department $department): bool
+    {
+        return $department->forceDelete();
+    }
+
     public function all(): Collection
     {
         return Department::all();
-    }
-
-    public function paginate(int $perPage = 15): LengthAwarePaginator
-    {
-        return Department::paginate($perPage);
     }
 
     public function findByName(string $name): ?Department

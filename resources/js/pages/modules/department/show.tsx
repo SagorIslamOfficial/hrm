@@ -1,231 +1,114 @@
-import { formatDateForDisplay } from '@/components/common';
+import { PageHeader } from '@/components/common';
+import { DepartmentShow } from '@/components/modules/department';
+import { Employee } from '@/components/modules/employee';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
+import {
+    edit as departmentsEdit,
+    index as departmentsIndex,
+    show as departmentsShow,
+} from '@/routes/departments/index';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { Edit } from 'lucide-react';
 
-interface Employee {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    position: string;
-    hire_date: string;
+interface DepartmentNote {
+    id: string;
+    note: string;
+    category: string;
+    user?: {
+        id?: string;
+        name?: string;
+        email?: string;
+    };
+    created_at: string;
+    updated_at?: string;
+}
+
+interface DepartmentDetail {
+    founded_date?: string;
+    division?: string;
+    cost_center?: string;
+    internal_code?: string;
+    office_phone?: string;
+}
+
+interface DepartmentSettings {
+    overtime_allowed?: boolean;
+    travel_allowed?: boolean;
+    home_office_allowed?: boolean;
+    meeting_room_count?: number;
+    desk_count?: number;
+    requires_approval?: boolean;
+    approval_level?: string;
 }
 
 interface Department {
-    id: number;
+    id: string;
     name: string;
-    description: string;
-    manager?: {
-        id: number;
-        first_name: string;
-        last_name: string;
-        email: string;
-    };
-    budget: number;
-    location: string;
+    code?: string;
+    description?: string;
+    manager?: Employee;
+    budget?: number;
+    location?: string;
     status: string;
+    is_active: boolean;
+    detail?: DepartmentDetail;
+    settings?: DepartmentSettings;
+    notes?: DepartmentNote[];
     employees: Employee[];
     created_at: string;
     updated_at: string;
+    deleted_at?: string | null;
 }
 
 interface Props {
     department: Department;
+    stats?: {
+        employee_count: number;
+        manager_name?: string;
+    };
 }
 
 export default function Show({ department }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Departments',
+            href: departmentsIndex().url,
+        },
+        {
+            title: department.name,
+            href: departmentsShow(department.id).url,
+        },
+    ];
+
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Department: ${department.name}`} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <div className="mb-6 flex items-center justify-between">
-                                <h1 className="text-2xl font-bold">
-                                    {department.name}
-                                </h1>
-                                <div className="space-x-2">
-                                    <Link
-                                        href={`/departments/${department.id}/edit`}
-                                        className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-700"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <Link
-                                        href="/departments"
-                                        className="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
-                                    >
-                                        Back to Departments
-                                    </Link>
-                                </div>
-                            </div>
+            <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
+                <PageHeader
+                    title={department.name}
+                    description={
+                        department.code ? `${department.code}` : 'No code'
+                    }
+                    backUrl={departmentsIndex().url}
+                    actions={
+                        <Button size="sm" asChild>
+                            <Link href={departmentsEdit(department.id).url}>
+                                <Edit className="mr-1 size-4" />
+                                Edit
+                            </Link>
+                        </Button>
+                    }
+                />
 
-                            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div>
-                                    <h2 className="mb-4 text-lg font-semibold">
-                                        Department Details
-                                    </h2>
-                                    <div className="space-y-3">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Name
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                {department.name}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Description
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                {department.description ||
-                                                    'No description'}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Manager
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                {department.manager
-                                                    ? `${department.manager.first_name} ${department.manager.last_name} (${department.manager.email})`
-                                                    : 'Not assigned'}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Budget
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                $
-                                                {department.budget?.toLocaleString()}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Location
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                {department.location || 'N/A'}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Status
-                                            </label>
-                                            <span
-                                                className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                                                    department.status ===
-                                                    'active'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
-                                                }`}
-                                            >
-                                                {department.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h2 className="mb-4 text-lg font-semibold">
-                                        Timestamps
-                                    </h2>
-                                    <div className="space-y-3">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Created
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                {formatDateForDisplay(
-                                                    department.created_at,
-                                                )}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Last Updated
-                                            </label>
-                                            <p className="mt-1 text-sm text-gray-900">
-                                                {formatDateForDisplay(
-                                                    department.updated_at,
-                                                )}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h2 className="mb-4 text-lg font-semibold">
-                                    Employees ({department.employees.length})
-                                </h2>
-                                {department.employees.length > 0 ? (
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full table-auto">
-                                            <thead>
-                                                <tr className="bg-gray-50">
-                                                    <th className="px-4 py-2 text-left">
-                                                        Name
-                                                    </th>
-                                                    <th className="px-4 py-2 text-left">
-                                                        Email
-                                                    </th>
-                                                    <th className="px-4 py-2 text-left">
-                                                        Position
-                                                    </th>
-                                                    <th className="px-4 py-2 text-left">
-                                                        Hire Date
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {department.employees.map(
-                                                    (employee) => (
-                                                        <tr
-                                                            key={employee.id}
-                                                            className="border-t"
-                                                        >
-                                                            <td className="px-4 py-2 font-medium">
-                                                                {
-                                                                    employee.first_name
-                                                                }{' '}
-                                                                {
-                                                                    employee.last_name
-                                                                }
-                                                            </td>
-                                                            <td className="px-4 py-2">
-                                                                {employee.email}
-                                                            </td>
-                                                            <td className="px-4 py-2">
-                                                                {
-                                                                    employee.position
-                                                                }
-                                                            </td>
-                                                            <td className="px-4 py-2">
-                                                                {formatDateForDisplay(
-                                                                    employee.hire_date,
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    ),
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ) : (
-                                    <p className="text-gray-500">
-                                        No employees assigned to this
-                                        department.
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* Department Show */}
+                <DepartmentShow
+                    department={department}
+                    className="rounded-xl border border-sidebar-border/70 p-6"
+                />
             </div>
-        </>
+        </AppLayout>
     );
 }

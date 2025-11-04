@@ -1,26 +1,7 @@
 import { FormActions, FormField } from '@/components/common';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import type { Note } from '@/components/common/interfaces';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-interface Note {
-    id: string;
-    note: string;
-    category: string;
-    is_private: boolean;
-    created_at: string;
-    creator?: {
-        name?: string;
-    };
-    updated_at?: string;
-    updater?: {
-        name?: string;
-    };
-    _isNew?: boolean;
-    _isModified?: boolean;
-    _isDeleted?: boolean;
-}
 
 const NOTE_CATEGORIES = [
     { value: 'general', label: 'General' },
@@ -39,6 +20,7 @@ interface NoteFormProps {
     onSuccess: (noteData: Note) => void;
     onCancel: () => void;
     subjectLabel?: string;
+    supportsPrivacy?: boolean;
 }
 
 export function NoteForm({
@@ -47,8 +29,10 @@ export function NoteForm({
     onSuccess,
     onCancel,
     subjectLabel = '',
+    supportsPrivacy = true,
 }: NoteFormProps) {
     const [formData, setFormData] = useState({
+        title: note?.title || '',
         note: note?.note || '',
         category: note?.category || 'general',
         is_private: note?.is_private || false,
@@ -62,6 +46,9 @@ export function NoteForm({
 
         try {
             const validationErrors: Record<string, string> = {};
+            if (!formData.title.trim()) {
+                validationErrors.title = 'Title is required';
+            }
             if (!formData.note.trim()) {
                 validationErrors.note = 'Note content is required';
             }
@@ -76,6 +63,7 @@ export function NoteForm({
 
             const stagedNote: Note = {
                 id: note?.id || `temp-${Date.now()}`,
+                title: formData.title,
                 note: formData.note,
                 category: formData.category,
                 is_private: formData.is_private,
@@ -104,6 +92,21 @@ export function NoteForm({
     return (
         <div className="space-y-4">
             <FormField
+                type="text"
+                id="title"
+                label="Title"
+                value={formData.title}
+                onChange={(value: string) =>
+                    setFormData((prev) => ({
+                        ...prev,
+                        title: value,
+                    }))
+                }
+                error={errors.title}
+                placeholder="Brief title for this note"
+            />
+
+            <FormField
                 type="textarea"
                 id="note"
                 label="Note"
@@ -120,7 +123,9 @@ export function NoteForm({
                 rows={5}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div
+                className={`grid gap-4 ${supportsPrivacy ? 'grid-cols-2' : 'grid-cols-1'}`}
+            >
                 <FormField
                     type="select"
                     id="category"
@@ -138,19 +143,21 @@ export function NoteForm({
                     required
                 />
 
-                <div className="flex items-center justify-between pt-5">
-                    <Label htmlFor="is_private">Private Note</Label>
-                    <Switch
+                {supportsPrivacy && (
+                    <FormField
+                        type="checkbox"
                         id="is_private"
-                        checked={formData.is_private}
-                        onCheckedChange={(checked) =>
+                        label="Private Note"
+                        value={formData.is_private}
+                        onChange={(checked: boolean) =>
                             setFormData((prev) => ({
                                 ...prev,
                                 is_private: checked,
                             }))
                         }
+                        helperText="Private notes are only visible to you"
                     />
-                </div>
+                )}
             </div>
 
             <FormActions

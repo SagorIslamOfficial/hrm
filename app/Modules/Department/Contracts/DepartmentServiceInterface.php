@@ -8,9 +8,13 @@ interface DepartmentServiceInterface
 {
     public function createDepartment(array $data): Department;
 
-    public function updateDepartment(int $id, array $data): Department;
+    public function updateDepartment(string $id, array $data): Department;
 
-    public function deleteDepartment(int $id): void;
+    public function deleteDepartment(string $id): void;
 
-    public function getDepartmentStats(int $id): array;
+    public function restoreDepartment(string $id): void;
+
+    public function forceDeleteDepartment(string $id): void;
+
+    public function getDepartmentStats(string $id): array;
 }
