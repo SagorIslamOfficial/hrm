@@ -21,11 +21,12 @@ import { index as departments } from '@/routes/departments/index';
 import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
 import { index as employmentTypes } from '@/routes/employment-types';
+import { type NavItem } from '@/types';
 
 const data = {
     teams: [
         {
-            name: 'Reverse Coders',
+            name: 'Reverse Code',
             logo: AppLogo,
             plan: 'Enterprise',
         },
@@ -117,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser user={data.user} />
+                <NavUser />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
