@@ -3,16 +3,16 @@ import {
     TabsNavigation,
     formatDateForInput,
 } from '@/components/common';
+import type { Note } from '@/components/common/interfaces';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useUrlTab } from '@/hooks';
-import { update as employeesUpdate } from '@/routes/employees/index';
-import { router, useForm } from '@inertiajs/react';
-// axios removed - use lib helpers
 import * as ContactsApi from '@/lib/employee/contacts';
 import * as CustomFieldsApi from '@/lib/employee/customFields';
 import * as DocumentsApi from '@/lib/employee/documents';
 import * as NotesApi from '@/lib/employee/notes';
 import processAndReport from '@/lib/employee/processAndReport';
+import { update as employeesUpdate } from '@/routes/employees/index';
+import { router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -65,24 +65,6 @@ interface Document {
     created_at: string;
     // Staging properties for pending changes
     _documentFile?: File;
-    _isNew?: boolean;
-    _isModified?: boolean;
-    _isDeleted?: boolean;
-}
-
-interface Note {
-    id: string;
-    note: string;
-    category: string;
-    is_private: boolean;
-    created_at: string;
-    updated_at?: string;
-    creator?: {
-        name?: string;
-    };
-    updater?: {
-        name?: string;
-    };
     _isNew?: boolean;
     _isModified?: boolean;
     _isDeleted?: boolean;
@@ -335,15 +317,17 @@ export function EmployeeEditForm({
                     isDeleted: (n) => Boolean(n._isDeleted),
                     create: (n) =>
                         NotesApi.createNote(employee.id, {
+                            title: n.title || '',
                             note: n.note,
                             category: n.category,
-                            is_private: n.is_private,
+                            is_private: Boolean(n.is_private),
                         }),
                     update: (n) =>
                         NotesApi.updateNote(employee.id, n.id, {
+                            title: n.title || '',
                             note: n.note,
                             category: n.category,
-                            is_private: n.is_private,
+                            is_private: Boolean(n.is_private),
                         }),
                     remove: (n) => NotesApi.deleteNote(employee.id, n.id),
                 },
