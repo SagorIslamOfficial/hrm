@@ -23,6 +23,7 @@ interface MembersModalProps {
     departmentName: string;
     title?: string;
     hideDesignationColumn?: boolean;
+    hideDepartmentBadge?: boolean;
 }
 
 export function MembersDrawer({
@@ -33,6 +34,7 @@ export function MembersDrawer({
     departmentName,
     title = 'Department Members',
     hideDesignationColumn = false,
+    hideDepartmentBadge = false,
 }: MembersModalProps) {
     const getInitials = (firstName: string, lastName: string) => {
         return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -109,7 +111,8 @@ export function MembersDrawer({
                                     Manager
                                 </div>
                             )}
-                            {row.original.department_name &&
+                            {!hideDepartmentBadge &&
+                                row.original.department_name &&
                                 row.original.department_name !==
                                     departmentName &&
                                 departmentName !== 'All Departments' && (
