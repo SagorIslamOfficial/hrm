@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Clock, Folder, Grid2x2Check, Users } from 'lucide-react';
+import { BookOpen, Folder, Grid2x2Check, Users } from 'lucide-react';
 import type * as React from 'react';
 import AppLogo from './app-logo';
 
@@ -16,7 +16,6 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as attendance } from '@/routes/attendance/index';
 import { index as departments } from '@/routes/departments/index';
 import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
@@ -85,12 +84,12 @@ const data = {
             ],
         },
 
-        {
-            title: 'Attendance',
-            url: attendance().url,
-            icon: Clock,
-            isActive: false,
-        },
+        // {
+        //     title: 'Attendance',
+        //     url: attendance().url,
+        //     icon: Clock,
+        //     isActive: false,
+        // },
     ],
 };
 
