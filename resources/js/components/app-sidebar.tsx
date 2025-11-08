@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Clock, Folder, Grid2x2Check, Users } from 'lucide-react';
+import { BookOpen, Folder, Grid2x2Check, Users } from 'lucide-react';
 import type * as React from 'react';
 import AppLogo from './app-logo';
 
@@ -16,15 +16,16 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as attendance } from '@/routes/attendance';
-import { index as departments } from '@/routes/departments';
+import { index as departments } from '@/routes/departments/index';
+import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
 import { index as employmentTypes } from '@/routes/employment-types';
-// This is sample data.
+import { type NavItem } from '@/types';
+
 const data = {
     teams: [
         {
-            name: 'Reverse Coders',
+            name: 'Reverse Code',
             logo: AppLogo,
             plan: 'Enterprise',
         },
@@ -73,17 +74,22 @@ const data = {
                             url: departments().url,
                             isActive: false,
                         },
+                        {
+                            title: 'Designations',
+                            url: designations().url,
+                            isActive: false,
+                        },
                     ],
                 },
             ],
         },
 
-        {
-            title: 'Attendance',
-            url: attendance().url,
-            icon: Clock,
-            isActive: false,
-        },
+        // {
+        //     title: 'Attendance',
+        //     url: attendance().url,
+        //     icon: Clock,
+        //     isActive: false,
+        // },
     ],
 };
 
@@ -111,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser user={data.user} />
+                <NavUser />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

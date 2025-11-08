@@ -3,7 +3,7 @@
 namespace App\Modules\Attendance\Database\Seeders;
 
 use App\Modules\Attendance\Models\Attendance;
-use App\Modules\Employee\Models\Employee;
+use App\Modules\HR\Employee\Models\Employee;
 use Carbon\Carbon;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;

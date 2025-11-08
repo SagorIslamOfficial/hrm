@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\User;
-use App\Modules\Department\Models\Department;
-use App\Modules\Department\Models\Designation;
-use App\Modules\Employee\Models\Employee;
-use App\Modules\Employee\Models\EmployeeNote;
+use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Employee\Models\EmployeeNote;
+use App\Modules\HR\Organization\Department\Models\Department;
+use App\Modules\HR\Organization\Department\Models\Designation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -46,6 +46,7 @@ test('admin can view all private notes', function () {
     $privateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'Private Note by Other User',
     ]);
 
     $response = $this->actingAs($admin)
@@ -75,6 +76,7 @@ test('HR can view all private notes', function () {
     $privateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'HR Test Private Note',
     ]);
 
     $response = $this->actingAs($hr)
@@ -104,6 +106,7 @@ test('manager can view private notes with permission', function () {
     $privateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'Manager Test Private Note',
     ]);
 
     $response = $this->actingAs($manager)
@@ -134,6 +137,7 @@ test('regular user cannot view other users private notes', function () {
     $privateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'Other User Private Note',
     ]);
 
     $response = $this->actingAs($user)
@@ -161,6 +165,7 @@ test('user can view their own private notes', function () {
     $myPrivateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $user->id,
+        'title' => 'My Private Note',
     ]);
 
     $response = $this->actingAs($user)
@@ -188,6 +193,7 @@ test('all users can view public notes', function () {
     $publicNote = EmployeeNote::factory()->create([
         'employee_id' => $employee->id,
         'is_private' => false,
+        'title' => 'Public Note',
     ]);
 
     $response = $this->actingAs($user)
@@ -216,6 +222,7 @@ test('admin can view private note details', function () {
     $privateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'Admin View Private Note',
     ]);
 
     $response = $this->actingAs($admin)
@@ -247,6 +254,7 @@ test('regular user cannot view other users private note details', function () {
     $privateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'Regular User Private Note',
     ]);
 
     $response = $this->actingAs($user)
@@ -275,6 +283,7 @@ test('note creator can update their own private note', function () {
 
     $response = $this->actingAs($user)
         ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$myPrivateNote->id}", [
+            'title' => 'Updated Private Note',
             'note' => 'Updated private note',
             'category' => 'performance',
             'is_private' => true,
@@ -311,6 +320,7 @@ test('regular user cannot update other users private note', function () {
 
     $response = $this->actingAs($user)
         ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}", [
+            'title' => 'Attempted Update',
             'note' => 'Attempted update',
             'category' => 'general',
             'is_private' => true,
@@ -341,6 +351,7 @@ test('admin can update any private note', function () {
 
     $response = $this->actingAs($admin)
         ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}", [
+            'title' => 'Admin Updated Note',
             'note' => 'Admin updated note',
             'category' => 'general',
             'is_private' => true,
@@ -377,6 +388,7 @@ test('HR can update any private note with manage permission', function () {
 
     $response = $this->actingAs($hr)
         ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$privateNote->id}", [
+            'title' => 'HR Updated Note',
             'note' => 'HR updated note',
             'category' => 'general',
             'is_private' => true,
@@ -498,22 +510,26 @@ test('mixing private and public notes filters correctly for regular users', func
         'employee_id' => $employee->id,
         'is_private' => false,
         'created_by' => $otherUser->id,
+        'title' => 'Public Note',
     ]);
 
     $otherUserPrivateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $otherUser->id,
+        'title' => 'Other User Private Note',
     ]);
 
     $myPrivateNote = EmployeeNote::factory()->private()->create([
         'employee_id' => $employee->id,
         'created_by' => $user->id,
+        'title' => 'My Private Note',
     ]);
 
     $myPublicNote = EmployeeNote::factory()->create([
         'employee_id' => $employee->id,
         'is_private' => false,
         'created_by' => $user->id,
+        'title' => 'My Public Note',
     ]);
 
     $response = $this->actingAs($user)

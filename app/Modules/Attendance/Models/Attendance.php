@@ -2,7 +2,7 @@
 
 namespace App\Modules\Attendance\Models;
 
-use App\Modules\Employee\Models\Employee;
+use App\Modules\HR\Employee\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

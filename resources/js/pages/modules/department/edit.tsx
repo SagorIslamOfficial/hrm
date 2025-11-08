@@ -1,257 +1,96 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { PageHeader } from '@/components/common';
+import type { Note } from '@/components/common/interfaces';
+import { DepartmentEditForm } from '@/components/modules/department';
+import AppLayout from '@/layouts/app-layout';
+import {
+    edit as departmentsEdit,
+    index as departmentsIndex,
+} from '@/routes/departments/index';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 
-interface User {
-    id: number;
+interface DepartmentDetail {
+    founded_date?: string;
+    division?: string;
+    cost_center?: string;
+    internal_code?: string;
+    office_phone?: string;
+}
+
+interface DepartmentSettings {
+    overtime_allowed?: boolean;
+    travel_allowed?: boolean;
+    home_office_allowed?: boolean;
+    meeting_room_count?: number;
+    desk_count?: number;
+    requires_approval?: boolean;
+    approval_level?: string;
+}
+
+interface Department {
+    id: string;
+    name: string;
+    code?: string;
+    description?: string;
+    location?: string;
+    budget?: number;
+    status: string;
+    is_active: boolean;
+    manager_id?: string;
+    detail?: DepartmentDetail;
+    settings?: DepartmentSettings;
+    notes?: Note[];
+}
+
+interface Employee {
+    id: string;
     first_name: string;
     last_name: string;
     email: string;
 }
 
-interface Department {
-    id: number;
-    name: string;
-    description: string;
-    manager_id?: number;
-    budget: number;
-    location: string;
-    status: string;
+interface CurrentUser {
+    id: string;
+    name?: string;
 }
 
 interface Props {
     department: Department;
-    users: User[];
+    employees: Employee[];
+    currentUser?: CurrentUser;
 }
 
-export default function Edit({ department, users }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
-        name: department.name,
-        description: department.description || '',
-        manager_id: department.manager_id || '',
-        budget: department.budget?.toString() || '',
-        location: department.location || '',
-        status: department.status,
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(`/departments/${department.id}`);
-    };
+export default function Edit({ department, employees, currentUser }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Departments',
+            href: departmentsIndex().url,
+        },
+        {
+            title: 'Edit Department',
+            href: departmentsEdit(department.id).url,
+        },
+    ];
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Department: ${department.name}`} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-2xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <div className="mb-6 flex items-center justify-between">
-                                <h1 className="text-2xl font-bold">
-                                    Edit Department
-                                </h1>
-                                <div className="space-x-2">
-                                    <Link
-                                        href={`/departments/${department.id}`}
-                                        className="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
-                                    >
-                                        View
-                                    </Link>
-                                    <Link
-                                        href="/departments"
-                                        className="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
-                                    >
-                                        Back to Departments
-                                    </Link>
-                                </div>
-                            </div>
+            <div className="mx-auto flex h-full w-7xl flex-1 flex-col gap-8 overflow-x-auto p-4">
+                <PageHeader
+                    title="Edit Department"
+                    description={`Update information for ${department.name}`}
+                    backUrl={departmentsIndex().url}
+                    backLabel="Cancel"
+                />
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    <label
-                                        htmlFor="name"
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        Name *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        value={data.name}
-                                        onChange={(e) =>
-                                            setData('name', e.target.value)
-                                        }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        required
-                                    />
-                                    {errors.name && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.name}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label
-                                        htmlFor="description"
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        Description
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        value={data.description}
-                                        onChange={(e) =>
-                                            setData(
-                                                'description',
-                                                e.target.value,
-                                            )
-                                        }
-                                        rows={4}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    />
-                                    {errors.description && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.description}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label
-                                        htmlFor="manager_id"
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        Manager
-                                    </label>
-                                    <select
-                                        id="manager_id"
-                                        value={data.manager_id}
-                                        onChange={(e) =>
-                                            setData(
-                                                'manager_id',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    >
-                                        <option value="">
-                                            Select a manager
-                                        </option>
-                                        {users.map((user) => (
-                                            <option
-                                                key={user.id}
-                                                value={user.id}
-                                            >
-                                                {user.first_name}{' '}
-                                                {user.last_name} ({user.email})
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.manager_id && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.manager_id}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label
-                                        htmlFor="budget"
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        Budget
-                                    </label>
-                                    <input
-                                        type="number"
-                                        id="budget"
-                                        value={data.budget}
-                                        onChange={(e) =>
-                                            setData('budget', e.target.value)
-                                        }
-                                        step="0.01"
-                                        min="0"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    />
-                                    {errors.budget && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.budget}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label
-                                        htmlFor="location"
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        Location
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="location"
-                                        value={data.location}
-                                        onChange={(e) =>
-                                            setData('location', e.target.value)
-                                        }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    />
-                                    {errors.location && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.location}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label
-                                        htmlFor="status"
-                                        className="block text-sm font-medium text-gray-700"
-                                    >
-                                        Status *
-                                    </label>
-                                    <select
-                                        id="status"
-                                        value={data.status}
-                                        onChange={(e) =>
-                                            setData('status', e.target.value)
-                                        }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        required
-                                    >
-                                        <option value="active">Active</option>
-                                        <option value="inactive">
-                                            Inactive
-                                        </option>
-                                    </select>
-                                    {errors.status && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.status}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center justify-end space-x-4">
-                                    <Link
-                                        href={`/departments/${department.id}`}
-                                        className="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
-                                    >
-                                        Cancel
-                                    </Link>
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 disabled:opacity-50"
-                                    >
-                                        {processing
-                                            ? 'Updating...'
-                                            : 'Update Department'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                <DepartmentEditForm
+                    department={department}
+                    employees={employees}
+                    currentUser={currentUser}
+                    className="rounded-xl border border-sidebar-border/70 p-6"
+                />
             </div>
-        </>
+        </AppLayout>
     );
 }

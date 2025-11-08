@@ -1,11 +1,11 @@
 <?php
 
-use App\Modules\Department\Models\Department;
-use App\Modules\Department\Models\Designation;
-use App\Modules\Employee\Contracts\EmployeeRepositoryInterface;
-use App\Modules\Employee\Models\Employee;
-use App\Modules\Employee\Repositories\EmployeeRepository;
-use App\Modules\Employee\Services\EmployeeService;
+use App\Modules\HR\Employee\Contracts\EmployeeRepositoryInterface;
+use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Employee\Repositories\EmployeeRepository;
+use App\Modules\HR\Employee\Services\EmployeeService;
+use App\Modules\HR\Organization\Department\Models\Department;
+use App\Modules\HR\Organization\Department\Models\Designation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\User;
-use App\Modules\Department\Models\Department;
-use App\Modules\Department\Models\Designation;
-use App\Modules\Employee\Models\Employee;
-use App\Modules\Employee\Models\EmployeeNote;
+use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Employee\Models\EmployeeNote;
+use App\Modules\HR\Organization\Department\Models\Department;
+use App\Modules\HR\Organization\Department\Models\Designation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 
@@ -67,6 +67,7 @@ it('can create an employee note', function () {
     ]);
 
     $noteData = [
+        'title' => 'Test Note Title',
         'note' => 'This is a test note for the employee.',
         'category' => 'general',
         'is_private' => false,
@@ -111,6 +112,7 @@ it('can create a private employee note', function () {
     ]);
 
     $noteData = [
+        'title' => 'Private Note Title',
         'note' => 'This is a private note.',
         'category' => 'disciplinary',
         'is_private' => true,
@@ -222,6 +224,7 @@ it('can update an employee note', function () {
     ]);
 
     $updateData = [
+        'title' => 'Updated Note Title',
         'note' => 'Updated note content',
         'category' => 'performance',
         'is_private' => true,
@@ -297,6 +300,7 @@ it('sets updated_by to current user when updating note', function () {
     ]);
 
     $updateData = [
+        'title' => 'Updated by Different User',
         'note' => 'Updated by different user',
         'category' => 'performance',
         'is_private' => true,
@@ -335,6 +339,7 @@ it('cannot update note that belongs to different employee', function () {
     ]);
 
     $updateData = [
+        'title' => 'Updated Note',
         'note' => 'Updated note',
         'category' => 'performance',
         'is_private' => false,
@@ -424,9 +429,9 @@ it('validates required note field when creating', function () {
 
     $response = $this->actingAs($user)
         ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
+            'title' => 'Test Title',
             'category' => 'general',
             'is_private' => false,
-            // Missing 'note' field
         ]);
 
     $response->assertUnprocessable()
@@ -450,6 +455,7 @@ it('validates required note field when updating', function () {
 
     $response = $this->actingAs($user)
         ->putJson("/dashboard/hr/employee/{$employee->id}/notes/{$note->id}", [
+            'title' => 'Updated Title',
             'category' => 'general',
             'is_private' => false,
             // Missing 'note' field
@@ -471,6 +477,7 @@ it('validates category enum values', function () {
 
     $response = $this->actingAs($user)
         ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
+            'title' => 'Test Note',
             'note' => 'Test note',
             'category' => 'invalid_category',
             'is_private' => false,
@@ -495,6 +502,7 @@ it('accepts valid category values', function () {
     foreach ($validCategories as $category) {
         $response = $this->actingAs($user)
             ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
+                'title' => "Test Title for {$category}",
                 'note' => "Test note for {$category}",
                 'category' => $category,
                 'is_private' => false,
@@ -522,6 +530,7 @@ it('validates is_private is boolean', function () {
 
     $response = $this->actingAs($user)
         ->postJson("/dashboard/hr/employee/{$employee->id}/notes", [
+            'title' => 'Test Note',
             'note' => 'Test note',
             'category' => 'general',
             'is_private' => 'not_boolean',
@@ -621,6 +630,7 @@ it('handles database errors during creation', function () {
 
     // Mock a database error by using an invalid employee_id
     $noteData = [
+        'title' => 'Test Note',
         'note' => 'This is a test note.',
         'category' => 'general',
         'is_private' => false,

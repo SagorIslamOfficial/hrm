@@ -26,6 +26,7 @@ interface BaseFieldProps {
     required?: boolean;
     className?: string;
     disabled?: boolean;
+    helperText?: string;
 }
 
 interface TextFieldProps extends BaseFieldProps {
@@ -110,6 +111,7 @@ export function FormField(props: FormFieldProps) {
         required = false,
         className,
         disabled = false,
+        helperText,
     } = props;
 
     const renderInput = () => {
@@ -325,6 +327,9 @@ export function FormField(props: FormFieldProps) {
                 {label} {required && '*'}
             </Label>
             {renderInput()}
+            {helperText && (
+                <p className="text-xs text-muted-foreground">{helperText}</p>
+            )}
             {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
     );

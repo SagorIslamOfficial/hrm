@@ -14,8 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Added module routes with dashboard prefix
     Route::prefix('dashboard/hr')->group(function () {
-        require __DIR__.'/../app/Modules/Employee/Routes/web.php';
-        require __DIR__.'/../app/Modules/Department/Routes/web.php';
+        require __DIR__.'/../app/Modules/HR/Employee/Routes/web.php';
+        require __DIR__.'/../app/Modules/HR/Organization/Department/Routes/web.php';
         require __DIR__.'/../app/Modules/Attendance/Routes/web.php';
     });
 });

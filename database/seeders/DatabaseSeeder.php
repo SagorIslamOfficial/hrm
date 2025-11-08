@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Modules\Department\Database\Seeders\DepartmentSeeder;
-use App\Modules\Department\Database\Seeders\DesignationSeeder;
-use App\Modules\Employee\Database\Seeders\EmployeeSeeder;
-use App\Modules\Employee\Database\Seeders\EmploymentTypeSeeder;
+use App\Modules\HR\Employee\Database\Seeders\EmployeeSeeder;
+use App\Modules\HR\Employee\Database\Seeders\EmploymentTypeSeeder;
+use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentSeeder;
+use App\Modules\HR\Organization\Department\Database\Seeders\DesignationSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
