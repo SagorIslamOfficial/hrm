@@ -5,7 +5,10 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Modules\HR\Employee\Database\Seeders\EmployeeSeeder;
 use App\Modules\HR\Employee\Database\Seeders\EmploymentTypeSeeder;
+use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentDetailSeeder;
+use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentNoteSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentSeeder;
+use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentSettingsSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DesignationSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -46,6 +49,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DepartmentSeeder::class,
             DesignationSeeder::class,
+        ]);
+
+        // Seed department details, settings, and notes
+        $this->call([
+            DepartmentDetailSeeder::class,
+            DepartmentSettingsSeeder::class,
+            DepartmentNoteSeeder::class,
         ]);
 
         // Seed employees with all related data
