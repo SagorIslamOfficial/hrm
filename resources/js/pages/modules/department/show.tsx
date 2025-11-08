@@ -93,6 +93,7 @@ export default function Show({ department }: Props) {
                         department.code ? `${department.code}` : 'No code'
                     }
                     backUrl={departmentsIndex().url}
+                    backLabel="Back"
                     actions={
                         <Button size="sm" asChild>
                             <Link href={departmentsEdit(department.id).url}>

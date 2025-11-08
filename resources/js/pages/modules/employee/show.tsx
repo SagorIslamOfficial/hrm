@@ -163,6 +163,7 @@ export default function Show({ employee, supervisors, auth }: Props) {
                     title={`${employee.first_name} ${employee.last_name}`}
                     description={`${employee.employee_code} - ${employee.designation.title} - ${employee.department.name}`}
                     backUrl={employeesIndex().url}
+                    backLabel="Back"
                     actions={
                         <Button size="sm" asChild>
                             <Link href={employeesEdit(employee.id).url}>
