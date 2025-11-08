@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Modules\HR\Employee\Employee\Database\Seeders\EmployeeSeeder;
-use App\Modules\HR\Employee\Employee\Database\Seeders\EmploymentTypeSeeder;
+use App\Modules\HR\Employee\Database\Seeders\EmployeeSeeder;
+use App\Modules\HR\Employee\Database\Seeders\EmploymentTypeSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DesignationSeeder;
 use Illuminate\Database\Seeder;

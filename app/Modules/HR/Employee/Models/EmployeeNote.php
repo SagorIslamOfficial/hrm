@@ -3,7 +3,7 @@
 namespace App\Modules\HR\Employee\Models;
 
 use App\Models\User;
-use App\Modules\HR\Employee\Employee\Database\Factories\EmployeeNoteFactory;
+use App\Modules\HR\Employee\Database\Factories\EmployeeNoteFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

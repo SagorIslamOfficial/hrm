@@ -3,7 +3,7 @@
 namespace App\Modules\HR\Employee\Models;
 
 use App\Models\User;
-use App\Modules\HR\Employee\Employee\Database\Factories\EmployeeDocumentFactory;
+use App\Modules\HR\Employee\Database\Factories\EmployeeDocumentFactory;
 use App\Traits\FileUploadTrait;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

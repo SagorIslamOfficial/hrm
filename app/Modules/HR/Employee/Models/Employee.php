@@ -2,7 +2,7 @@
 
 namespace App\Modules\HR\Employee\Models;
 
-use App\Modules\HR\Employee\Employee\Database\Factories\EmployeeFactory;
+use App\Modules\HR\Employee\Database\Factories\EmployeeFactory;
 use App\Modules\HR\Organization\Department\Models\Department;
 use App\Modules\HR\Organization\Department\Models\Designation;
 use App\Traits\FileUploadTrait;

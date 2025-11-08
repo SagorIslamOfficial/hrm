@@ -2,7 +2,7 @@
 
 namespace App\Modules\HR\Employee\Models;
 
-use App\Modules\HR\Employee\Employee\Database\Factories\EmploymentTypeFactory;
+use App\Modules\HR\Employee\Database\Factories\EmploymentTypeFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
