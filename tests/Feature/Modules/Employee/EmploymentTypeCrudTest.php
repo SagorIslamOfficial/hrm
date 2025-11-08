@@ -1,12 +1,12 @@
 <?php
 
 use App\Models\User;
+use App\Modules\HR\Employee\Http\Controllers\EmploymentTypeController;
+use App\Modules\HR\Employee\Models\EmploymentType;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
-use Illuminate\Http\RedirectResponse;
-use App\Modules\Employee\Models\EmploymentType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Modules\Employee\Http\Controllers\EmploymentTypeController;
 
 uses(RefreshDatabase::class);
 
@@ -117,7 +117,7 @@ test('cannot delete employment type with assigned employees', function () {
     $employmentType = EmploymentType::factory()->create(['code' => 'permanent']);
 
     // Create an employee with this employment type
-    \App\Modules\Employee\Models\Employee::factory()->create([
+    \App\Modules\HR\Employee\Models\Employee::factory()->create([
         'employment_type' => 'permanent',
     ]);
 

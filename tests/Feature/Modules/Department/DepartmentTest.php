@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
-use App\Modules\Department\Models\Department;
-use App\Modules\Department\Services\DepartmentService;
+use App\Modules\HR\Organization\Department\Models\Department;
+use App\Modules\HR\Organization\Department\Services\DepartmentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 

@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
-use App\Modules\Employee\Models\Employee;
-use App\Modules\Employee\Models\EmployeeContact;
+use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Employee\Models\EmployeeContact;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

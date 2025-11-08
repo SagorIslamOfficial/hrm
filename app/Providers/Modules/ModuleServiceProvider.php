@@ -9,13 +9,11 @@ class ModuleServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $modules = $this->getModules();
+        $providers = $this->findServiceProviders(); // Find all module service providers
 
-        foreach ($modules as $module) {
-            $providerClass = "App\\Modules\\{$module}\\Providers\\{$module}ServiceProvider";
-
-            if (class_exists($providerClass)) {
-                $this->app->register($providerClass);
+        foreach ($providers as $providerClass) {
+            if (class_exists($providerClass)) { // Check if the class exists
+                $this->app->register($providerClass); // Register the service provider
             }
         }
     }
@@ -25,16 +23,27 @@ class ModuleServiceProvider extends ServiceProvider
         // Additional module loading logic can go here
     }
 
-    private function getModules(): array
+    private function findServiceProviders(): array
     {
-        $modulesPath = app_path('Modules');
+        $modulesPath = app_path('Modules'); //Get path: /app/Modules
+        $providers = [];
 
         if (! File::exists($modulesPath)) {
-            return [];
+            return $providers; // Return empty if Modules directory doesn't exist
         }
 
-        return collect(File::directories($modulesPath))
-            ->map(fn ($path) => basename($path))
-            ->toArray();
+        $files = File::allFiles($modulesPath); // Get ALL files recursively from /app/Modules
+
+        foreach ($files as $file) {
+            if (str_ends_with($file->getFilename(), 'ServiceProvider.php')) {
+                // Only process files that end with 'ServiceProvider.php'
+                $relativePath = str_replace(app_path() . '/', '', $file->getPathname());
+                $namespace = 'App\\' . str_replace(['/', '.php'], ['\\', ''], $relativePath);
+
+                $providers[] = $namespace;
+            }
+        }
+
+        return $providers;
     }
 }

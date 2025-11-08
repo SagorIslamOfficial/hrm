@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\User;
-use App\Modules\Department\Models\Department;
-use App\Modules\Department\Models\Designation;
-use App\Modules\Employee\Models\Employee;
-use App\Modules\Employee\Models\EmployeeDocument;
+use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Employee\Models\EmployeeDocument;
+use App\Modules\HR\Organization\Department\Models\Department;
+use App\Modules\HR\Organization\Department\Models\Designation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

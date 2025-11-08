@@ -3,8 +3,8 @@
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Modules\Attendance\Http\Middleware\AttendanceAccessMiddleware;
-use App\Modules\Department\Http\Middleware\DepartmentAccessMiddleware;
-use App\Modules\Employee\Http\Middleware\EmployeeAccessMiddleware;
+use App\Modules\HR\Employee\Http\Middleware\EmployeeAccessMiddleware;
+use App\Modules\HR\Organization\Department\Http\Middleware\DepartmentAccessMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

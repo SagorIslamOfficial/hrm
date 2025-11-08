@@ -1,7 +1,7 @@
 <?php
 
-use App\Modules\Department\Models\Designation;
-use App\Modules\Department\Services\DesignationService;
+use App\Modules\HR\Organization\Department\Models\Designation;
+use App\Modules\HR\Organization\Department\Services\DesignationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -64,7 +64,7 @@ it('can get designations by department', function () {
     $service = app(DesignationService::class);
 
     // Create department
-    $department = \App\Modules\Department\Models\Department::factory()->create();
+    $department = \App\Modules\HR\Organization\Department\Models\Department::factory()->create();
 
     // Create designations
     $designation1 = $service->createDesignation([
