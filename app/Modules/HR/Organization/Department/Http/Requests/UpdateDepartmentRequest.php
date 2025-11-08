@@ -13,7 +13,7 @@ class UpdateDepartmentRequest extends FormRequest
 
     public function rules(): array
     {
-        $departmentId = $this->route('department');
+        $departmentId = request()->route('department');
 
         return [
             // Department
@@ -39,7 +39,7 @@ class UpdateDepartmentRequest extends FormRequest
             'settings.meeting_room_count' => 'nullable|integer|min:0',
             'settings.desk_count' => 'nullable|integer|min:0',
             'settings.requires_approval' => 'sometimes|boolean',
-            'settings.approval_level' => 'nullable|in:Manager,Director,Head,C-Level',
+            'settings.approval_level' => 'nullable|in:,Manager,Director,Head,C-Level',
 
             // Notes
             'notes' => 'nullable|array',

@@ -3,6 +3,7 @@ import {
     StatusBadge,
     formatDateForDisplay,
 } from '@/components/common';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getCurrencySymbol } from '@/config/currency';
 import { useCurrency } from '@/hooks/useCurrency';
 import {
@@ -21,6 +22,8 @@ export interface Department {
         id: string;
         first_name: string;
         last_name: string;
+        photo?: string;
+        photo_url?: string;
     };
     budget?: number;
     location?: string;
@@ -40,6 +43,10 @@ export function UseDepartmentColumns({
     onDeleteClick,
 }: UseDepartmentColumnsProps): ColumnDef<Department>[] {
     const currency = useCurrency();
+
+    const getInitials = (firstName: string, lastName: string) => {
+        return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    };
 
     const handleView = (department: Department) => {
         router.visit(departmentsShow(department.id).url);
@@ -74,7 +81,36 @@ export function UseDepartmentColumns({
                     ? `${row.manager.first_name} ${row.manager.last_name}`
                     : 'Not assigned',
             header: 'Manager',
-            cell: ({ row }) => <div>{row.getValue('manager')}</div>,
+            cell: ({ row }) => {
+                if (!row.original.manager) {
+                    return (
+                        <div className="text-muted-foreground">
+                            Not assigned
+                        </div>
+                    );
+                }
+
+                const manager = row.original.manager;
+                return (
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage
+                                src={manager.photo_url}
+                                alt={`${manager.first_name} ${manager.last_name}`}
+                            />
+                            <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+                                {getInitials(
+                                    manager.first_name,
+                                    manager.last_name,
+                                )}
+                            </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">
+                            {manager.first_name} {manager.last_name}
+                        </span>
+                    </div>
+                );
+            },
         },
         {
             id: 'employees',
