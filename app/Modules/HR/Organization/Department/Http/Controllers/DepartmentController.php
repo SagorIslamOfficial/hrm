@@ -24,7 +24,12 @@ class DepartmentController
     public function index()
     {
         $this->authorize('viewAny', Department::class);
-        $departments = Department::with('manager', 'employees')
+        $departments = Department::with([
+            'manager' => function ($query) {
+                $query->select('id', 'first_name', 'last_name', 'photo');
+            },
+            'employees'
+        ])
             ->orderBy('created_at', 'desc')
             ->get();
 
