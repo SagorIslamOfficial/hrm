@@ -24,7 +24,7 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $dept) {
-            Department::firstOrCreate(
+            $department = Department::firstOrCreate(
                 ['code' => $dept['code']],
                 [
                     'name' => $dept['name'],
@@ -32,6 +32,20 @@ class DepartmentSeeder extends Seeder
                     'budget' => $dept['budget'],
                     'location' => $dept['location'],
                     'is_active' => true,
+                ]
+            );
+
+            // Create or update settings for the department
+            $department->settings()->firstOrCreate(
+                ['department_id' => $department->id],
+                [
+                    'overtime_allowed' => $faker->boolean(),
+                    'travel_allowed' => $faker->boolean(),
+                    'home_office_allowed' => $faker->boolean(),
+                    'meeting_room_count' => $faker->numberBetween(0, 10),
+                    'desk_count' => $faker->numberBetween(5, 50),
+                    'requires_approval' => $faker->boolean(),
+                    'approval_level' => $faker->randomElement(['', 'Manager', 'Director', 'Head', 'C-Level']),
                 ]
             );
         }

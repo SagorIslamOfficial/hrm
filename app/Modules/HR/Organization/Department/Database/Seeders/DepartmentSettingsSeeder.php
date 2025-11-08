@@ -24,7 +24,7 @@ class DepartmentSettingsSeeder extends Seeder
                     'meeting_room_count' => $faker->numberBetween(0, 5),
                     'desk_count' => $faker->numberBetween(5, 50),
                     'requires_approval' => $faker->boolean(40), // 40% chance of requiring approval
-                    'approval_level' => $faker->randomElement(['manager', 'director', 'vp', 'ceo', null]),
+                    'approval_level' => $faker->randomElement(['', 'Manager', 'Director', 'Head', 'C-Level']),
                 ]
             );
         }

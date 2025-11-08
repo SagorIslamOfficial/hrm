@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\HR\Employee\Database\Seeders\EmployeeSeeder;
 use App\Modules\HR\Employee\Database\Seeders\EmploymentTypeSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentDetailSeeder;
+use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentManagerSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentNoteSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentSettingsSeeder;
@@ -62,6 +63,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EmploymentTypeSeeder::class,
             EmployeeSeeder::class,
+        ]);
+
+        // Assign managers to departments
+        $this->call([
+            DepartmentManagerSeeder::class,
         ]);
     }
 }

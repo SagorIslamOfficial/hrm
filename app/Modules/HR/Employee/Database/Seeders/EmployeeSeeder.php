@@ -162,29 +162,31 @@ class EmployeeSeeder extends Seeder
             }
 
             // Create attendance records for the last 30 days
-            $existingAttendance = EmployeeAttendance::where('employee_id', $employee->id)->count();
-            if ($existingAttendance < 30) {
-                foreach (range(0, 29 - $existingAttendance) as $dayOffset) {
-                    $date = now()->subDays($dayOffset);
+            for ($dayOffset = 0; $dayOffset < 30; $dayOffset++) {
+                $date = now()->subDays($dayOffset)->toDateString(); // Use date string
 
-                    // Skip weekends
-                    if ($date->isWeekend()) {
-                        continue;
-                    }
-
-                    $checkIn = $date->copy()->setTime($faker->numberBetween(8, 9), $faker->numberBetween(0, 59));
-                    $checkOut = $faker->boolean(90) ? $checkIn->copy()->addHours($faker->numberBetween(8, 10)) : null;
-
-                    EmployeeAttendance::firstOrCreate(
-                        ['employee_id' => $employee->id, 'date' => $date],
-                        [
-                            'check_in' => $checkIn,
-                            'check_out' => $checkOut,
-                            'status' => $faker->randomElement(['present', 'absent', 'half_day', 'late', 'leave']),
-                            'remarks' => $faker->optional()->sentence(),
-                        ]
-                    );
+                // Skip if attendance already exists for this date
+                if (EmployeeAttendance::where('employee_id', $employee->id)->where('date', $date)->exists()) {
+                    continue;
                 }
+
+                // Skip weekends
+                $dateObj = now()->subDays($dayOffset);
+                if ($dateObj->isWeekend()) {
+                    continue;
+                }
+
+                $checkIn = $dateObj->copy()->setTime($faker->numberBetween(8, 9), $faker->numberBetween(0, 59));
+                $checkOut = $faker->boolean(90) ? $checkIn->copy()->addHours($faker->numberBetween(8, 10)) : null;
+
+                EmployeeAttendance::create([
+                    'employee_id' => $employee->id,
+                    'date' => $date,
+                    'check_in' => $checkIn,
+                    'check_out' => $checkOut,
+                    'status' => $faker->randomElement(['present', 'absent', 'half_day', 'late', 'leave']),
+                    'remarks' => $faker->optional()->sentence(),
+                ]);
             }
 
             // Create 2-4 leave records
@@ -243,7 +245,5 @@ class EmployeeSeeder extends Seeder
                 }
             }
         }
-
-        $this->command->info('Successfully seeded 50 employees with all related data!');
     }
 }
