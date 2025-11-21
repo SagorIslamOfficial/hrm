@@ -61,6 +61,7 @@ class UpdateEmployeeRequest extends FormRequest
             'job_detail.job_title' => 'nullable|string|max:255',
             'job_detail.employment_type' => 'nullable|in:'.$validEmploymentTypes,
             'job_detail.supervisor_id' => 'nullable|uuid|exists:employees,id',
+            'job_detail.branch_id' => 'nullable|uuid|exists:branches,id',
             'job_detail.work_shift' => 'nullable|in:day,night,rotating,flexible',
             'job_detail.probation_end_date' => 'nullable|date|after:today',
             'job_detail.contract_end_date' => 'nullable|date|after:today',
