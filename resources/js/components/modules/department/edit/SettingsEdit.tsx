@@ -8,15 +8,23 @@ interface DepartmentSettings {
     desk_count?: number;
     requires_approval?: boolean;
     approval_level?: string;
+    branch_id?: string;
+}
+
+interface Branch {
+    id: string;
+    name: string;
+    code?: string;
 }
 
 interface Props {
     data: DepartmentSettings;
     errors: Record<string, string>;
+    branches: Branch[];
     setData: (key: string, value: string | number | boolean) => void;
 }
 
-export function SettingsEdit({ data, errors, setData }: Props) {
+export function SettingsEdit({ data, errors, branches, setData }: Props) {
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -102,6 +110,23 @@ export function SettingsEdit({ data, errors, setData }: Props) {
                             { value: 'C-Level', label: 'C-Level' },
                         ]}
                         error={errors.approval_level}
+                    />
+
+                    <FormField
+                        type="combobox"
+                        id="branch_id"
+                        label="Branch"
+                        value={data.branch_id || ''}
+                        onChange={(value: string) =>
+                            setData('branch_id', value)
+                        }
+                        options={branches.map((branch) => ({
+                            value: branch.id,
+                            label: `${branch.name}${branch.code ? ` (${branch.code})` : ''}`,
+                        }))}
+                        searchPlaceholder="Search branches..."
+                        emptyText="No branches found."
+                        error={errors.branch_id}
                     />
                 </div>
             </div>

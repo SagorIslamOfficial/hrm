@@ -1,5 +1,13 @@
 import { EmptyActionState, FormField, InfoCard } from '@/components/common';
 import DetailRow from '@/components/common/DetailRow';
+import { show as branchShow } from '@/routes/branches';
+import { Link } from '@inertiajs/react';
+
+interface Branch {
+    id: string;
+    name: string;
+    code?: string;
+}
 
 interface DepartmentSettings {
     overtime_allowed?: boolean;
@@ -9,6 +17,8 @@ interface DepartmentSettings {
     desk_count?: number;
     requires_approval?: boolean;
     approval_level?: string;
+    branch_id?: string;
+    branch?: Branch;
 }
 
 interface SettingsViewProps {
@@ -77,6 +87,27 @@ export function SettingsView({ settings }: SettingsViewProps) {
                                 label="Approval Level"
                                 value={settings.approval_level || 'N/A'}
                             />
+
+                            <div>
+                                <label className="text-sm font-medium text-muted-foreground">
+                                    Branch
+                                </label>
+                                <p className="text-sm font-medium">
+                                    {settings.branch_id ? (
+                                        <Link
+                                            href={
+                                                branchShow(settings.branch_id)
+                                                    .url
+                                            }
+                                            className="text-primary hover:underline"
+                                        >
+                                            {settings.branch?.name || 'N/A'}
+                                        </Link>
+                                    ) : (
+                                        'N/A'
+                                    )}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
