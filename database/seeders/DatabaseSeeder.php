@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Modules\HR\Employee\Database\Seeders\EmployeeSeeder;
 use App\Modules\HR\Employee\Database\Seeders\EmploymentTypeSeeder;
+use App\Modules\HR\Organization\Branch\Database\Seeders\BranchManagerSeeder;
+use App\Modules\HR\Organization\Branch\Database\Seeders\BranchSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentDetailSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentManagerSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentNoteSeeder;
@@ -52,6 +54,11 @@ class DatabaseSeeder extends Seeder
             DesignationSeeder::class,
         ]);
 
+        // Seed branches (must come before employees since employees reference branches)
+        $this->call([
+            BranchSeeder::class,
+        ]);
+
         // Seed department details, settings, and notes
         $this->call([
             DepartmentDetailSeeder::class,
@@ -65,9 +72,10 @@ class DatabaseSeeder extends Seeder
             EmployeeSeeder::class,
         ]);
 
-        // Assign managers to departments
+        // Assign managers to departments and branches
         $this->call([
             DepartmentManagerSeeder::class,
+            BranchManagerSeeder::class,
         ]);
     }
 }

@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('dashboard/hr')->group(function () {
         require __DIR__.'/../app/Modules/HR/Employee/Routes/web.php';
         require __DIR__.'/../app/Modules/HR/Organization/Department/Routes/web.php';
+        require __DIR__.'/../app/Modules/HR/Organization/Branch/Routes/web.php';
         require __DIR__.'/../app/Modules/Attendance/Routes/web.php';
     });
 });
