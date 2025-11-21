@@ -3,6 +3,7 @@ import {
     formatDateForDisplay,
     InfoCard,
 } from '@/components/common';
+import { titleCase } from '@/components/common/utils/formatUtils';
 import { Badge } from '@/components/ui/badge';
 
 interface Leave {
@@ -29,17 +30,8 @@ export function LeavesView({ leaves }: LeavesViewProps) {
                             <div className="flex items-start justify-between">
                                 <div className="space-y-2">
                                     <div className="flex gap-2">
-                                        <Badge variant="secondary">
-                                            {leave.leave_type
-                                                .split('_')
-                                                .map(
-                                                    (word) =>
-                                                        word
-                                                            .charAt(0)
-                                                            .toUpperCase() +
-                                                        word.slice(1),
-                                                )
-                                                .join(' ')}
+                                            <Badge variant="secondary">
+                                                {titleCase(leave.leave_type)}
                                         </Badge>
                                         <Badge
                                             variant={
