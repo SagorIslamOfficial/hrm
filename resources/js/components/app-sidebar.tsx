@@ -16,6 +16,7 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as branches } from '@/routes/branches/index';
 import { index as departments } from '@/routes/departments/index';
 import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
@@ -77,6 +78,11 @@ const data = {
                         {
                             title: 'Designations',
                             url: designations().url,
+                            isActive: false,
+                        },
+                        {
+                            title: 'Branches',
+                            url: branches().url,
                             isActive: false,
                         },
                     ],
