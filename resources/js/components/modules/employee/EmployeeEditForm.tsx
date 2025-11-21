@@ -119,6 +119,7 @@ interface Employee {
         work_shift?: string;
         probation_end_date?: string;
         contract_end_date?: string;
+        branch_id?: string;
     };
     salary_detail?: {
         basic_salary?: number;
@@ -142,6 +143,7 @@ interface EmployeeEditFormProps {
     designations: Array<{ id: string; title: string }>;
     employmentTypes: Array<{ code: string; name: string }>;
     supervisors: Array<{ id: string; name: string; employee_code: string }>;
+    branches: Array<{ id: string; name: string; code?: string }>;
     auth?: {
         user?: {
             id: string;
@@ -160,6 +162,7 @@ export function EmployeeEditForm({
     designations,
     employmentTypes,
     supervisors,
+    branches,
     auth,
     className,
 }: EmployeeEditFormProps) {
@@ -224,6 +227,7 @@ export function EmployeeEditForm({
             contract_end_date: formatDateForInput(
                 employee.job_detail?.contract_end_date,
             ),
+            branch_id: employee.job_detail?.branch_id || '',
         },
 
         // Salary details
@@ -608,6 +612,7 @@ export function EmployeeEditForm({
                             }}
                             setData={setData}
                             supervisors={supervisors}
+                            branches={branches}
                             isSuperAdminOrOwner={isSuperAdminOrOwner || false}
                         />
                     </TabsContent>
