@@ -3,11 +3,14 @@
 namespace App\Modules\HR\Organization\Department\Models;
 
 use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Organization\Branch\Models\Branch;
+use App\Modules\HR\Organization\Branch\Models\BranchDepartment;
 use App\Modules\HR\Organization\Department\Database\Factories\DepartmentFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -38,7 +41,7 @@ class Department extends Model
         'status',
     ];
 
-    protected $appends = ['employee_count'];
+    protected $appends = ['employee_count', 'status'];
 
     protected function casts(): array
     {
@@ -78,6 +81,23 @@ class Department extends Model
         return $this->belongsTo(Employee::class, 'manager_id');
     }
 
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Branch::class,
+            'branch_department',
+            'department_id',
+            'branch_id'
+        )
+            ->withPivot([
+                'id',
+                'budget_allocation',
+                'is_primary',
+            ])
+            ->withTimestamps()
+            ->using(BranchDepartment::class);
+    }
+
     /**
      * Get the count of employees in this department
      */
@@ -87,6 +107,14 @@ class Department extends Model
         return $this->relationLoaded('employees')
             ? $this->employees->count()
             : $this->employees()->count();
+    }
+
+    /**
+     * Get the status based on is_active flag
+     */
+    public function getStatusAttribute(): string
+    {
+        return $this->is_active ? 'active' : 'inactive';
     }
 
     protected static function newFactory()
