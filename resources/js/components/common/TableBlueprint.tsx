@@ -8,6 +8,8 @@ interface TableBlueprintProps<TData, TValue> {
     data: TData[];
     searchPlaceholder?: string;
     globalSearchKeys?: (keyof TData)[];
+    className?: string;
+    getRowProps?: (row: any) => React.HTMLAttributes<HTMLTableRowElement>;
 }
 
 export function TableBlueprint<TData, TValue>({
@@ -15,6 +17,8 @@ export function TableBlueprint<TData, TValue>({
     data,
     searchPlaceholder = 'Search...',
     globalSearchKeys,
+    className,
+    getRowProps,
 }: TableBlueprintProps<TData, TValue>) {
     return (
         <DataTable
@@ -22,6 +26,8 @@ export function TableBlueprint<TData, TValue>({
             data={data}
             searchPlaceholder={searchPlaceholder}
             globalSearchKeys={globalSearchKeys}
+            className={className}
+            getRowProps={getRowProps}
         />
     );
 }
