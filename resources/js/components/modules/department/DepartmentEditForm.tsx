@@ -27,6 +27,7 @@ interface DepartmentSettings {
     desk_count?: number;
     requires_approval?: boolean;
     approval_level?: string;
+    branch_id?: string;
 }
 
 interface Department {
@@ -51,6 +52,12 @@ interface Employee {
     email: string;
 }
 
+interface Branch {
+    id: string;
+    name: string;
+    code?: string;
+}
+
 interface CurrentUser {
     id: string;
     name?: string;
@@ -59,6 +66,7 @@ interface CurrentUser {
 interface Props {
     department: Department;
     employees: Employee[];
+    branches: Branch[];
     currentUser?: CurrentUser;
     className?: string;
 }
@@ -73,6 +81,7 @@ const departmentTabs = [
 export function DepartmentEditForm({
     department,
     employees,
+    branches,
     currentUser,
     className,
 }: Props) {
@@ -103,6 +112,7 @@ export function DepartmentEditForm({
         desk_count: department.settings?.desk_count?.toString() || '',
         requires_approval: department.settings?.requires_approval || false,
         approval_level: department.settings?.approval_level || '',
+        branch_id: department.settings?.branch_id || '',
         // Notes
         notes: department.notes || [],
     });
@@ -165,6 +175,7 @@ export function DepartmentEditForm({
                 desk_count: data.desk_count,
                 requires_approval: data.requires_approval,
                 approval_level: data.approval_level,
+                branch_id: data.branch_id,
             },
             // Notes array
             notes: data.notes,
@@ -206,6 +217,7 @@ export function DepartmentEditForm({
             desk_count: department.settings?.desk_count?.toString() || '',
             requires_approval: department.settings?.requires_approval || false,
             approval_level: department.settings?.approval_level || '',
+            branch_id: department.settings?.branch_id || '',
             notes: department.notes || [],
         };
         setData(resetData);
@@ -241,6 +253,7 @@ export function DepartmentEditForm({
         data.requires_approval !==
             (department.settings?.requires_approval || false) ||
         data.approval_level !== (department.settings?.approval_level || '') ||
+        data.branch_id !== (department.settings?.branch_id || '') ||
         JSON.stringify(notes) !== JSON.stringify(department.notes || []);
 
     return (
@@ -317,8 +330,10 @@ export function DepartmentEditForm({
                                     : undefined,
                                 requires_approval: data.requires_approval,
                                 approval_level: data.approval_level,
+                                branch_id: data.branch_id,
                             }}
                             errors={errors as Record<string, string>}
+                            branches={branches}
                             setData={(key, value) => {
                                 if (
                                     key === 'meeting_room_count' ||

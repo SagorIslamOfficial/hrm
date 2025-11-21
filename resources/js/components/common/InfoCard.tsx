@@ -2,10 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ReactNode } from 'react';
 
 interface InfoCardProps {
-    title: string;
-    children: ReactNode;
+    title: React.ReactNode;
+    children?: ReactNode;
     className?: string;
     action?: ReactNode;
+    titleClassName?: string;
 }
 
 export function InfoCard({
@@ -13,16 +14,19 @@ export function InfoCard({
     children,
     className = '',
     action,
+    titleClassName = '',
 }: InfoCardProps) {
     return (
-        <Card className={`shadow-none ${className}`}>
+        <Card className={`h-full shadow-none ${className}`}>
             <CardHeader>
                 <div className="flex items-center justify-between">
-                    <CardTitle>{title}</CardTitle>
+                    <CardTitle className={`min-w-0 ${titleClassName}`}>
+                        {title}
+                    </CardTitle>
                     {action && <div>{action}</div>}
                 </div>
             </CardHeader>
-            <CardContent>{children}</CardContent>
+            {children && <CardContent>{children}</CardContent>}
         </Card>
     );
 }

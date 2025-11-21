@@ -3,6 +3,7 @@
 namespace App\Modules\HR\Employee\Models;
 
 use App\Modules\HR\Employee\Database\Factories\EmployeeJobDetailFactory;
+use App\Modules\HR\Organization\Branch\Models\Branch;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,7 @@ class EmployeeJobDetail extends Model
         'job_title',
         'employment_type',
         'supervisor_id',
+        'branch_id',
         'work_shift',
         'probation_end_date',
         'contract_end_date',
@@ -38,6 +40,11 @@ class EmployeeJobDetail extends Model
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'supervisor_id');
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     protected static function newFactory()

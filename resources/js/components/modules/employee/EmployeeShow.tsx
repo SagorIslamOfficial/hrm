@@ -63,6 +63,7 @@ interface Employee {
     };
     job_detail?: {
         job_title: string;
+        branch_id: string;
         supervisor_id: string;
         work_shift: string;
         probation_end_date: string | null;
@@ -138,6 +139,8 @@ interface Employee {
 
 interface EmployeeShowFormProps {
     employee: Employee;
+    branches: Array<{ id: string; name: string; code?: string }>;
+    branch_id?: string;
     supervisors: Array<{ id: string; name: string; employee_code: string }>;
     className?: string;
     auth?: {
@@ -152,6 +155,7 @@ interface EmployeeShowFormProps {
 
 export function EmployeeShow({
     employee,
+    branches,
     supervisors,
     className,
     auth,
@@ -202,6 +206,7 @@ export function EmployeeShow({
                     <JobView
                         jobDetail={employee.job_detail}
                         supervisors={supervisors}
+                        branches={branches}
                     />
                 </TabsContent>
 

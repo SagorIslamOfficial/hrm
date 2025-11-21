@@ -4,8 +4,9 @@ import {
     formatDateForDisplay,
 } from '@/components/common';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getCurrencySymbol } from '@/config/currency';
+import { formatCurrency } from '@/config/currency';
 import { useCurrency } from '@/hooks/useCurrency';
+import { show as branchShow } from '@/routes/branches';
 import {
     edit as departmentsEdit,
     show as departmentsShow,
@@ -31,6 +32,15 @@ export interface Department {
     is_active: boolean;
     employee_count?: number;
     employees?: Array<{ id: string; first_name: string; last_name: string }>;
+    settings?: {
+        id?: string;
+        branch_id?: string;
+        branch?: {
+            id: string;
+            name: string;
+            code?: string;
+        };
+    };
     deleted_at?: string | null;
     created_at?: string;
 }
@@ -126,8 +136,8 @@ export function UseDepartmentColumns({
                 return (
                     <div>
                         {budget
-                            ? `${getCurrencySymbol(currency)}${budget.toLocaleString()}`
-                            : `${getCurrencySymbol(currency)}0`}
+                            ? formatCurrency(budget, currency)
+                            : formatCurrency(0, currency)}
                     </div>
                 );
             },
@@ -141,6 +151,29 @@ export function UseDepartmentColumns({
             accessorKey: 'status',
             header: 'Status',
             cell: ({ row }) => <StatusBadge status={row.getValue('status')} />,
+        },
+        {
+            id: 'branch',
+            accessorFn: (row) => row.settings?.branch?.name || 'Not assigned',
+            header: 'Branch',
+            cell: ({ row }) => {
+                const branch = row.original.settings?.branch;
+                if (!branch || !row.original.settings?.branch_id) {
+                    return (
+                        <div className="text-muted-foreground">
+                            Not assigned
+                        </div>
+                    );
+                }
+                return (
+                    <Link
+                        href={branchShow(branch.id).url}
+                        className="font-medium text-primary hover:text-amber-600"
+                    >
+                        {branch.name}
+                    </Link>
+                );
+            },
         },
         {
             accessorKey: 'created_at',

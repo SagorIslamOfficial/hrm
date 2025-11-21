@@ -2,6 +2,7 @@
 
 namespace App\Modules\HR\Organization\Department\Models;
 
+use App\Modules\HR\Organization\Branch\Models\Branch;
 use App\Modules\HR\Organization\Department\Database\Factories\DepartmentSettingsFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ class DepartmentSettings extends Model
 
     protected $fillable = [
         'department_id',
+        'branch_id',
         'overtime_allowed',
         'travel_allowed',
         'home_office_allowed',
@@ -38,6 +40,11 @@ class DepartmentSettings extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     protected static function newFactory()

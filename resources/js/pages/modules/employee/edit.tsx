@@ -97,12 +97,19 @@ interface Employee {
     }>;
 }
 
+interface Branch {
+    id: string;
+    name: string;
+    code?: string;
+}
+
 interface Props {
     employee: Employee;
     departments: Array<{ id: string; name: string }>;
     designations: Array<{ id: string; title: string }>;
     employmentTypes: Array<{ code: string; name: string }>;
     supervisors: Array<{ id: string; name: string; employee_code: string }>;
+    branches: Branch[];
     auth?: {
         user?: {
             id: string;
@@ -120,6 +127,7 @@ export default function Edit({
     designations,
     employmentTypes,
     supervisors,
+    branches,
     auth,
 }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -162,6 +170,7 @@ export default function Edit({
                     designations={designations}
                     employmentTypes={employmentTypes}
                     supervisors={supervisors}
+                    branches={branches}
                     auth={auth}
                     className="rounded-xl border border-sidebar-border/70 p-6"
                 />

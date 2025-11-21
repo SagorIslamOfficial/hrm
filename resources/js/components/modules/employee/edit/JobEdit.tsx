@@ -8,6 +8,7 @@ interface JobTabProps {
             work_shift: string;
             probation_end_date: string;
             contract_end_date: string;
+            branch_id?: string;
         };
     };
     setData: (
@@ -21,6 +22,7 @@ interface JobTabProps {
             | Record<string, unknown>,
     ) => void;
     supervisors: Array<{ id: string; name: string; employee_code: string }>;
+    branches: Array<{ id: string; name: string; code?: string }>;
     isSuperAdminOrOwner: boolean;
 }
 
@@ -28,6 +30,7 @@ export function JobEdit({
     data,
     setData,
     supervisors,
+    branches,
     isSuperAdminOrOwner,
 }: JobTabProps) {
     // Helper function to update nested job_detail object
@@ -51,6 +54,22 @@ export function JobEdit({
                         updateJobDetail('job_title', value)
                     }
                     placeholder="e.g., Software Engineer"
+                />
+
+                <FormField
+                    type="combobox"
+                    id="branch_id"
+                    label="Branch"
+                    value={data.job_detail.branch_id || ''}
+                    onChange={(value: string) =>
+                        updateJobDetail('branch_id', value)
+                    }
+                    options={branches.map((branch) => ({
+                        value: branch.id,
+                        label: `${branch.name}${branch.code ? ` (${branch.code})` : ''}`,
+                    }))}
+                    searchPlaceholder="Search branches..."
+                    emptyText="No branches found."
                 />
 
                 <FormField

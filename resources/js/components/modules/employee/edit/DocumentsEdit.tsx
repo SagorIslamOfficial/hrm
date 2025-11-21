@@ -6,6 +6,7 @@ import {
     InfoCard,
     ResourceDialog,
 } from '@/components/common';
+import { titleCase } from '@/components/common/utils/formatUtils';
 import { DocumentForm } from '@/components/common/DocumentForm';
 import { EntityHeader, GetBorderClass } from '@/components/common/EntityHeader';
 import type { Document } from '@/components/common/interfaces';
@@ -58,12 +59,7 @@ export function DocumentsEdit({
         setDeleteDocumentDialogOpen(null);
     };
 
-    const formatDocType = (type: string): string => {
-        return type
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-    };
+    const formatDocType = (type: string): string => titleCase(type);
 
     const formatFileSize = (bytes: number): string => {
         if (bytes < 1024) return `${bytes} B`;

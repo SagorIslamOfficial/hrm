@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('department_settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('department_id')->constrained('departments')->onDelete('cascade');
+            $table->foreignUuid('branch_id')->nullable()->constrained('branches')->cascadeOnDelete();
             $table->boolean('overtime_allowed')->default(true);
             $table->boolean('travel_allowed')->default(true);
             $table->boolean('home_office_allowed')->default(true);

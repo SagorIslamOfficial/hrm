@@ -49,6 +49,12 @@ interface Employee {
     email: string;
 }
 
+interface Branch {
+    id: string;
+    name: string;
+    code?: string;
+}
+
 interface CurrentUser {
     id: string;
     name?: string;
@@ -57,10 +63,16 @@ interface CurrentUser {
 interface Props {
     department: Department;
     employees: Employee[];
+    branches: Branch[];
     currentUser?: CurrentUser;
 }
 
-export default function Edit({ department, employees, currentUser }: Props) {
+export default function Edit({
+    department,
+    employees,
+    branches,
+    currentUser,
+}: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Departments',
@@ -87,6 +99,7 @@ export default function Edit({ department, employees, currentUser }: Props) {
                 <DepartmentEditForm
                     department={department}
                     employees={employees}
+                    branches={branches}
                     currentUser={currentUser}
                     className="rounded-xl border border-sidebar-border/70 p-6"
                 />
