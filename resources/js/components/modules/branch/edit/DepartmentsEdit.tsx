@@ -5,9 +5,9 @@ import {
     ResourceDialog,
     StatusBadge,
 } from '@/components/common';
-import { BranchDepartmentForm } from '@/components/common/BranchDepartmentForm';
 import { EmptyActionState } from '@/components/common/EmptyActionState';
 import { TableBlueprint } from '@/components/common/TableBlueprint';
+import { BranchDepartmentForm } from '@/components/modules/branch/BranchDepartmentForm';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/config/currency';
 import { useCurrency } from '@/hooks/useCurrency';
