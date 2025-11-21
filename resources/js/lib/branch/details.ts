@@ -3,7 +3,7 @@ import axios from 'axios';
 export interface BranchDetailPayload {
     latitude?: number | string | null;
     longitude?: number | string | null;
-    working_hours?: Record<string, any> | null;
+    working_hours?: Record<string, unknown> | null;
     facilities?: string[] | null;
     total_area?: number | string | null;
     total_floors?: number | string | null;
@@ -30,7 +30,7 @@ export interface BranchDetailPayload {
 function buildDetailFormData(payload: BranchDetailPayload): FormData {
     const formData = new FormData();
 
-    Object.entries(payload).forEach(([key, value]) => {
+    Object.entries(payload).forEach(([key, value]: [string, unknown]) => {
         if (value === null || value === undefined) {
             return;
         }

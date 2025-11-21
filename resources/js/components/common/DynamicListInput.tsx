@@ -9,14 +9,14 @@ import { toast } from 'sonner';
 
 export interface DynamicListItem {
     key: string;
-    value: any;
+    value: unknown;
     display?: ReactNode;
 }
 
 export interface DynamicListField {
     id: string;
     label: string;
-    type: string;
+    type: 'text' | 'number' | 'email' | 'password' | 'date';
     placeholder?: string;
     disabled?: boolean;
     min?: number;
@@ -25,18 +25,18 @@ export interface DynamicListField {
 }
 
 export interface DynamicListInputProps {
-    value: Record<string, any> | null;
-    onChange: (value: Record<string, any>) => void;
+    value: Record<string, unknown> | null;
+    onChange: (value: Record<string, unknown>) => void;
     error?: string;
     listTitle: string;
     addTitle: string;
     editTitle: string;
     fields: DynamicListField[];
-    getItemDisplay: (key: string, value: any) => ReactNode;
-    getItemKey: (formValues: Record<string, any>) => string;
-    onBeforeAdd?: (key: string, value: any) => boolean;
-    onBeforeUpdate?: (key: string, oldKey: string, value: any) => boolean;
-    onBeforeDelete?: (key: string, value: any) => boolean;
+    getItemDisplay: (key: string, value: unknown) => ReactNode;
+    getItemKey: (formValues: Record<string, unknown>) => string;
+    onBeforeAdd?: (key: string, value: unknown) => boolean;
+    onBeforeUpdate?: (key: string, oldKey: string, value: unknown) => boolean;
+    onBeforeDelete?: (key: string, value: unknown) => boolean;
     itemAddedMessage?: string;
     itemUpdatedMessage?: string;
     itemDeletedMessage?: string;
@@ -65,13 +65,13 @@ export function DynamicListInput({
     itemEmptyMessage = 'The input fields cannot be empty.',
     gridCols = 'md:grid-cols-3',
 }: DynamicListInputProps) {
-    const [formValues, setFormValues] = useState<Record<string, any>>({});
+    const [formValues, setFormValues] = useState<Record<string, unknown>>({});
     const [editingKey, setEditingKey] = useState<string | null>(null);
 
     const items = value || {};
     const entries = Object.entries(items);
 
-    const handleFormChange = (fieldId: string, fieldValue: any) => {
+    const handleFormChange = (fieldId: string, fieldValue: unknown) => {
         const newFormValues = {
             ...formValues,
             [fieldId]: fieldValue,
@@ -203,7 +203,7 @@ export function DynamicListInput({
     };
 
     const handleEdit = (key: string) => {
-        const values: Record<string, any> = {};
+        const values: Record<string, unknown> = {};
 
         // For single field components (like ApprovalHierarchyInput)
         if (fields.length === 1) {
@@ -287,22 +287,35 @@ export function DynamicListInput({
                 className="text-sm text-gray-600 dark:text-gray-700"
             >
                 <div className="grid gap-4 md:grid-cols-3">
-                    {fields.map((field) => (
-                        <FormField
-                            key={field.id}
-                            type={field.type as any}
-                            id={field.id}
-                            label={field.label}
-                            value={formValues[field.id] ?? ''}
-                            onChange={(value: string | number | boolean) =>
-                                handleFormChange(field.id, value)
-                            }
-                            placeholder={field.placeholder}
-                            min={field.min}
-                            max={field.max}
-                            step={field.step}
-                        />
-                    ))}
+                    {fields.map((field) => {
+                        const fieldValue = formValues[field.id] ?? '';
+                        const stringValue =
+                            typeof fieldValue === 'string' ||
+                            typeof fieldValue === 'number'
+                                ? String(fieldValue)
+                                : '';
+
+                        return (
+                            <FormField
+                                key={field.id}
+                                {...({
+                                    type: field.type,
+                                    id: field.id,
+                                    label: field.label,
+                                    value: stringValue,
+                                    onChange: (
+                                        value: string | number | boolean,
+                                    ) => handleFormChange(field.id, value),
+                                    placeholder: field.placeholder,
+                                    min: field.min,
+                                    max: field.max,
+                                    step: field.step,
+                                } as unknown as React.ComponentProps<
+                                    typeof FormField
+                                >)}
+                            />
+                        );
+                    })}
 
                     <FormActions
                         onSubmit={handleSubmit}
