@@ -3,6 +3,7 @@
 namespace App\Modules\HR\Organization\Department\Http\Controllers;
 
 use App\Modules\HR\Employee\Models\Employee;
+use App\Modules\HR\Organization\Branch\Models\Branch;
 use App\Modules\HR\Organization\Department\Contracts\DepartmentRepositoryInterface;
 use App\Modules\HR\Organization\Department\Http\Requests\StoreDepartmentRequest;
 use App\Modules\HR\Organization\Department\Http\Requests\UpdateDepartmentRequest;
@@ -28,7 +29,8 @@ class DepartmentController
             'manager' => function ($query) {
                 $query->select('id', 'first_name', 'last_name', 'photo');
             },
-            'employees'
+            'employees',
+            'settings.branch:id,name,code',
         ])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -64,7 +66,7 @@ class DepartmentController
 
         $department->load([
             'detail',
-            'settings',
+            'settings.branch:id,name,code',
             'notes.creator',
             'notes.updater',
             'designations',
@@ -135,9 +137,14 @@ class DepartmentController
 
         $employees = Employee::select('id', 'first_name', 'last_name', 'email')->get();
 
+        $branches = Branch::select('id', 'name', 'code')
+            ->where('is_active', true)
+            ->get();
+
         return Inertia::render('modules/department/edit', [
             'department' => $department,
             'employees' => $employees,
+            'branches' => $branches,
             'currentUser' => Auth::user(),
         ]);
     }

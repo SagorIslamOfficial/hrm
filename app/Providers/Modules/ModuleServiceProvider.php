@@ -37,8 +37,8 @@ class ModuleServiceProvider extends ServiceProvider
         foreach ($files as $file) {
             if (str_ends_with($file->getFilename(), 'ServiceProvider.php')) {
                 // Only process files that end with 'ServiceProvider.php'
-                $relativePath = str_replace(app_path() . '/', '', $file->getPathname());
-                $namespace = 'App\\' . str_replace(['/', '.php'], ['\\', ''], $relativePath);
+                $relativePath = str_replace(app_path().'/', '', $file->getPathname());
+                $namespace = 'App\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
                 $providers[] = $namespace;
             }

@@ -27,7 +27,9 @@ class EmployeeAccessMiddleware
         }
 
         // Check if user has permission to access employee module
-        if (! Auth::user()->hasRole(['Admin', 'HR', 'Manager'])) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if (! $user->hasRole(['Admin', 'HR', 'Manager'])) {
             abort(403, 'Unauthorized access to Employee module');
         }
 

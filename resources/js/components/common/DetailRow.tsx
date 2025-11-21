@@ -1,3 +1,4 @@
+import { titleCase } from '@/components/common/utils/formatUtils';
 import { Badge } from '@/components/ui/badge';
 import React from 'react';
 
@@ -48,10 +49,7 @@ export default function DetailRow({
     const defaultLabelMapper = (value: string) => {
         if (!value) return '';
         if (value === 'inactive') return 'InActive';
-        return value
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+        return titleCase(value);
     };
 
     const renderBadge = (value: string) => {
@@ -94,7 +92,11 @@ export default function DetailRow({
                     )}
                     {showValue &&
                         (value !== undefined ? (
-                            <p className={valueClassName}>{value}</p>
+                            React.isValidElement(value) ? (
+                                <div className={valueClassName}>{value}</div>
+                            ) : (
+                                <p className={valueClassName}>{value}</p>
+                            )
                         ) : (
                             <p className={valueClassName}>{children}</p>
                         ))}

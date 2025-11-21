@@ -33,6 +33,7 @@ class UpdateDepartmentRequest extends FormRequest
             'detail.office_phone' => 'nullable|string|max:20',
 
             // Settings
+            'settings.branch_id' => 'nullable|uuid|exists:branches,id',
             'settings.overtime_allowed' => 'sometimes|boolean',
             'settings.travel_allowed' => 'sometimes|boolean',
             'settings.home_office_allowed' => 'sometimes|boolean',

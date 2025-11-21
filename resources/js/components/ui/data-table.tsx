@@ -9,6 +9,7 @@ import {
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    Row,
     SortingState,
     useReactTable,
     VisibilityState,
@@ -39,6 +40,10 @@ interface DataTableProps<TData, TValue> {
     data: TData[];
     searchPlaceholder?: string;
     globalSearchKeys?: (keyof TData)[];
+    className?: string;
+    getRowProps?: (
+        row: Row<TData>,
+    ) => React.HTMLAttributes<HTMLTableRowElement>;
 }
 
 export function DataTable<TData, TValue>({
@@ -46,6 +51,8 @@ export function DataTable<TData, TValue>({
     data,
     searchPlaceholder = 'Search all columns...',
     globalSearchKeys,
+    className,
+    getRowProps,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -106,7 +113,7 @@ export function DataTable<TData, TValue>({
     });
 
     return (
-        <div className="mx-4">
+        <div className={className || 'mx-4'}>
             <div className="flex items-center py-4">
                 <Input
                     placeholder={searchPlaceholder}
@@ -175,6 +182,7 @@ export function DataTable<TData, TValue>({
                                     data-state={
                                         row.getIsSelected() && 'selected'
                                     }
+                                    {...(getRowProps ? getRowProps(row) : {})}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>

@@ -4,6 +4,7 @@ import {
     formatDateForDisplay,
     InfoCard,
 } from '@/components/common';
+import { titleCase } from '@/components/common/utils/formatUtils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Eye, FileText } from 'lucide-react';
@@ -55,12 +56,7 @@ export function DocumentsView({ documents, employeeId }: DocumentsViewProps) {
         });
     };
 
-    const formatDocType = (docType: string) => {
-        return docType
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-    };
+    const formatDocType = (docType: string) => titleCase(docType);
 
     return (
         <InfoCard title="Documents">

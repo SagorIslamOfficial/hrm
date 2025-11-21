@@ -27,6 +27,14 @@ const statusConfig: Record<
 };
 
 export function StatusBadge({ status, variant, className }: StatusBadgeProps) {
+    if (!status) {
+        return (
+            <Badge variant="outline" className={`text-xs ${className || ''}`}>
+                N/A
+            </Badge>
+        );
+    }
+
     const config = statusConfig[status.toLowerCase()] || {
         label: status,
         variant: variant || 'outline',

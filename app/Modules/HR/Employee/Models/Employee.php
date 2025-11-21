@@ -3,6 +3,7 @@
 namespace App\Modules\HR\Employee\Models;
 
 use App\Modules\HR\Employee\Database\Factories\EmployeeFactory;
+use App\Modules\HR\Organization\Branch\Models\Branch;
 use App\Modules\HR\Organization\Department\Models\Department;
 use App\Modules\HR\Organization\Department\Models\Designation;
 use App\Traits\FileUploadTrait;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Log;
  * @property string $email
  * @property string $phone
  * @property string $photo
+ * @property string $branch_id
  * @property string $department_id
  * @property string $designation_id
  * @property string $employment_status
@@ -42,6 +44,7 @@ class Employee extends Model
         'email',
         'phone',
         'photo',
+        'branch_id',
         'department_id',
         'designation_id',
         'employment_status',
@@ -65,6 +68,11 @@ class Employee extends Model
     public function getFullNameAttribute(): string
     {
         return trim($this->first_name.' '.$this->last_name);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function department(): BelongsTo

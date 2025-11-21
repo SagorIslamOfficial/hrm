@@ -8,6 +8,7 @@ use App\Modules\HR\Employee\Http\Requests\UpdateEmployeeRequest;
 use App\Modules\HR\Employee\Models\Employee;
 use App\Modules\HR\Employee\Models\EmploymentType;
 use App\Modules\HR\Employee\Services\EmployeeService;
+use App\Modules\HR\Organization\Branch\Models\Branch;
 use App\Modules\HR\Organization\Department\Models\Department;
 use App\Modules\HR\Organization\Department\Models\Designation;
 use Illuminate\Http\Request;
@@ -62,12 +63,15 @@ class EmployeeController
             ->orderBy('name')
             ->get();
 
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
         return Inertia::render('modules/employee/create', [
             'departments' => $departments,
             'designations' => $designations,
             'employmentTypes' => $employmentTypes,
             'auth' => [
-                'user' => Auth::user()->load('roles'),
+                'user' => $user->load('roles'),
             ],
         ]);
     }
@@ -116,7 +120,7 @@ class EmployeeController
             'department',
             'designation',
             'personalDetail',
-            'jobDetail',
+            'jobDetail.branch:id,name,code',
             'salaryDetail',
             'contacts',
             'documents.uploader:id,name',
@@ -135,12 +139,18 @@ class EmployeeController
             ])
             ->values();
 
+        $branches = Branch::select('id', 'name', 'code')->where('is_active', true)->get();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
         return Inertia::render('modules/employee/show', [
             'employee' => $employee,
             'supervisors' => $supervisors,
+            'branches' => $branches,
             'currency' => $employee->currency ?? 'BDT',
             'auth' => [
-                'user' => Auth::user()->load('roles'),
+                'user' => $user->load('roles'),
             ],
         ]);
     }
@@ -177,15 +187,23 @@ class EmployeeController
             ])
             ->values();
 
+        $branches = Branch::select('id', 'name', 'code')
+            ->where('is_active', true)
+            ->get();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
         return Inertia::render('modules/employee/edit', [
             'employee' => $employee,
             'departments' => $departments,
             'designations' => $designations,
             'employmentTypes' => $employmentTypes,
             'supervisors' => $supervisors,
+            'branches' => $branches,
             'currency' => $employee->currency ?? 'BDT',
             'auth' => [
-                'user' => Auth::user()->load('roles'),
+                'user' => $user->load('roles'),
             ],
         ]);
     }
