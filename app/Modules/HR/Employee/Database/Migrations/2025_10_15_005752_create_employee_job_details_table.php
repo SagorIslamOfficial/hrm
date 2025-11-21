@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('job_title')->nullable();
             $table->string('employment_type')->nullable();
             $table->foreignUuid('supervisor_id')->nullable()->references('id')->on('employees')->nullOnDelete();
+            $table->foreignUuid('branch_id')->nullable()->constrained('branches')->cascadeOnDelete();
             $table->string('work_shift')->nullable();
             $table->date('probation_end_date')->nullable();
             $table->date('contract_end_date')->nullable();
