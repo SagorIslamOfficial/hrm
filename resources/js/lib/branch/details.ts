@@ -3,7 +3,7 @@ import axios from 'axios';
 export interface BranchDetailPayload {
     latitude?: number | string | null;
     longitude?: number | string | null;
-    working_hours?: Record<string, any> | null;
+    working_hours?: Record<string, unknown> | null;
     facilities?: string[] | null;
     total_area?: number | string | null;
     total_floors?: number | string | null;
@@ -73,7 +73,10 @@ export async function updateBranchDetail(
 ) {
     const formData = buildDetailFormData(payload);
 
-    return axios.put(
+    // Add _method field for Laravel to treat this as PUT request
+    formData.append('_method', 'PUT');
+
+    return axios.post(
         `/dashboard/hr/organization/branches/${branchId}`,
         formData,
         {
