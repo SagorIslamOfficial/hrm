@@ -11,13 +11,13 @@ interface Document {
     id: string;
     doc_type: string;
     title: string;
-    file_name: string;
-    file_path: string;
-    file_url: string;
-    file_size: number;
-    expiry_date: string | null;
-    is_expired: boolean;
-    is_expiring_soon: boolean;
+    file_name?: string | null;
+    file_path?: string | null;
+    file_url?: string | null;
+    file_size?: number | null;
+    expiry_date?: string | null;
+    is_expired?: boolean;
+    is_expiring_soon?: boolean;
     uploader?: {
         id: string;
         name: string;
@@ -52,6 +52,7 @@ interface DocumentFormProps {
     onSuccess: (documentData: Document) => void;
     onCancel: () => void;
     subjectLabel?: string;
+    documentTypes?: { value: string; label: string }[];
 }
 
 export function DocumentForm({
@@ -59,6 +60,7 @@ export function DocumentForm({
     onSuccess,
     onCancel,
     subjectLabel = '',
+    documentTypes = DOCUMENT_TYPES,
 }: DocumentFormProps) {
     const [formData, setFormData] = useState({
         doc_type: document?.doc_type || '',
@@ -99,12 +101,12 @@ export function DocumentForm({
                 title: formData.title,
                 file_name: documentFile
                     ? documentFile.name
-                    : document?.file_name || '',
-                file_path: document?.file_path || '',
-                file_url: document?.file_url || '',
+                    : (document?.file_name ?? null),
+                file_path: document?.file_path ?? null,
+                file_url: document?.file_url ?? null,
                 file_size: documentFile
                     ? documentFile.size
-                    : document?.file_size || 0,
+                    : (document?.file_size ?? null),
                 expiry_date: formData.expiry_date || null,
                 is_expired: false,
                 is_expiring_soon: false,
@@ -144,7 +146,7 @@ export function DocumentForm({
                             doc_type: value,
                         }))
                     }
-                    options={DOCUMENT_TYPES}
+                    options={documentTypes}
                     error={errors.doc_type}
                     placeholder="Select document type"
                     required
@@ -219,10 +221,10 @@ export function DocumentForm({
                 required={!document}
                 helperText="Upload a document (max 10MB, PDF, DOC, DOCX, JPG, JPEG, PNG)"
                 currentFile={
-                    document
+                    document && document.file_name
                         ? {
                               name: document.file_name,
-                              size: document.file_size,
+                              size: document.file_size ?? 0,
                           }
                         : undefined
                 }

@@ -9,9 +9,7 @@ interface TableBlueprintProps<TData, TValue> {
     searchPlaceholder?: string;
     globalSearchKeys?: (keyof TData)[];
     className?: string;
-    getRowProps?: (
-        row: Row<TData>,
-    ) => React.HTMLAttributes<HTMLTableRowElement>;
+    getRowProps?: (row: Row<TData>) => React.HTMLAttributes<HTMLTableRowElement>;
 }
 
 export function TableBlueprint<TData, TValue>({

@@ -2,6 +2,7 @@
 
 namespace App\Modules\HR\Organization\Branch\Http\Requests;
 
+use App\Modules\HR\Organization\Branch\Models\BranchCustomField;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -56,8 +57,8 @@ class UpdateBranchRequest extends FormRequest
             'phone_2' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255|unique:branches,email,'.$branchId,
             'opening_date' => 'nullable|date',
-            'is_active' => 'required|boolean',
-            'status' => 'required|in:active,inactive,under_construction,closed',
+            'is_active' => 'sometimes|boolean',
+            'status' => 'sometimes|in:active,inactive,under_construction,closed',
             'max_employees' => 'nullable|integer|min:0',
             'budget' => 'nullable|numeric|min:0',
             'cost_center' => 'nullable|string|max:50',
@@ -132,6 +133,44 @@ class UpdateBranchRequest extends FormRequest
             'departments.*.department_id' => 'required_with:departments|exists:departments,id',
             'departments.*.budget_allocation' => 'nullable|numeric|min:0',
             'departments.*.is_primary' => 'nullable|boolean',
+
+            // Documents - for branch document endpoints
+            'doc_type' => 'sometimes|in:license,contract,permit,certificate,report',
+            'title' => 'sometimes|string|max:255',
+            'file' => 'sometimes|file|mimes:pdf,doc,docx,jpg,jpeg,png,webp,xlsx,xls,zip|max:10240',
+            'expiry_date' => 'nullable|date|after:today',
+
+            // Custom Fields (for sync endpoint) - optional since processed separately
+            'custom_fields' => 'sometimes|nullable|array',
+            'custom_fields.*.field_key' => 'required_with:custom_fields|string|regex:/^[a-z0-9-_]+$/|max:255',
+            'custom_fields.*.field_value' => 'nullable|string|max:255',
+            'custom_fields.*.field_type' => 'required_with:custom_fields|in:text,number,date,boolean,select,textarea,email,phone,url',
+            'custom_fields.*.section' => 'nullable|string|in:general,operational,technical,other',
+
+            // Single Custom Field - for create/update custom field
+            'branch_id' => 'sometimes|uuid|exists:branches,id',
+            'field_key' => [
+                'sometimes',
+                'string',
+                'regex:/^[a-z0-9-_]+$/',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (request()->has('branch_id')) {
+                        $exists = BranchCustomField::where('branch_id', request('branch_id'))
+                            ->where('field_key', $value)
+                            ->when(request()->route('customField'), function ($query) {
+                                return $query->where('id', '!=', request()->route('customField'));
+                            })
+                            ->exists();
+                        if ($exists) {
+                            $fail('The field key has already been taken for this branch.');
+                        }
+                    }
+                },
+            ],
+            'field_value' => 'sometimes|string|max:255',
+            'field_type' => 'sometimes|in:text,number,date,boolean,select,textarea,email,phone,url',
+            'section' => 'nullable|string|in:general,operational,technical,other',
         ];
     }
 
@@ -395,6 +434,30 @@ class UpdateBranchRequest extends FormRequest
             'departments.*.budget_allocation.numeric' => 'Budget allocation must be a valid number.',
             'departments.*.budget_allocation.min' => 'Budget allocation cannot be negative.',
             'departments.*.is_primary.boolean' => 'Primary department flag must be true or false.',
+
+            // Document messages
+            'doc_type.in' => 'Document type must be one of: license, contract, permit, certificate, report.',
+            'title.string' => 'Document title must be a valid string.',
+            'title.max' => 'Document title cannot exceed 255 characters.',
+            'file.file' => 'The document file field must be a file.',
+            'file.mimes' => 'The document file field must be a file of type: pdf, doc, docx, jpg, jpeg, png, webp, xlsx, xls, zip.',
+            'file.max' => 'The document file must not exceed 10MB.',
+            'expiry_date.after' => 'Expiry date must be a future date.',
+
+            // Custom Fields
+            'custom_fields.array' => 'Custom fields must be a valid array.',
+            'custom_fields.*.field_key.required_with' => 'Field key is required for each custom field.',
+            'custom_fields.*.field_key.regex' => 'Field key must be in lowercase with hyphens or underscores (e.g., wifi-password).',
+            'custom_fields.*.field_key.max' => 'Field key cannot exceed 255 characters.',
+            'custom_fields.*.field_value.max' => 'Field value cannot exceed 255 characters.',
+            'custom_fields.*.field_type.required_with' => 'Field type is required for each custom field.',
+            'custom_fields.*.field_type.in' => 'Field type must be one of: text, number, date, boolean, select, textarea, email, phone, url.',
+            'custom_fields.*.section.in' => 'Section must be one of: general, operational, technical, other.',
+
+            // Single custom field messages
+            'field_key.regex' => 'Field key must be in lowercase with hyphens or underscores (e.g., wifi-password).',
+            'field_value.max' => 'Field value cannot exceed 255 characters.',
+            'field_type.in' => 'Field type must be one of: text, number, date, boolean, select, textarea, email, phone, url.',
         ];
     }
 }
