@@ -121,6 +121,56 @@ export interface Note {
     _isDeleted?: boolean;
 }
 
+export interface BranchDocument {
+    id: string;
+    branch_id: string;
+    doc_type: string;
+    title: string;
+    file_path?: string | null;
+    file_name?: string | null;
+    file_size?: number | null;
+    mime_type?: string | null;
+    expiry_date?: string | null;
+    uploaded_by?: string;
+    uploader?: {
+        id: string;
+        name: string;
+    };
+    file_url?: string | null;
+    is_expired?: boolean;
+    is_expiring_soon?: boolean;
+    created_at: string;
+    updated_at: string;
+    file?: File;
+    _documentFile?: File;
+    _isNew?: boolean;
+    _isModified?: boolean;
+    _isDeleted?: boolean;
+}
+
+export interface BranchCustomField {
+    id: string;
+    branch_id: string;
+    field_key: string;
+    field_value?: string | null;
+    field_type:
+        | 'text'
+        | 'number'
+        | 'date'
+        | 'boolean'
+        | 'select'
+        | 'textarea'
+        | 'email'
+        | 'phone'
+        | 'url';
+    section?: 'general' | 'operational' | 'technical' | 'other';
+    created_at: string;
+    updated_at: string;
+    _isNew?: boolean;
+    _isModified?: boolean;
+    _isDeleted?: boolean;
+}
+
 export interface Branch {
     id: string;
     name: string;
@@ -165,6 +215,8 @@ export interface Branch {
     settings?: BranchSettings;
     departments?: Department[];
     notes?: Note[];
+    documents?: BranchDocument[];
+    custom_fields?: BranchCustomField[];
     created_at: string;
     updated_at: string;
 }

@@ -3,8 +3,10 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useUrlTab } from '@/hooks';
 import { useState } from 'react';
 import {
+    CustomFieldsView,
     DepartmentsView,
     DetailsView,
+    DocumentsView,
     NotesView,
     OverviewView,
     SettingsView,
@@ -34,7 +36,9 @@ export function BranchShow({ branch, className, stats }: BranchShowProps) {
         { value: 'details', label: 'Details' },
         { value: 'departments', label: 'Departments' },
         { value: 'settings', label: 'Settings' },
+        { value: 'documents', label: 'Documents' },
         { value: 'notes', label: 'Notes' },
+        { value: 'custom-fields', label: 'Custom Fields' },
     ];
 
     return (
@@ -66,6 +70,19 @@ export function BranchShow({ branch, className, stats }: BranchShowProps) {
 
                 <TabsContent value="settings" className="space-y-4">
                     <SettingsView settings={branch.settings} />
+                </TabsContent>
+
+                <TabsContent value="documents" className="space-y-4">
+                    <DocumentsView
+                        documents={branch.documents || []}
+                        branchId={branch.id}
+                    />
+                </TabsContent>
+
+                <TabsContent value="custom-fields" className="space-y-4">
+                    <CustomFieldsView
+                        customFields={branch.custom_fields || []}
+                    />
                 </TabsContent>
 
                 <TabsContent value="notes" className="space-y-4">

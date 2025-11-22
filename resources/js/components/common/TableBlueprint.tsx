@@ -1,7 +1,7 @@
 'use client';
 
 import { DataTable } from '@/components/ui/data-table';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
 
 interface TableBlueprintProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -9,7 +9,7 @@ interface TableBlueprintProps<TData, TValue> {
     searchPlaceholder?: string;
     globalSearchKeys?: (keyof TData)[];
     className?: string;
-    getRowProps?: (row: any) => React.HTMLAttributes<HTMLTableRowElement>;
+    getRowProps?: (row: Row<TData>) => React.HTMLAttributes<HTMLTableRowElement>;
 }
 
 export function TableBlueprint<TData, TValue>({

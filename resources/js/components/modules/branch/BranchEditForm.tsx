@@ -2,13 +2,17 @@ import { FormActions, TabsNavigation } from '@/components/common';
 import type { Note } from '@/components/common/interfaces';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useUrlTab } from '@/hooks';
+import * as CustomFieldsApi from '@/lib/branch/customFields';
 import * as DepartmentsApi from '@/lib/branch/departments';
+import * as DocumentsApi from '@/lib/branch/documents';
 import * as NotesApi from '@/lib/branch/notes';
 import processAndReport from '@/lib/branch/processAndReport';
 import { update as branchesUpdate } from '@/routes/branches';
 import { type User } from '@/types';
 import {
     type Branch,
+    type BranchCustomField,
+    type BranchDocument,
     type BranchEditFormData,
     type BranchOption,
     type BranchType,
@@ -20,8 +24,10 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import {
     BasicEdit,
+    CustomFieldsEdit,
     DepartmentsEdit,
     DetailsEdit,
+    DocumentsEdit,
     NotesEdit,
     SettingsEdit,
 } from './edit';
@@ -54,6 +60,16 @@ export function BranchEditForm({
 
     // Staged notes state
     const [stagedNotes, setStagedNotes] = useState<Note[]>(branch.notes || []);
+
+    // Staged documents state
+    const [stagedDocuments, setStagedDocuments] = useState(
+        branch.documents || [],
+    );
+
+    // Staged custom fields state
+    const [stagedCustomFields, setStagedCustomFields] = useState(
+        branch.custom_fields || [],
+    );
 
     const { data, setData, post, processing, errors } =
         useForm<BranchEditFormData>({
@@ -211,6 +227,77 @@ export function BranchEditForm({
                 },
             );
 
+            // Process documents
+            await processAndReport(
+                stagedDocuments,
+                {
+                    isNew: (d) => Boolean(d._isNew),
+                    isModified: (d) => Boolean(d._isModified),
+                    isDeleted: (d) => Boolean(d._isDeleted),
+                    create: async (d) => {
+                        const formData = new FormData();
+                        formData.append('branch_id', branch.id);
+                        formData.append('doc_type', d.doc_type);
+                        formData.append('title', d.title);
+                        if (d._documentFile)
+                            formData.append('file', d._documentFile);
+                        if (d.expiry_date)
+                            formData.append('expiry_date', d.expiry_date);
+                        return DocumentsApi.createDocument(branch.id, formData);
+                    },
+                    update: async (d) => {
+                        const formData = new FormData();
+                        formData.append('doc_type', d.doc_type);
+                        formData.append('title', d.title);
+                        if (d._documentFile)
+                            formData.append('file', d._documentFile);
+                        if (d.expiry_date)
+                            formData.append('expiry_date', d.expiry_date);
+                        return DocumentsApi.updateDocument(
+                            branch.id,
+                            d.id,
+                            formData,
+                        );
+                    },
+                    remove: (d) => DocumentsApi.deleteDocument(branch.id, d.id),
+                },
+                {
+                    label: 'document',
+                    getItemLabel: (d) => d.title || 'document',
+                },
+            );
+
+            // Process custom fields
+            await processAndReport(
+                stagedCustomFields,
+                {
+                    isNew: (f) => Boolean(f._isNew),
+                    isModified: (f) => Boolean(f._isModified),
+                    isDeleted: (f) => Boolean(f._isDeleted),
+                    create: (f) =>
+                        CustomFieldsApi.createCustomField({
+                            branch_id: branch.id,
+                            field_key: f.field_key,
+                            field_value: f.field_value || null,
+                            field_type: f.field_type,
+                            section: f.section,
+                        }),
+                    update: (f) =>
+                        CustomFieldsApi.updateCustomField(branch.id, f.id, {
+                            field_key: f.field_key,
+                            field_value: f.field_value || null,
+                            field_type: f.field_type,
+                            section: f.section,
+                        }),
+                    remove: (f) =>
+                        CustomFieldsApi.deleteCustomField(branch.id, f.id),
+                },
+                {
+                    label: 'custom field',
+                    getItemLabel: (f) => f.field_key || 'field',
+                },
+            );
+
             toast.success('Branch updated successfully!');
             router.reload({ only: ['branch'] });
         } catch (error) {
@@ -309,6 +396,12 @@ export function BranchEditForm({
         ) ||
         stagedNotes.some(
             (note) => note._isNew || note._isModified || note._isDeleted,
+        ) ||
+        stagedDocuments.some(
+            (doc) => doc._isNew || doc._isModified || doc._isDeleted,
+        ) ||
+        stagedCustomFields.some(
+            (field) => field._isNew || field._isModified || field._isDeleted,
         );
 
     const handleNoteAdd = (noteData: Note) => {
@@ -349,12 +442,73 @@ export function BranchEditForm({
         toast.success('Note deletion staged - save branch to apply');
     };
 
+    const handleDocumentAdd = (documentData: Partial<BranchDocument>) => {
+        const newDocument = {
+            ...documentData,
+            id: `temp-${Date.now()}-${Math.random()}`,
+            _isNew: true,
+        };
+        setStagedDocuments([...stagedDocuments, newDocument as BranchDocument]);
+    };
+
+    const handleDocumentEdit = (documentData: Partial<BranchDocument>) => {
+        setStagedDocuments(
+            stagedDocuments.map((doc) =>
+                doc.id === documentData.id
+                    ? { ...doc, ...documentData, _isModified: true }
+                    : doc,
+            ),
+        );
+    };
+
+    const handleDocumentDelete = (documentId: string) => {
+        setStagedDocuments(
+            stagedDocuments.map((doc) =>
+                doc.id === documentId ? { ...doc, _isDeleted: true } : doc,
+            ),
+        );
+        toast.success('Document deletion staged - save branch to apply');
+    };
+
+    const handleCustomFieldAdd = (fieldData: Partial<BranchCustomField>) => {
+        const newField = {
+            ...fieldData,
+            id: `temp-${Date.now()}-${Math.random()}`,
+            _isNew: true,
+        };
+        setStagedCustomFields([
+            ...stagedCustomFields,
+            newField as BranchCustomField,
+        ]);
+    };
+
+    const handleCustomFieldEdit = (fieldData: Partial<BranchCustomField>) => {
+        setStagedCustomFields(
+            stagedCustomFields.map((field) =>
+                field.id === fieldData.id
+                    ? { ...field, ...fieldData, _isModified: true }
+                    : field,
+            ),
+        );
+    };
+
+    const handleCustomFieldDelete = (fieldId: string) => {
+        setStagedCustomFields(
+            stagedCustomFields.map((field) =>
+                field.id === fieldId ? { ...field, _isDeleted: true } : field,
+            ),
+        );
+        toast.success('Custom field deletion staged - save branch to apply');
+    };
+
     const branchTabs = [
         { value: 'basic', label: 'Basic' },
         { value: 'details', label: 'Details' },
         { value: 'departments', label: 'Departments' },
         { value: 'settings', label: 'Settings' },
+        { value: 'documents', label: 'Documents' },
         { value: 'notes', label: 'Notes' },
+        { value: 'custom-fields', label: 'Custom Fields' },
     ];
 
     return (
@@ -400,6 +554,24 @@ export function BranchEditForm({
                             data={data}
                             errors={errors}
                             setData={setData}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="documents" className="space-y-6">
+                        <DocumentsEdit
+                            documents={stagedDocuments}
+                            onDocumentAdd={handleDocumentAdd}
+                            onDocumentEdit={handleDocumentEdit}
+                            onDocumentDelete={handleDocumentDelete}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="custom-fields" className="space-y-6">
+                        <CustomFieldsEdit
+                            customFields={stagedCustomFields}
+                            onCustomFieldAdd={handleCustomFieldAdd}
+                            onCustomFieldEdit={handleCustomFieldEdit}
+                            onCustomFieldDelete={handleCustomFieldDelete}
                         />
                     </TabsContent>
 
