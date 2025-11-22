@@ -2,6 +2,7 @@
 
 namespace App\Modules\HR\Organization\Branch\Http\Requests;
 
+use App\Modules\HR\Organization\Branch\Models\BranchCustomField;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,12 +15,16 @@ class StoreBranchRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $route = request()->route()?->getName() ?? '';
+        $isUpdate = request()->route('branch') !== null && $route === 'branches.update';
+        $isBranchStore = $route === 'branches.store';
+
+        $baseRules = [
             // Basic Information
-            'name' => 'required|string|max:255|unique:branches,name',
-            'code' => 'required|string|max:20|unique:branches,code',
-            'type' => [
-                'required',
+            'name' => ($isBranchStore ? 'required' : ($isUpdate ? 'sometimes|' : '')).'|string|max:255|unique:branches,name',
+            'code' => ($isBranchStore ? 'required' : ($isUpdate ? 'sometimes|' : '')).'|string|max:20|unique:branches,code',
+            'type' => array_filter([
+                $isBranchStore ? 'required' : ($isUpdate ? 'sometimes' : null),
                 Rule::in([
                     'head_office',
                     'regional_office',
@@ -30,7 +35,7 @@ class StoreBranchRequest extends FormRequest
                     'service_center',
                     'others',
                 ]),
-            ],
+            ]),
             'description' => 'nullable|string',
             'parent_id' => [
                 'nullable',
@@ -55,7 +60,7 @@ class StoreBranchRequest extends FormRequest
             'email' => 'nullable|email|max:255|unique:branches,email',
             'opening_date' => 'nullable|date',
             'is_active' => 'sometimes|boolean',
-            'status' => 'required|in:active,inactive,under_construction,closed',
+            'status' => ($isBranchStore ? 'required' : ($isUpdate ? 'sometimes|' : '')).'|in:active,inactive,under_construction,closed',
             'max_employees' => 'nullable|integer|min:0',
             'budget' => 'nullable|numeric|min:0',
             'cost_center' => 'nullable|string|max:50',
@@ -118,7 +123,75 @@ class StoreBranchRequest extends FormRequest
             'departments.*.department_id' => 'required|exists:departments,id',
             'departments.*.budget_allocation' => 'nullable|numeric|min:0',
             'departments.*.is_primary' => 'nullable|boolean',
+
+            // Documents - for branch document endpoints
+            'doc_type' => 'sometimes|required|in:license,contract,permit,certificate,report',
+            'title' => 'sometimes|required|string|max:255',
+            'file' => 'sometimes|required|file|mimes:pdf,doc,docx,jpg,jpeg,png,webp,xlsx,xls,zip|max:10240',
+            'expiry_date' => 'nullable|date|after:today',
+
+            // Custom Fields - for custom field endpoints
+            'custom_fields' => 'sometimes|nullable|array',
+            'custom_fields.*.field_key' => 'required_with:custom_fields|string|regex:/^[a-z0-9-_]+$/|max:255',
+            'custom_fields.*.field_value' => 'nullable|string|max:255',
+            'custom_fields.*.field_type' => 'required_with:custom_fields|in:text,number,date,boolean,select,textarea,email,phone,url',
+            'custom_fields.*.section' => 'nullable|string|in:general,operational,technical,other',
+
+            // Single Custom Field - for create/update custom field
+            'branch_id' => 'sometimes|required|uuid|exists:branches,id',
+            'field_key' => [
+                'sometimes',
+                'required',
+                'string',
+                'regex:/^[a-z0-9-_]+$/',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (request()->has('branch_id')) {
+                        $exists = BranchCustomField::where('branch_id', request('branch_id'))
+                            ->where('field_key', $value)
+                            ->when(request()->route('customField'), function ($query) {
+                                return $query->where('id', '!=', request()->route('customField'));
+                            })
+                            ->exists();
+                        if ($exists) {
+                            $fail('The field key has already been taken for this branch.');
+                        }
+                    }
+                },
+            ],
+            'field_value' => 'sometimes|string|max:255',
+            'field_type' => 'sometimes|in:text,number,date,boolean,select,textarea,email,phone,url',
+            'section' => 'nullable|string|in:general,operational,technical,other',
         ];
+
+        // Add route-specific required rules
+        if (str_contains($route, 'custom-fields.store')) {
+            $baseRules['branch_id'] = 'required|uuid|exists:branches,id';
+            $baseRules['field_key'] = [
+                'required',
+                'string',
+                'regex:/^[a-z0-9-_]+$/',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (request()->has('branch_id')) {
+                        $exists = BranchCustomField::where('branch_id', request('branch_id'))
+                            ->where('field_key', $value)
+                            ->exists();
+                        if ($exists) {
+                            $fail('The field key has already been taken for this branch.');
+                        }
+                    }
+                },
+            ];
+            $baseRules['field_value'] = 'required|string|max:255';
+            $baseRules['field_type'] = 'required|in:text,number,date,boolean,select,textarea,email,phone,url';
+        } elseif (str_contains($route, 'documents.store')) {
+            $baseRules['doc_type'] = 'required|in:license,contract,permit,certificate,report';
+            $baseRules['title'] = 'required|string|max:255';
+            $baseRules['file'] = 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,webp,xlsx,xls,zip|max:10240';
+        }
+
+        return $baseRules;
     }
 
     public function messages(): array
@@ -133,6 +206,22 @@ class StoreBranchRequest extends FormRequest
             'manager_id.exists' => 'Selected manager does not exist.',
             'email.email' => 'Please provide a valid email address.',
             'detail.lease_end_date.after' => 'Lease end date must be after start date.',
+
+            // Document messages
+            'doc_type.required' => 'Document type is required.',
+            'title.required' => 'Document title is required.',
+            'file.required' => 'Document file is required.',
+            'file.file' => 'The document file field must be a file.',
+            'file.mimes' => 'The document file field must be a file of type: pdf, doc, docx, jpg, jpeg, png, webp, xlsx, xls, zip.',
+            'file.max' => 'The document file must not exceed 10MB.',
+            'expiry_date.after' => 'Expiry date must be a future date.',
+
+            // Custom field messages
+            'field_key.required' => 'Field key is required.',
+            'field_key.regex' => 'Field key must be in lowercase with hyphens or underscores (e.g., wifi-password).',
+            'field_value.required' => 'Field value is required.',
+            'field_type.required' => 'Field type is required.',
+            'custom_fields.*.field_key.regex' => 'Field key must be in lowercase with hyphens or underscores (e.g., wifi-password).',
         ];
     }
 }

@@ -99,6 +99,16 @@ class Branch extends Model
         return $this->hasMany(BranchNote::class);
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(BranchDocument::class);
+    }
+
+    public function customFields(): HasMany
+    {
+        return $this->hasMany(BranchCustomField::class);
+    }
+
     public function employees(): HasManyThrough
     {
         return $this->hasManyThrough(

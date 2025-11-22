@@ -125,6 +125,8 @@ class BranchController
             'settings',
             'notes.creator',
             'notes.updater',
+            'documents.uploader:id,name',
+            'customFields',
             'parentBranch',
             'childBranches' => function ($query) {
                 $query->select('id', 'name', 'code', 'type', 'parent_id', 'is_active', 'city', 'country');
@@ -200,6 +202,8 @@ class BranchController
             'settings',
             'notes.creator',
             'notes.updater',
+            'documents.uploader:id,name',
+            'customFields',
             'manager',
             'parentBranch',
             'departments' => function ($query) {
