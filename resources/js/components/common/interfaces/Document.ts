@@ -2,13 +2,13 @@ export interface Document {
     id: string;
     doc_type: string;
     title: string;
-    file_name: string;
-    file_path: string;
-    file_url: string;
-    file_size: number;
-    expiry_date: string | null;
-    is_expired: boolean;
-    is_expiring_soon: boolean;
+    file_name?: string | null;
+    file_path?: string | null;
+    file_url?: string | null;
+    file_size?: number | null;
+    expiry_date?: string | null;
+    is_expired?: boolean;
+    is_expiring_soon?: boolean;
     uploader?: {
         id: string;
         name: string;

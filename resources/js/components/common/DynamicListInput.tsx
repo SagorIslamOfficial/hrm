@@ -16,7 +16,20 @@ export interface DynamicListItem {
 export interface DynamicListField {
     id: string;
     label: string;
-    type: 'text' | 'number' | 'email' | 'password' | 'date';
+    type:
+        | 'text'
+        | 'number'
+        | 'email'
+        | 'password'
+        | 'tel'
+        | 'url'
+        | 'date'
+        | 'textarea'
+        | 'select'
+        | 'combobox'
+        | 'file'
+        | 'checkbox'
+        | 'search';
     placeholder?: string;
     disabled?: boolean;
     min?: number;
@@ -287,35 +300,27 @@ export function DynamicListInput({
                 className="text-sm text-gray-600 dark:text-gray-700"
             >
                 <div className="grid gap-4 md:grid-cols-3">
-                    {fields.map((field) => {
-                        const fieldValue = formValues[field.id] ?? '';
-                        const stringValue =
-                            typeof fieldValue === 'string' ||
-                            typeof fieldValue === 'number'
-                                ? String(fieldValue)
-                                : '';
-
-                        return (
-                            <FormField
-                                key={field.id}
-                                {...({
-                                    type: field.type,
-                                    id: field.id,
-                                    label: field.label,
-                                    value: stringValue,
-                                    onChange: (
-                                        value: string | number | boolean,
-                                    ) => handleFormChange(field.id, value),
-                                    placeholder: field.placeholder,
-                                    min: field.min,
-                                    max: field.max,
-                                    step: field.step,
-                                } as unknown as React.ComponentProps<
-                                    typeof FormField
-                                >)}
-                            />
-                        );
-                    })}
+                    {fields.map((field) => (
+                        <FormField
+                            key={field.id}
+                            {...(field as unknown as {
+                                type: 'text';
+                                id: string;
+                                label: string;
+                            })}
+                            value={
+                                ((formValues[field.id] as
+                                    | string
+                                    | number
+                                    | boolean
+                                    | null
+                                    | undefined) ?? '') as string
+                            }
+                            onChange={(value: string | number | boolean) =>
+                                handleFormChange(field.id, value)
+                            }
+                        />
+                    ))}
 
                     <FormActions
                         onSubmit={handleSubmit}

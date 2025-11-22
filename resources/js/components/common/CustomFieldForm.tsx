@@ -15,9 +15,18 @@ import { toast } from 'sonner';
 interface CustomField {
     id: string;
     field_key: string;
-    field_value: string;
-    field_type: string;
-    section: string;
+    field_value?: string | null;
+    field_type:
+        | 'text'
+        | 'number'
+        | 'date'
+        | 'boolean'
+        | 'select'
+        | 'textarea'
+        | 'email'
+        | 'phone'
+        | 'url';
+    section?: 'general' | 'operational' | 'technical' | 'other';
     _isNew?: boolean;
     _isModified?: boolean;
     _isDeleted?: boolean;
@@ -36,8 +45,9 @@ const FIELD_TYPES = [
 ];
 
 const SECTIONS = [
-    { value: 'personal', label: 'Personal' },
-    { value: 'professional', label: 'Professional' },
+    { value: 'general', label: 'General' },
+    { value: 'operational', label: 'Operational' },
+    { value: 'technical', label: 'Technical' },
     { value: 'other', label: 'Other' },
 ];
 
@@ -54,11 +64,28 @@ export function CustomFieldForm({
     onCancel,
     subjectLabel = '',
 }: CustomFieldFormProps) {
-    const [formData, setFormData] = useState({
+    type FieldType =
+        | 'text'
+        | 'number'
+        | 'date'
+        | 'boolean'
+        | 'select'
+        | 'textarea'
+        | 'email'
+        | 'phone'
+        | 'url';
+    type SectionType = 'general' | 'operational' | 'technical' | 'other';
+
+    const [formData, setFormData] = useState<{
+        field_key: string;
+        field_value: string;
+        field_type: FieldType;
+        section: SectionType;
+    }>({
         field_key: customField?.field_key || '',
-        field_value: customField?.field_value || '',
-        field_type: customField?.field_type || 'text',
-        section: customField?.section || 'other',
+        field_value: customField?.field_value ?? '',
+        field_type: (customField?.field_type as FieldType) || 'text',
+        section: (customField?.section as SectionType) || 'other',
     });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -100,7 +127,7 @@ export function CustomFieldForm({
             const stagedCustomField: CustomField = {
                 id: customField?.id || `temp-${Date.now()}`,
                 field_key: formData.field_key,
-                field_value: formData.field_value,
+                field_value: formData.field_value || null,
                 field_type: formData.field_type,
                 section: formData.section,
                 _isNew: !customField,
@@ -315,7 +342,7 @@ export function CustomFieldForm({
                 onChange={(value: string) =>
                     setFormData((prev) => ({
                         ...prev,
-                        field_type: value,
+                        field_type: value as FieldType,
                     }))
                 }
                 options={FIELD_TYPES}
@@ -334,7 +361,7 @@ export function CustomFieldForm({
                 onChange={(value: string) =>
                     setFormData((prev) => ({
                         ...prev,
-                        section: value,
+                        section: value as SectionType,
                     }))
                 }
                 options={SECTIONS}

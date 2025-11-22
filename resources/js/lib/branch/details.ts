@@ -73,7 +73,10 @@ export async function updateBranchDetail(
 ) {
     const formData = buildDetailFormData(payload);
 
-    return axios.put(
+    // Add _method field for Laravel to treat this as PUT request
+    formData.append('_method', 'PUT');
+
+    return axios.post(
         `/dashboard/hr/organization/branches/${branchId}`,
         formData,
         {

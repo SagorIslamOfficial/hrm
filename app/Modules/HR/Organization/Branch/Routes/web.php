@@ -1,7 +1,9 @@
 <?php
 
 use App\Modules\HR\Organization\Branch\Http\Controllers\BranchController;
+use App\Modules\HR\Organization\Branch\Http\Controllers\BranchCustomFieldController;
 use App\Modules\HR\Organization\Branch\Http\Controllers\BranchDepartmentController;
+use App\Modules\HR\Organization\Branch\Http\Controllers\BranchDocumentController;
 use App\Modules\HR\Organization\Branch\Http\Controllers\BranchNoteController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,5 +31,17 @@ Route::middleware(['branch.access'])->group(function () {
             ->name('branches.notes.update');
         Route::delete('branches/{branch}/notes/{note}', [BranchNoteController::class, 'destroy'])
             ->name('branches.notes.destroy');
+
+        // Branch Documents (nested resource)
+        Route::resource('branches.documents', BranchDocumentController::class)
+            ->except(['create', 'edit']);
+        Route::get('branches/{branch}/documents/{document}/download', [BranchDocumentController::class, 'download'])
+            ->name('branches.documents.download');
+
+        // Branch Custom Fields (nested resource)
+        Route::resource('branches.custom-fields', BranchCustomFieldController::class)
+            ->except(['create', 'edit']);
+        Route::post('branches/{branch}/custom-fields/sync', [BranchCustomFieldController::class, 'sync'])
+            ->name('branches.custom-fields.sync');
     });
 });
