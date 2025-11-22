@@ -30,7 +30,7 @@ export interface BranchDetailPayload {
 function buildDetailFormData(payload: BranchDetailPayload): FormData {
     const formData = new FormData();
 
-    Object.entries(payload).forEach(([key, value]) => {
+    Object.entries(payload).forEach(([key, value]: [string, unknown]) => {
         if (value === null || value === undefined) {
             return;
         }
