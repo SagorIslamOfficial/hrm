@@ -4,8 +4,10 @@ import {
     edit as employeesEdit,
     show as employeesShow,
 } from '@/routes/employees/index';
+import { show as usersShow } from '@/routes/users/index';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
+import { UserCheck, UserX } from 'lucide-react';
 import type { Employee } from './index';
 
 interface UseEmployeeColumnsProps {
@@ -88,6 +90,31 @@ export function UseEmployeeColumns({
             cell: ({ row }) => (
                 <StatusBadge status={row.getValue('employment_status')} />
             ),
+        },
+        {
+            id: 'user',
+            accessorFn: (row) => (row.user ? row.user.name : ''),
+            header: 'User Account',
+            cell: ({ row }) => {
+                const user = row.original.user;
+                if (!user) {
+                    return (
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <UserX className="h-4 w-4" />
+                            <span className="text-sm">No account</span>
+                        </div>
+                    );
+                }
+                return (
+                    <Link
+                        href={usersShow(user.id).url}
+                        className="flex items-center gap-1.5 text-green-600 hover:text-green-700"
+                    >
+                        <UserCheck className="h-4 w-4" />
+                        <span className="text-sm">{user.name}</span>
+                    </Link>
+                );
+            },
         },
         {
             id: 'actions',

@@ -19,6 +19,11 @@ export interface Employee {
         id: number;
         name: string;
         email: string;
+        created_at?: string;
+        roles?: Array<{
+            id: number;
+            name: string;
+        }>;
     };
 }
 

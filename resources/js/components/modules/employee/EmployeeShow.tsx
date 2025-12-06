@@ -135,6 +135,16 @@ interface Employee {
         field_type: string;
         section: string;
     }>;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+        created_at: string;
+        roles?: Array<{
+            id: number;
+            name: string;
+        }>;
+    };
 }
 
 interface EmployeeShowFormProps {
@@ -191,11 +201,7 @@ export function EmployeeShow({
                 <TabsNavigation tabs={employeeTabs} />
 
                 <TabsContent value="overview" className="space-y-4">
-                    <OverviewView
-                        employee={employee}
-                        onPhotoClick={setSelectedPhoto}
-                        auth={auth}
-                    />
+                    <OverviewView employee={employee} auth={auth} />
                 </TabsContent>
 
                 <TabsContent value="personal" className="space-y-4">

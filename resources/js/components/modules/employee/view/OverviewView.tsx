@@ -1,10 +1,13 @@
-import { InfoCard } from '@/components/common';
+import { InfoCard, StatusBadge } from '@/components/common';
 import DetailRow from '@/components/common/DetailRow';
 import {
     formatDateForDisplay,
     formatDateTimeForDisplay,
 } from '@/components/common/utils/dateUtils';
 import { Separator } from '@/components/ui/separator';
+import { show as usersShow } from '@/routes/users';
+import { Link } from '@inertiajs/react';
+import { UserCheck, UserX } from 'lucide-react';
 
 interface Employee {
     id: string;
@@ -27,6 +30,13 @@ interface Employee {
         title: string;
         code: string;
     };
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+        created_at?: string;
+        roles?: Array<{ id: number; name: string }>;
+    };
     creator?: { name: string };
     created_at?: string;
     updated_at?: string;
@@ -34,7 +44,6 @@ interface Employee {
 
 interface OverviewViewProps {
     employee: Employee;
-    onPhotoClick: (photo: { url: string; name: string }) => void;
     auth?: {
         user?: {
             id?: number;
@@ -45,11 +54,7 @@ interface OverviewViewProps {
     };
 }
 
-export function OverviewView({
-    employee,
-    onPhotoClick,
-    auth,
-}: OverviewViewProps) {
+export function OverviewView({ employee, auth }: OverviewViewProps) {
     return (
         <div className="grid gap-6 md:grid-cols-2">
             <InfoCard title="Employee Information">
@@ -90,13 +95,6 @@ export function OverviewView({
                                 imageSrc={employee.photo_url}
                                 imageAlt={`${employee.first_name} ${employee.last_name}`}
                                 imageClassName="size-30 cursor-pointer rounded-lg transition-opacity hover:opacity-80"
-                                imageWrapperClassName=""
-                                onImageClick={() =>
-                                    onPhotoClick({
-                                        url: employee.photo_url!,
-                                        name: `${employee.first_name} ${employee.last_name}`,
-                                    })
-                                }
                                 showValue={false}
                             />
                         )}
@@ -159,6 +157,80 @@ export function OverviewView({
                     </div>
                 </div>
             </InfoCard>
+
+            {(auth?.user?.is_super_admin ||
+                auth?.user?.roles?.some((r) => r.name === 'Admin')) && (
+                <InfoCard title="User Account" className="md:col-span-2">
+                    {employee.user ? (
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                                    <UserCheck className="size-5 text-green-600 dark:text-green-400" />
+                                </div>
+
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        Status
+                                    </p>
+                                    <div className="mt-1">
+                                        <StatusBadge status="active" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <DetailRow
+                                    label="Username"
+                                    value={employee.user.name}
+                                />
+                                <DetailRow
+                                    label="Email"
+                                    value={employee.user.email}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <DetailRow
+                                    label="Role"
+                                    value={
+                                        employee.user.roles
+                                            ?.map((r) => r.name)
+                                            .join(', ') || 'No role assigned'
+                                    }
+                                />
+                                <DetailRow
+                                    label="Account Created"
+                                    value={formatDateTimeForDisplay(
+                                        employee.user.created_at,
+                                    )}
+                                />
+                            </div>
+
+                            <div className="md:col-span-3">
+                                <Link
+                                    href={usersShow(employee.user.id).url}
+                                    className="text-sm font-medium text-primary hover:underline"
+                                >
+                                    View User Details →
+                                </Link>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-4">
+                            <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+                                <UserX className="size-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p className="font-medium">No User Account</p>
+                                <p className="text-sm text-muted-foreground">
+                                    This employee does not have a system login
+                                    account.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </InfoCard>
+            )}
         </div>
     );
 }

@@ -21,6 +21,7 @@ import { index as departments } from '@/routes/departments/index';
 import { index as designations } from '@/routes/designations/index';
 import { index as employees } from '@/routes/employees';
 import { index as employmentTypes } from '@/routes/employment-types';
+import { index as users } from '@/routes/users';
 import { type NavItem } from '@/types';
 
 const data = {
@@ -37,6 +38,13 @@ const data = {
             title: 'Dashboard',
             url: dashboard().url,
             icon: Grid2x2Check,
+            isActive: false,
+        },
+
+        {
+            title: 'Users',
+            url: users().url,
+            icon: UsersRound,
             isActive: false,
         },
 
