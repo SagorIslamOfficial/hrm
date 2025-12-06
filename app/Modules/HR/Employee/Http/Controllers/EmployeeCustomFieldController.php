@@ -8,11 +8,14 @@ use App\Modules\HR\Employee\Http\Requests\StoreEmployeeCustomFieldRequest;
 use App\Modules\HR\Employee\Http\Requests\UpdateEmployeeCustomFieldRequest;
 use App\Modules\HR\Employee\Models\Employee;
 use App\Modules\HR\Employee\Models\EmployeeCustomField;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class EmployeeCustomFieldController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected EmployeeCustomFieldServiceInterface $customFieldService
     ) {}

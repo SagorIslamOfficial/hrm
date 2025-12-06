@@ -9,16 +9,18 @@ use App\Modules\HR\Employee\Models\EmployeeContact;
 use App\Modules\HR\Employee\Models\EmployeeJobDetail;
 use App\Modules\HR\Employee\Models\EmployeePersonalDetail;
 use App\Modules\HR\Employee\Models\EmployeeSalaryDetail;
+use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeService implements EmployeeServiceInterface
 {
     public function __construct(
-        private EmployeeRepositoryInterface $employeeRepository
+        private EmployeeRepositoryInterface $employeeRepository,
+        private UserService $userService,
     ) {}
 
     /**
-     * Create a new employee with related data.
+     * Create a new employee with related data and optionally a user account.
      */
     public function createEmployee(array $data): Employee
     {
@@ -44,7 +46,15 @@ class EmployeeService implements EmployeeServiceInterface
             $this->createOrUpdateJobDetail($employee->id, $data['job_detail'] ?? []);
             $this->createOrUpdateSalaryDetail($employee->id, $data['salary_detail'] ?? []);
 
-            return $employee->fresh(['department', 'designation', 'personalDetail', 'jobDetail', 'salaryDetail']);
+            // Create user account if requested
+            if (! empty($data['create_user'])) {
+                $this->userService->createUserForEmployee($employee, [
+                    'role' => $data['user_role'] ?? config('user.default_role.for_employee', 'Employee'),
+                    'send_credentials' => $data['send_credentials'] ?? true,
+                ]);
+            }
+
+            return $employee->fresh(['department', 'designation', 'personalDetail', 'jobDetail', 'salaryDetail', 'user']);
         });
     }
 

@@ -55,6 +55,11 @@ class StoreEmployeeRequest extends FormRequest
             'salary_detail' => 'nullable|array',
             'salary_detail.basic_salary' => 'nullable|numeric|min:0',
             'salary_detail.allowances' => 'nullable|numeric|min:0',
+
+            // User account creation options
+            'create_user' => 'nullable|boolean',
+            'send_credentials' => 'nullable|boolean',
+            'user_role' => 'nullable|string|exists:roles,name',
         ];
     }
 

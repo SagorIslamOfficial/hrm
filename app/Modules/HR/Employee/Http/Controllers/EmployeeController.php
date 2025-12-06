@@ -11,13 +11,17 @@ use App\Modules\HR\Employee\Services\EmployeeService;
 use App\Modules\HR\Organization\Branch\Models\Branch;
 use App\Modules\HR\Organization\Department\Models\Department;
 use App\Modules\HR\Organization\Department\Models\Designation;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class EmployeeController
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private EmployeeService $employeeService,
         private EmployeeRepositoryInterface $employeeRepository,
@@ -25,27 +29,31 @@ class EmployeeController
 
     public function index(Request $request)
     {
-        $employees = Employee::select([
-            'employees.id',
-            'employees.employee_code',
-            'employees.first_name',
-            'employees.last_name',
-            'employees.email',
-            'employees.phone',
-            'employees.photo',
-            'employees.employment_status',
-            'employees.employment_type',
-            'employees.joining_date',
-            'employees.created_at',
-            'employees.department_id',
-            'employees.designation_id',
-            'departments.name as department_name',
-            'designations.title as designation_title',
-        ])
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
-            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+        $employees = Employee::query()
+            ->with(['user', 'department:id,name,code', 'designation:id,title,code'])
+            ->select([
+                'employees.id',
+                'employees.employee_code',
+                'employees.first_name',
+                'employees.last_name',
+                'employees.email',
+                'employees.phone',
+                'employees.photo',
+                'employees.employment_status',
+                'employees.employment_type',
+                'employees.joining_date',
+                'employees.created_at',
+                'employees.department_id',
+                'employees.designation_id',
+            ])
             ->orderBy('employees.created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($employee) {
+                return array_merge($employee->toArray(), [
+                    'department_name' => $employee->department?->name ?? 'N/A',
+                    'designation_title' => $employee->designation?->title ?? 'N/A',
+                ]);
+            });
 
         return Inertia::render('modules/employee/index', [
             'employees' => $employees,
@@ -63,13 +71,25 @@ class EmployeeController
             ->orderBy('name')
             ->get();
 
-        /** @var \App\Models\User $user */
+        // Get roles for user creation
+        $roles = Role::select('id', 'name')->orderBy('name')->get();
+
+        // Get user creation settings from cache or config
+        $systemSettings = cache()->get('system_settings', []);
+        $userCreationMode = $systemSettings['user']['auto_create_for_employee']
+            ?? config('user.auto_create_for_employee', 'manual');
+        $defaultRole = $systemSettings['user']['default_role']['for_employee']
+            ?? config('user.default_role.for_employee', 'Employee');
+
         $user = Auth::user();
 
         return Inertia::render('modules/employee/create', [
             'departments' => $departments,
             'designations' => $designations,
             'employmentTypes' => $employmentTypes,
+            'roles' => $roles,
+            'userCreationMode' => $userCreationMode,
+            'defaultRole' => $defaultRole,
             'auth' => [
                 'user' => $user->load('roles'),
             ],
@@ -78,6 +98,8 @@ class EmployeeController
 
     public function store(StoreEmployeeRequest $request)
     {
+        $this->authorize('create', Employee::class);
+
         try {
             $data = $request->validated();
 
@@ -128,6 +150,8 @@ class EmployeeController
             'attendanceRecords' => fn ($query) => $query->latest()->limit(30),
             'leaveRecords' => fn ($query) => $query->latest()->limit(10),
             'customFields',
+            'user',
+            'user.roles:id,name',
         ]);
 
         $supervisors = $this->employeeRepository->all()
@@ -141,7 +165,6 @@ class EmployeeController
 
         $branches = Branch::select('id', 'name', 'code')->where('is_active', true)->get();
 
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         return Inertia::render('modules/employee/show', [
@@ -210,6 +233,8 @@ class EmployeeController
 
     public function update(UpdateEmployeeRequest $request, int|string $id)
     {
+        $this->authorize('update', Employee::class);
+
         try {
             $employee = $this->employeeService->updateEmployee($id, $request->validated());
 
@@ -260,6 +285,8 @@ class EmployeeController
 
     public function destroy(int|string $id)
     {
+        $this->authorize('delete', Employee::class);
+
         $this->employeeService->deleteEmployee($id);
 
         return redirect()->route('employees.index')

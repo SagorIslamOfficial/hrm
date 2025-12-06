@@ -28,6 +28,14 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        // Add foreign key constraint to users table for employee_id
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('employee_id')
+                ->references('id')
+                ->on('employees')
+                ->nullOnDelete();
+        });
     }
 
     /**
@@ -35,6 +43,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['employee_id']);
+        });
+
         Schema::dropIfExists('employees');
     }
 };

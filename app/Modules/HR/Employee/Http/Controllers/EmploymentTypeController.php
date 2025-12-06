@@ -5,11 +5,14 @@ namespace App\Modules\HR\Employee\Http\Controllers;
 use App\Modules\HR\Employee\Http\Requests\StoreEmploymentTypeRequest;
 use App\Modules\HR\Employee\Http\Requests\UpdateEmploymentTypeRequest;
 use App\Modules\HR\Employee\Models\EmploymentType;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class EmploymentTypeController
 {
+    use AuthorizesRequests;
+
     public function index(Request $request)
     {
         $employmentTypes = EmploymentType::query()

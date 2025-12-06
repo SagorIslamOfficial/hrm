@@ -9,11 +9,14 @@ use App\Modules\HR\Employee\Http\Requests\StoreEmployeeDocumentRequest;
 use App\Modules\HR\Employee\Http\Requests\UpdateEmployeeDocumentRequest;
 use App\Modules\HR\Employee\Models\Employee;
 use App\Modules\HR\Employee\Models\EmployeeDocument;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class EmployeeDocumentController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private EmployeeDocumentServiceInterface $documentService,
         private EmployeeDocumentRepositoryInterface $documentRepository,

@@ -2,11 +2,13 @@
 
 namespace App\Modules\HR\Employee\Models;
 
+use App\Models\User;
 use App\Modules\HR\Employee\Database\Factories\EmployeeFactory;
 use App\Modules\HR\Organization\Branch\Models\Branch;
 use App\Modules\HR\Organization\Department\Models\Department;
 use App\Modules\HR\Organization\Department\Models\Designation;
 use App\Traits\FileUploadTrait;
+use App\Traits\StatusManagement;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +37,7 @@ use Illuminate\Support\Facades\Log;
  */
 class Employee extends Model
 {
-    use FileUploadTrait, HasFactory, HasUuids, SoftDeletes;
+    use FileUploadTrait, HasFactory, HasUuids, SoftDeletes, StatusManagement;
 
     protected $fillable = [
         'employee_code',
@@ -52,6 +54,37 @@ class Employee extends Model
         'joining_date',
         'currency',
     ];
+
+    /**
+     * Available status options for employees.
+     *
+     * @var array<string>
+     */
+    protected static $statusOptions = ['active', 'inactive', 'terminated', 'on_leave'];
+
+    /**
+     * Map employment_status to status for the StatusManagement trait.
+     */
+    protected function getStatusAttribute(): string
+    {
+        return $this->attributes['employment_status'] ?? 'active';
+    }
+
+    protected function setStatusAttribute(string $value): void
+    {
+        $this->attributes['employment_status'] = $value;
+    }
+
+    /**
+     * Override setStatus to use the employment_status column.
+     * Syncing to linked user is handled by EmployeeObserver.
+     */
+    public function setStatus(string $status): self
+    {
+        $this->update(['employment_status' => $status]);
+
+        return $this;
+    }
 
     protected function casts(): array
     {
@@ -128,6 +161,22 @@ class Employee extends Model
     public function customFields(): HasMany
     {
         return $this->hasMany(EmployeeCustomField::class);
+    }
+
+    /**
+     * Get the user account associated with this employee.
+     */
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'employee_id');
+    }
+
+    /**
+     * Check if the employee has a linked user account.
+     */
+    public function hasUser(): bool
+    {
+        return $this->user()->exists();
     }
 
     /**

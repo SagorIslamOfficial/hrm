@@ -99,6 +99,6 @@ class EmployeeRepository implements EmployeeRepositoryInterface
 
     public function findByUserId(int $userId): ?Employee
     {
-        return Employee::where('user_id', $userId)->first();
+        return Employee::whereHas('user', fn ($query) => $query->where('id', $userId))->first();
     }
 }

@@ -10,8 +10,10 @@ use App\Modules\HR\Employee\Contracts\EmployeeNoteRepositoryInterface;
 use App\Modules\HR\Employee\Contracts\EmployeeNoteServiceInterface;
 use App\Modules\HR\Employee\Contracts\EmployeeRepositoryInterface;
 use App\Modules\HR\Employee\Contracts\EmployeeServiceInterface;
+use App\Modules\HR\Employee\Models\Employee;
 use App\Modules\HR\Employee\Models\EmployeeNote;
 use App\Modules\HR\Employee\Policies\EmployeeNotePolicy;
+use App\Modules\HR\Employee\Policies\EmployeePolicy;
 use App\Modules\HR\Employee\Repositories\EmployeeCustomFieldRepository;
 use App\Modules\HR\Employee\Repositories\EmployeeDocumentRepository;
 use App\Modules\HR\Employee\Repositories\EmployeeNoteRepository;
@@ -46,6 +48,7 @@ class EmployeeServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register policies
+        Gate::policy(Employee::class, EmployeePolicy::class);
         Gate::policy(EmployeeNote::class, EmployeeNotePolicy::class);
 
         // Load module migrations
