@@ -12,6 +12,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->middleware('throttle:web')->name('dashboard');
 
+    // User management routes
+    require __DIR__.'/users.php';
+
     // Added module routes with dashboard prefix
     Route::prefix('dashboard/hr')->group(function () {
         require __DIR__.'/../app/Modules/HR/Employee/Routes/web.php';

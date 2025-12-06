@@ -64,7 +64,7 @@ test('user can delete their account', function () {
         ->assertRedirect(route('home'));
 
     $this->assertGuest();
-    expect($user->fresh())->toBeNull();
+    expect(User::find($user->id))->toBeNull();
 });
 
 test('correct password must be provided to delete account', function () {

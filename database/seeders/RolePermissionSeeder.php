@@ -15,6 +15,9 @@ class RolePermissionSeeder extends Seeder
     {
         // Create permissions
         $permissions = [
+            // User Management
+            'view users', 'create users', 'edit users', 'delete users', 'link-user-employee',
+
             // Employee Management
             'view employees', 'create employees', 'edit employees', 'delete employees',
 
@@ -50,6 +53,7 @@ class RolePermissionSeeder extends Seeder
 
         $hrRole = Role::firstOrCreate(['name' => 'HR']);
         $hrRole->givePermissionTo([
+            'view users', 'create users', 'edit users', 'link-user-employee',
             'view employees', 'create employees', 'edit employees',
             'view departments', 'create departments', 'edit departments',
             'view attendance', 'edit attendance', 'approve attendance',
