@@ -6,6 +6,8 @@ import {
     PageHeader,
     PhotoUploadField,
 } from '@/components/common';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import {
     create as employeesCreate,
@@ -21,6 +23,9 @@ interface Props {
     departments: Array<{ id: string; name: string }>;
     designations: Array<{ id: string; title: string }>;
     employmentTypes: Array<{ code: string; name: string }>;
+    roles: Array<{ id: number; name: string }>;
+    userCreationMode: 'disabled' | 'with_invite' | 'manual';
+    defaultRole: string;
     auth?: {
         user?: {
             id: number;
@@ -45,6 +50,9 @@ export default function Create({
     departments,
     designations,
     employmentTypes,
+    roles,
+    userCreationMode,
+    defaultRole,
     auth,
 }: Props) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -55,6 +63,9 @@ export default function Create({
     // Get first employment type as default
     const defaultEmploymentType =
         employmentTypes.length > 0 ? employmentTypes[0].code : '';
+
+    // Determine initial create_user state based on mode
+    const initialCreateUser = userCreationMode === 'with_invite';
 
     const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({
@@ -69,6 +80,10 @@ export default function Create({
             employment_status: 'active',
             employment_type: defaultEmploymentType,
             joining_date: today,
+            // User creation options
+            create_user: initialCreateUser,
+            send_credentials: true,
+            user_role: defaultRole,
         });
 
     // Check if all required fields are filled
@@ -300,6 +315,93 @@ export default function Create({
                             <CreatedByField userName={auth?.user?.name} />
                         </div>
                     </InfoCard>
+
+                    {/* User Account Creation Section */}
+                    {userCreationMode !== 'disabled' && (
+                        <InfoCard
+                            title="User Account"
+                            className="rounded-xl border border-sidebar-border/70 p-6"
+                        >
+                            <div className="space-y-4">
+                                <div className="flex items-start space-x-3">
+                                    <Checkbox
+                                        id="create_user"
+                                        className="mt-1"
+                                        checked={data.create_user}
+                                        onCheckedChange={(checked) =>
+                                            setData(
+                                                'create_user',
+                                                checked === true,
+                                            )
+                                        }
+                                        disabled={
+                                            userCreationMode === 'with_invite'
+                                        }
+                                    />
+
+                                    <div className="space-y-1">
+                                        <Label
+                                            htmlFor="create_user"
+                                            className="leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                            Create user account for this
+                                            employee
+                                        </Label>
+                                        <p className="text-sm text-muted-foreground">
+                                            {userCreationMode === 'with_invite'
+                                                ? 'User accounts are automatically created for new employees.'
+                                                : 'A user account will be created with the same email address.'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {data.create_user && (
+                                    <div className="ml-6 grid gap-4 border-l-2 border-primary/20 pl-4">
+                                        <FormField
+                                            type="select"
+                                            id="user_role"
+                                            label="User Role"
+                                            value={data.user_role}
+                                            onChange={(value: string) =>
+                                                setData('user_role', value)
+                                            }
+                                            options={roles.map((role) => ({
+                                                value: role.name,
+                                                label: role.name,
+                                            }))}
+                                        />
+
+                                        <div className="flex items-start space-x-3">
+                                            <Checkbox
+                                                id="send_credentials"
+                                                checked={data.send_credentials}
+                                                onCheckedChange={(checked) =>
+                                                    setData(
+                                                        'send_credentials',
+                                                        checked === true,
+                                                    )
+                                                }
+                                            />
+                                            <div className="space-y-1">
+                                                <Label
+                                                    htmlFor="send_credentials"
+                                                    className="leading-none font-medium"
+                                                >
+                                                    Send login credentials via
+                                                    email
+                                                </Label>
+                                                <p className="text-sm text-muted-foreground">
+                                                    An email with a temporary
+                                                    password and login
+                                                    instructions will be sent.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </InfoCard>
+                    )}
 
                     <FormActions
                         onReset={handleReset}

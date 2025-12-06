@@ -1,9 +1,10 @@
 import {
+    arrayToPaginatedData,
     DeleteDialog,
     EmptyActionState,
     PageHeader,
+    PaginatedTable,
 } from '@/components/common';
-import { TableBlueprint } from '@/components/common/TableBlueprint';
 import {
     UseEmployeeColumns,
     type Employee,
@@ -87,9 +88,9 @@ export default function Index({ employees = [] }: Props) {
                             buttonIcon={<FilePlus className="mr-1 size-4" />}
                         />
                     ) : (
-                        <TableBlueprint
+                        <PaginatedTable
                             columns={columns}
-                            data={employees}
+                            paginatedData={arrayToPaginatedData(employees)}
                             searchPlaceholder="Search employees..."
                             globalSearchKeys={[
                                 'first_name',

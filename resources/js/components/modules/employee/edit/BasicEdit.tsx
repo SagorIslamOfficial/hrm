@@ -4,6 +4,7 @@ import {
     InfoCard,
     PhotoUploadField,
 } from '@/components/common';
+import { STATUS_OPTIONS } from '@/constants/status';
 import { useState } from 'react';
 
 interface BasicTabProps {
@@ -150,12 +151,7 @@ export function BasicEdit({
                     onChange={(value: string) =>
                         setData('employment_status', value)
                     }
-                    options={[
-                        { value: 'active', label: 'Active' },
-                        { value: 'inactive', label: 'InActive' },
-                        { value: 'terminated', label: 'Terminated' },
-                        { value: 'on_leave', label: 'On Leave' },
-                    ]}
+                    options={STATUS_OPTIONS}
                 />
 
                 <FormField

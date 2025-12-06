@@ -1,9 +1,10 @@
 import {
+    arrayToPaginatedData,
     DeleteDialog,
     EmptyActionState,
     PageHeader,
+    PaginatedTable,
 } from '@/components/common';
-import { TableBlueprint } from '@/components/common/TableBlueprint';
 import { UseBranchColumns } from '@/components/modules/branch';
 import AppLayout from '@/layouts/app-layout';
 import {
@@ -84,9 +85,9 @@ export default function Index({ branches }: Props) {
                             buttonIcon={<FilePlus className="mr-1 size-4" />}
                         />
                     ) : (
-                        <TableBlueprint
+                        <PaginatedTable
                             columns={columns}
-                            data={branchesData}
+                            paginatedData={arrayToPaginatedData(branchesData)}
                             searchPlaceholder="Search branches..."
                             globalSearchKeys={['name', 'code', 'city', 'type']}
                         />

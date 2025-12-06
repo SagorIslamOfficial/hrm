@@ -90,10 +90,7 @@ export default function Create({ employees, branches, branchTypes }: Props) {
                 />
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <InfoCard
-                        title="Branch Information"
-                        className="rounded-xl border border-sidebar-border/70 p-6"
-                    >
+                    <InfoCard title="Branch Information">
                         <div className="grid gap-6 md:grid-cols-2">
                             <FormField
                                 type="text"

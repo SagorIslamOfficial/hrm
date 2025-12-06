@@ -1,9 +1,10 @@
 import {
+    arrayToPaginatedData,
     DeleteDialog,
     EmptyActionState,
     PageHeader,
+    PaginatedTable,
 } from '@/components/common';
-import { TableBlueprint } from '@/components/common/TableBlueprint';
 import { UseEmploymentTypeColumns } from '@/components/modules/employee';
 import AppLayout from '@/layouts/app-layout';
 import {
@@ -100,9 +101,9 @@ export default function Index({ employmentTypes = [] }: Props) {
                             buttonIcon={<FilePlus className="mr-1 size-4" />}
                         />
                     ) : (
-                        <TableBlueprint
+                        <PaginatedTable
                             columns={columns}
-                            data={employmentTypes}
+                            paginatedData={arrayToPaginatedData(employmentTypes)}
                             searchPlaceholder="Search employment types..."
                             globalSearchKeys={['name', 'code', 'description']}
                         />
