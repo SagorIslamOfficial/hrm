@@ -7,6 +7,7 @@ use App\Modules\HR\Employee\Database\Seeders\EmployeeSeeder;
 use App\Modules\HR\Employee\Database\Seeders\EmploymentTypeSeeder;
 use App\Modules\HR\Organization\Branch\Database\Seeders\BranchManagerSeeder;
 use App\Modules\HR\Organization\Branch\Database\Seeders\BranchSeeder;
+use App\Modules\HR\Organization\Complaint\Database\Seeders\ComplaintSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentDetailSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentManagerSeeder;
 use App\Modules\HR\Organization\Department\Database\Seeders\DepartmentNoteSeeder;
@@ -76,6 +77,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DepartmentManagerSeeder::class,
             BranchManagerSeeder::class,
+        ]);
+
+        // Seed complaints
+        $this->call([
+            ComplaintSeeder::class,
         ]);
     }
 }
