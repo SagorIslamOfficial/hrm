@@ -6,6 +6,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Modules\Attendance\Http\Middleware\AttendanceAccessMiddleware;
 use App\Modules\HR\Employee\Http\Middleware\EmployeeAccessMiddleware;
 use App\Modules\HR\Organization\Branch\Http\Middleware\BranchAccessMiddleware;
+use App\Modules\HR\Organization\Complaint\Http\Middleware\ComplaintAccessMiddleware;
 use App\Modules\HR\Organization\Department\Http\Middleware\DepartmentAccessMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'branch.access' => BranchAccessMiddleware::class,
+            'complaint.access' => ComplaintAccessMiddleware::class,
             'employee.access' => EmployeeAccessMiddleware::class,
             'department.access' => DepartmentAccessMiddleware::class,
             'attendance.access' => AttendanceAccessMiddleware::class,
