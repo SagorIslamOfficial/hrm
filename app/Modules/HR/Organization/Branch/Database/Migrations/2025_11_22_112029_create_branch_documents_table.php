@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('file_size')->nullable();
             $table->string('mime_type')->nullable();
             $table->date('expiry_date')->nullable();
-            $table->foreignId('uploaded_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUuid('uploaded_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
