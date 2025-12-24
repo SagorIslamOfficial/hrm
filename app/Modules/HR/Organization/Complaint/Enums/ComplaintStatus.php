@@ -6,6 +6,7 @@ enum ComplaintStatus: string
 {
     case DRAFT = 'draft';
     case SUBMITTED = 'submitted';
+    case ACKNOWLEDGED = 'acknowledged';
     case UNDER_REVIEW = 'under_review';
     case INVESTIGATING = 'investigating';
     case PENDING_INFO = 'pending_info';
@@ -19,6 +20,7 @@ enum ComplaintStatus: string
         return match ($this) {
             self::DRAFT => 'Draft',
             self::SUBMITTED => 'Submitted',
+            self::ACKNOWLEDGED => 'Acknowledged',
             self::UNDER_REVIEW => 'Under Review',
             self::INVESTIGATING => 'Investigating',
             self::PENDING_INFO => 'Pending Information',
@@ -34,6 +36,7 @@ enum ComplaintStatus: string
         return match ($this) {
             self::DRAFT => 'gray',
             self::SUBMITTED => 'blue',
+            self::ACKNOWLEDGED => 'indigo',
             self::UNDER_REVIEW => 'yellow',
             self::INVESTIGATING => 'purple',
             self::PENDING_INFO => 'orange',
@@ -49,6 +52,7 @@ enum ComplaintStatus: string
         return match ($this) {
             self::DRAFT => 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
             self::SUBMITTED => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+            self::ACKNOWLEDGED => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
             self::UNDER_REVIEW => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
             self::INVESTIGATING => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
             self::PENDING_INFO => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
