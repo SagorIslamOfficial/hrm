@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('branch_notes', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('branch_id');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreignUuid('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUuid('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('title')->nullable();
             $table->longText('note');
             $table->enum('category', [
@@ -23,11 +23,7 @@ return new class extends Migration
                 'other',
             ])->default('general');
             $table->boolean('is_private')->default(false);
-
             $table->foreign('branch_id')->references('id')->on('branches')->cascadeOnDelete();
-            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
-
             $table->timestamps();
 
             $table->index(['branch_id', 'category']);
