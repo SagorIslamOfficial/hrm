@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('complaint_subjects', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('complaint_id');
-            $table->uuid('subject_id');
-            $table->string('subject_type');
+            $table->uuid('subject_id')->nullable();
+            $table->string('subject_type')->nullable();
+            $table->string('subject_name')->nullable();
             $table->string('relationship_to_complainant')->nullable();
             $table->text('specific_issue');
             $table->boolean('is_primary')->default(false);
