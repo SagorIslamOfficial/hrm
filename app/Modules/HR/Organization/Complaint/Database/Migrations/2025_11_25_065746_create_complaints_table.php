@@ -32,15 +32,12 @@ return new class extends Migration
             $table->boolean('is_confidential')->default(true);
             $table->boolean('is_recurring')->default(false);
 
-            // JSON columns for resolution
-            $table->json('resolution')->nullable();
-
             // SLA & Escalation
             $table->integer('sla_hours')->nullable();
             $table->timestamp('sla_breach_at')->nullable();
             $table->boolean('is_escalated')->default(false);
             $table->timestamp('escalated_at')->nullable();
-            $table->uuid('escalated_to')->nullable();
+            $table->json('escalated_to')->nullable();
 
             // Dates
             $table->timestamp('submitted_at')->nullable();
@@ -57,7 +54,6 @@ return new class extends Migration
             $table->foreign('employee_id')->references('id')->on('employees')->cascadeOnDelete();
             $table->foreign('department_id')->references('id')->on('departments')->nullOnDelete();
             $table->foreign('assigned_to')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('escalated_to')->references('id')->on('users')->nullOnDelete();
 
             // Indexes
             $table->index(['status', 'priority']);
