@@ -9,10 +9,6 @@ use App\Modules\HR\Organization\Complaint\Http\Controllers\ComplaintStatusContro
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['complaint.access'])->prefix('organization/complaints')->group(function () {
-    // Pending reminders (before resource)
-    Route::get('reminders/pending', [ComplaintReminderController::class, 'pending'])
-        ->name('complaints.reminders.pending');
-
     // Main Complaints Resource Controller
     Route::resource('/', ComplaintController::class)
         ->parameters(['' => 'complaint'])
@@ -28,9 +24,7 @@ Route::middleware(['complaint.access'])->prefix('organization/complaints')->grou
     Route::get('{complaint}/documents/{document}/download', [ComplaintDocumentController::class, 'download'])->name('complaints.documents.download');
 
     // Escalations
-    Route::get('{complaint}/escalations', [ComplaintEscalationController::class, 'index'])->name('complaints.escalations.index');
     Route::post('{complaint}/escalations', [ComplaintEscalationController::class, 'store'])->name('complaints.escalations.store');
-    Route::post('{complaint}/deescalate', [ComplaintEscalationController::class, 'deescalate'])->name('complaints.escalations.deescalate');
 
     // Resolution (Singleton - one per complaint)
     Route::post('{complaint}/resolution', [ComplaintResolutionController::class, 'store'])->name('complaints.resolution.store');
@@ -38,10 +32,5 @@ Route::middleware(['complaint.access'])->prefix('organization/complaints')->grou
     Route::post('{complaint}/resolution/feedback', [ComplaintResolutionController::class, 'feedback'])->name('complaints.resolution.feedback');
 
     // Reminders
-    Route::resource('{complaint}/reminders', ComplaintReminderController::class)
-        ->parameters(['reminders' => 'reminder'])
-        ->names('complaints.reminders')
-        ->except(['create', 'edit']);
-
-    Route::post('{complaint}/reminders/{reminder}/sent', [ComplaintReminderController::class, 'markAsSent'])->name('complaints.reminders.sent');
+    Route::post('{complaint}/reminders', [ComplaintReminderController::class, 'store'])->name('complaints.reminders.store');
 });
