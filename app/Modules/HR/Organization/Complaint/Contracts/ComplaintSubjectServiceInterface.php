@@ -12,6 +12,4 @@ interface ComplaintSubjectServiceInterface
     public function createSubject(Complaint $complaint, array $data): ComplaintSubject;
 
     public function updateSubject(Complaint $complaint, string $subjectId, array $data): bool;
-
-    public function deleteSubject(ComplaintSubject $subject): bool;
 }
