@@ -1,5 +1,8 @@
-import { StatusBadge } from '@/components/common';
-import { TableBlueprint } from '@/components/common/TableBlueprint';
+import {
+    arrayToPaginatedData,
+    PaginatedTable,
+    StatusBadge,
+} from '@/components/common';
 import { Employee } from '@/components/modules/employee';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -180,9 +183,9 @@ export function MembersDrawer({
                 </DrawerHeader>
 
                 <div className="max-h-[70vh] overflow-y-auto">
-                    <TableBlueprint
+                    <PaginatedTable
                         columns={columns}
-                        data={sortedEmployees}
+                        paginatedData={arrayToPaginatedData(sortedEmployees)}
                         searchPlaceholder="Search employees..."
                         globalSearchKeys={[
                             'employee_code',
