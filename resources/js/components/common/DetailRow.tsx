@@ -1,6 +1,13 @@
-import { titleCase } from '@/components/common/utils/formatUtils';
-import { Badge } from '@/components/ui/badge';
-import React from 'react';
+import { StatusBadge } from '@/components/common/StatusBadge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { User as UserIcon } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface DetailRowProps {
     label: string;
@@ -9,17 +16,11 @@ interface DetailRowProps {
     imageSrc?: string;
     imageAlt?: string;
     imageClassName?: string;
-    imageWrapperClassName?: string;
-    onImageClick?: () => void;
     showValue?: boolean;
     valueClassName?: string;
     className?: string;
     statusValue?: string | null;
     badgeClassName?: string;
-    badgeVariantMapper?: (
-        value: string,
-    ) => 'default' | 'secondary' | 'outline' | 'destructive';
-    statusLabelMapper?: (value: string) => string;
 }
 
 export default function DetailRow({
@@ -29,79 +30,95 @@ export default function DetailRow({
     imageSrc,
     imageAlt,
     imageClassName = 'w-8 h-8 rounded-md',
-    imageWrapperClassName = 'mr-3',
-    onImageClick,
     showValue = true,
     valueClassName = 'text-sm font-medium capitalize',
     className = '',
     statusValue = null,
     badgeClassName = '',
-    badgeVariantMapper,
-    statusLabelMapper,
 }: DetailRowProps) {
-    const defaultVariantMapper = (value: string) => {
-        if (value === 'active') return 'default';
-        if (value === 'inactive') return 'secondary';
-        if (value === 'on_leave') return 'outline';
-        return 'destructive';
-    };
+    const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
-    const defaultLabelMapper = (value: string) => {
-        if (!value) return '';
-        if (value === 'inactive') return 'InActive';
-        return titleCase(value);
-    };
-
-    const renderBadge = (value: string) => {
-        const variant = (badgeVariantMapper || defaultVariantMapper)(value);
-        const labelText = (statusLabelMapper || defaultLabelMapper)(value);
-        const extraClass =
-            value === 'on_leave'
-                ? 'border-rose-200 bg-rose-100 text-rose-800 hover:bg-rose-200'
-                : '';
-        return (
-            <div className="mt-1">
-                <Badge
-                    className={`text-[13px] ${extraClass} ${badgeClassName}`}
-                    variant={variant}
-                >
-                    {labelText}
-                </Badge>
-            </div>
-        );
-    };
+    const renderBadge = (status: string) => (
+        <div className="mt-1">
+            <StatusBadge status={status} className={badgeClassName} />
+        </div>
+    );
 
     return (
-        <div className={className}>
-            <h3 className="text-sm font-medium text-muted-foreground">
-                {label}
-            </h3>
-            {statusValue ? (
-                renderBadge(statusValue)
-            ) : (
-                <div className="mt-1 flex items-center">
-                    {imageSrc && (
-                        <div className={imageWrapperClassName}>
-                            <img
-                                src={imageSrc}
-                                alt={imageAlt ?? label}
-                                className={imageClassName}
-                                onClick={onImageClick}
-                            />
-                        </div>
-                    )}
-                    {showValue &&
-                        (value !== undefined ? (
-                            React.isValidElement(value) ? (
-                                <div className={valueClassName}>{value}</div>
+        <>
+            <div className={className}>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                    {label}
+                </h3>
+                {statusValue ? (
+                    renderBadge(statusValue)
+                ) : (
+                    <div className="mt-1 flex flex-col items-start gap-2">
+                        {imageSrc !== undefined && (
+                            <>
+                                <Avatar
+                                    className={`${imageClassName} cursor-pointer bg-muted shadow-none transition-opacity hover:opacity-80`}
+                                    onClick={() => setIsPhotoModalOpen(true)}
+                                >
+                                    <AvatarImage
+                                        src={imageSrc || undefined}
+                                        alt={imageAlt ?? label}
+                                    />
+                                    <AvatarFallback>
+                                        <UserIcon className="size-16 text-muted-foreground" />
+                                    </AvatarFallback>
+                                </Avatar>
+
+                                {imageSrc && (
+                                    <Dialog
+                                        open={isPhotoModalOpen}
+                                        onOpenChange={setIsPhotoModalOpen}
+                                    >
+                                        <DialogContent className="max-w-2xl border-0 bg-gray-700/60 p-6 shadow-lg">
+                                            <div className="space-y-4">
+                                                <DialogTitle className="text-lg font-semibold text-white">
+                                                    {imageAlt ?? label} - Photo
+                                                </DialogTitle>
+                                                <DialogDescription className="sr-only">
+                                                    Preview of{' '}
+                                                    {imageAlt ?? label}
+                                                </DialogDescription>
+                                                <img
+                                                    src={imageSrc}
+                                                    alt={imageAlt ?? label}
+                                                    className="h-auto w-full rounded-lg"
+                                                />
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                )}
+                            </>
+                        )}
+                        {showValue &&
+                            (value !== undefined ? (
+                                React.isValidElement(value) ? (
+                                    <div
+                                        className={`${valueClassName} ${
+                                            label === 'Email' ? 'lowercase' : ''
+                                        }`}
+                                    >
+                                        {value}
+                                    </div>
+                                ) : (
+                                    <p
+                                        className={`${valueClassName} ${
+                                            label === 'Email' ? 'lowercase' : ''
+                                        }`}
+                                    >
+                                        {value}
+                                    </p>
+                                )
                             ) : (
-                                <p className={valueClassName}>{value}</p>
-                            )
-                        ) : (
-                            <p className={valueClassName}>{children}</p>
-                        ))}
-                </div>
-            )}
-        </div>
+                                <p className={valueClassName}>{children}</p>
+                            ))}
+                    </div>
+                )}
+            </div>
+        </>
     );
 }
