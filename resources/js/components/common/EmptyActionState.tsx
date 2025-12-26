@@ -30,3 +30,5 @@ export function EmptyActionState({
         </div>
     );
 }
+
+export default EmptyActionState;
