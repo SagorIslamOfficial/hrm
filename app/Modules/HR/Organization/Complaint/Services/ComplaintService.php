@@ -112,6 +112,115 @@ class ComplaintService implements ComplaintServiceInterface
         $this->complaintRepository->forceDelete($complaint);
     }
 
+    public function submitComplaint(string $id): Complaint
+    {
+        $complaint = $this->complaintRepository->findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            $data = [
+                'status' => 'submitted',
+                'submitted_at' => now(),
+            ];
+
+            // Calculate due date based on SLA hours
+            if ($complaint->sla_hours) {
+                $data['due_date'] = now()->addHours($complaint->sla_hours);
+            }
+
+            $this->complaintRepository->update($complaint, $data);
+
+            // Create status history
+            $complaint->statusHistory()->create([
+                'from_status' => 'draft',
+                'to_status' => 'submitted',
+                'notes' => 'Complaint submitted',
+                'changed_by' => Auth::id(),
+            ]);
+
+            DB::commit();
+
+            return $complaint->fresh();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function updateComplaintStatus(string $id, string $status, ?string $notes = null): Complaint
+    {
+        $complaint = $this->complaintRepository->findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            $oldStatus = $complaint->status->value;
+
+            $this->complaintRepository->update($complaint, ['status' => $status]);
+
+            // Create status history
+            $complaint->statusHistory()->create([
+                'from_status' => $oldStatus,
+                'to_status' => $status,
+                'notes' => $notes,
+                'changed_by' => Auth::id(),
+            ]);
+
+            DB::commit();
+
+            return $complaint->fresh(['statusHistory']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function escalateComplaint(string $id, string $escalateToUserId, ?string $reason = null): Complaint
+    {
+        $complaint = $this->complaintRepository->findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            $escalatedToList = $complaint->escalated_to ?? [];
+            if (! is_array($escalatedToList)) {
+                $escalatedToList = [];
+            }
+            $escalatedToList[] = $escalateToUserId;
+
+            $data = [
+                'is_escalated' => true,
+                'escalated_at' => now(),
+                'escalated_to' => $escalatedToList,
+                'status' => 'escalated',
+            ];
+
+            $this->complaintRepository->update($complaint, $data);
+
+            // Create escalation record
+            $complaint->escalations()->create([
+                'escalated_by' => Auth::id(),
+                'escalated_to' => $escalateToUserId,
+                'reason' => $reason,
+                'escalation_level' => 1,
+                'escalated_at' => now(),
+            ]);
+
+            // Create status history
+            $complaint->statusHistory()->create([
+                'from_status' => $complaint->getOriginal('status'),
+                'to_status' => 'escalated',
+                'notes' => $reason ?? 'Complaint escalated',
+                'changed_by' => Auth::id(),
+            ]);
+
+            DB::commit();
+
+            return $complaint->fresh();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
     private function generateComplaintNumber(): string
     {
         $year = date('Y');
