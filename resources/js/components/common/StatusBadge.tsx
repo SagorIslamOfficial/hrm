@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { STATUS_CONFIG } from '@/constants/status';
 
 interface StatusBadgeProps {
     status: string;
@@ -6,24 +7,15 @@ interface StatusBadgeProps {
     className?: string;
 }
 
-const statusConfig: Record<
+const statusVariantMap: Record<
     string,
-    {
-        label: string;
-        variant: 'default' | 'secondary' | 'destructive' | 'outline';
-        className?: string;
-    }
+    'default' | 'secondary' | 'destructive' | 'outline'
 > = {
-    active: { label: 'Active', variant: 'default' },
-    inactive: { label: 'In Active', variant: 'secondary' },
-    pending: { label: 'Pending', variant: 'outline' },
-    on_leave: {
-        label: 'On Leave',
-        variant: 'outline',
-        className:
-            'border-orange-500 text-orange-700 bg-orange-50 dark:border-orange-400 dark:text-orange-300 dark:bg-orange-950/30',
-    },
-    terminated: { label: 'Terminated', variant: 'destructive' },
+    active: 'default',
+    inactive: 'secondary',
+    pending: 'outline',
+    on_leave: 'outline',
+    terminated: 'destructive',
 };
 
 export function StatusBadge({ status, variant, className }: StatusBadgeProps) {
@@ -35,17 +27,18 @@ export function StatusBadge({ status, variant, className }: StatusBadgeProps) {
         );
     }
 
-    const config = statusConfig[status.toLowerCase()] || {
-        label: status,
-        variant: variant || 'outline',
-    };
+    const statusKey = status.toLowerCase() as keyof typeof STATUS_CONFIG;
+    const config = STATUS_CONFIG[statusKey];
+    const badgeVariant =
+        variant || statusVariantMap[status.toLowerCase()] || 'outline';
+    const badgeClassName = config?.color || '';
 
     return (
         <Badge
-            variant={variant || config.variant}
-            className={`text-xs ${config.className || ''} ${className || ''}`}
+            variant={badgeVariant}
+            className={`text-xs ${badgeClassName} ${className || ''}`}
         >
-            {config.label}
+            {config?.label || status}
         </Badge>
     );
 }
