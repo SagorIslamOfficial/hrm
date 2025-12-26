@@ -17,9 +17,12 @@ class StoreComplaintRequest extends FormRequest
     // Prepare the data for validation.
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'employee_id' => Auth::user()->employee->id ?? null,
-        ]);
+        // Only set employee_id if not provided and user has employee
+        if (! $this->has('employee_id') && Auth::user()->employee) {
+            $this->merge([
+                'employee_id' => Auth::user()->employee->id,
+            ]);
+        }
     }
 
     // Get the validation rules that apply to the request.
