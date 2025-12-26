@@ -15,6 +15,7 @@ use App\Modules\HR\Organization\Department\Models\Department;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -228,5 +229,50 @@ class ComplaintController
         return redirect()
             ->route('complaints.index')
             ->with('success', 'Complaint permanently deleted.');
+    }
+
+    // Store comment for the complaint
+    public function storeComment(Request $request, Complaint $complaint)
+    {
+        $this->authorize('addComment', $complaint);
+
+        $request->validate([
+            'comment' => 'required|string|max:5000',
+            'comment_type' => 'nullable|string|in:internal,external,resolution',
+            'is_private' => 'boolean',
+        ]);
+
+        $complaint->comments()->create([
+            'user_id' => Auth::id(),
+            'created_by' => Auth::id(),
+            'comment' => $request->comment,
+            'comment_type' => $request->comment_type ?? 'external',
+            'is_private' => $request->is_private ?? false,
+        ]);
+
+        return back()->with('success', 'Comment added successfully.');
+    }
+
+    // Store document for the complaint
+    public function storeDocument(Request $request, Complaint $complaint)
+    {
+        $this->authorize('uploadDocument', $complaint);
+
+        $request->validate([
+            'document' => 'required|file|max:10240',
+            'title' => 'nullable|string|max:255',
+            'document_type' => 'nullable|string|max:50',
+        ]);
+
+        $path = $request->file('document')->store('complaints/'.$complaint->id, 'private');
+
+        $complaint->documents()->create([
+            'title' => $request->title ?? $request->file('document')->getClientOriginalName(),
+            'doc_type' => $request->document_type,
+            'file_path' => $path,
+            'uploaded_by' => Auth::id(),
+        ]);
+
+        return back()->with('success', 'Document uploaded successfully.');
     }
 }
