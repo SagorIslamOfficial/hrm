@@ -608,7 +608,7 @@ it('can create note using factory', function () {
     expect($note->category)->toBeIn(['general', 'performance', 'disciplinary', 'achievement', 'other']);
     expect($note->is_private)->toBeBool();
     expect($note->employee_id)->toBeString();
-    expect($note->created_by)->toBeInt();
+    expect($note->created_by)->toBeString();
 });
 
 it('can create private note using factory state', function () {
