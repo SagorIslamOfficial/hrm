@@ -26,10 +26,20 @@ export interface NavItem {
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
-    auth: Auth;
+    auth: {
+        user: User;
+    };
     sidebarOpen: boolean;
     [key: string]: unknown;
 }
+
+export type PageProps<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> = T & {
+    auth: {
+        user: User;
+    };
+};
 
 export interface User {
     id: string;
@@ -40,5 +50,7 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    roles: string[];
+    permissions: string[];
     [key: string]: unknown; // This allows for additional properties...
 }
