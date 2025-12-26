@@ -165,6 +165,48 @@ class Complaint extends Model
         return $this->due_date->isPast();
     }
 
+    // Query Scopes
+    public function scopeActive($query)
+    {
+        return $query->whereNotIn('status', ['resolved', 'closed', 'rejected']);
+    }
+
+    public function scopeOverdue($query)
+    {
+        return $query->where('due_date', '<', now())
+            ->whereNotIn('status', ['resolved', 'closed', 'rejected']);
+    }
+
+    public function scopeEscalated($query)
+    {
+        return $query->where('is_escalated', true);
+    }
+
+    public function scopeByPriority($query, string $priority)
+    {
+        return $query->where('priority', $priority);
+    }
+
+    public function scopeByStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    public function scopeByEmployee($query, string $employeeId)
+    {
+        return $query->where('employee_id', $employeeId);
+    }
+
+    public function scopeByDepartment($query, string $departmentId)
+    {
+        return $query->where('department_id', $departmentId);
+    }
+
+    public function scopeAssignedTo($query, string $userId)
+    {
+        return $query->where('assigned_to', $userId);
+    }
+
     protected static function boot()
     {
         parent::boot();
