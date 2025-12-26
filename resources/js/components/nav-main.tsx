@@ -45,12 +45,15 @@ export function NavMain({
     const [openNestedItems, setOpenNestedItems] = useState<string[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
 
+    // Strip query parameters from URL for comparison
+    const currentPathname = currentUrl.split('?')[0];
+
     // Initialize nested items that should be open based on current URL
     useEffect(() => {
         if (!isInitialized) {
             const isUrlMatch = (itemUrl: string): boolean => {
                 if (!itemUrl || itemUrl === '#') return false;
-                return currentUrl.includes(itemUrl);
+                return currentPathname.includes(itemUrl);
             };
 
             const itemsToOpen: string[] = [];
@@ -71,7 +74,7 @@ export function NavMain({
             }
             setIsInitialized(true);
         }
-    }, [isInitialized, items, currentUrl]);
+    }, [isInitialized, items, currentPathname]);
 
     const toggleNestedItem = (title: string) => {
         setOpenNestedItems((prev) =>
@@ -84,7 +87,7 @@ export function NavMain({
     const isUrlActiveMatch = (itemUrl: string): boolean => {
         if (!itemUrl || itemUrl === '#') return false;
 
-        const normalizedCurrent = currentUrl.replace(/\/$/, '');
+        const normalizedCurrent = currentPathname.replace(/\/$/, '');
         const normalizedItem = itemUrl.replace(/\/$/, '');
 
         // Exact match
@@ -131,9 +134,30 @@ export function NavMain({
     // Helper for exact matching on top-level link items
     const isExactUrlMatch = (itemUrl: string): boolean => {
         if (!itemUrl || itemUrl === '#') return false;
-        const normalizedCurrent = currentUrl.replace(/\/$/, '');
+
+        const normalizedCurrent = currentPathname.replace(/\/$/, '');
         const normalizedItem = itemUrl.replace(/\/$/, '');
-        return normalizedCurrent === normalizedItem;
+
+        // Exact match
+        if (normalizedCurrent === normalizedItem) {
+            return true;
+        }
+
+        // Also match child routes
+        if (normalizedCurrent.startsWith(normalizedItem + '/')) {
+            const remainingPath = normalizedCurrent.substring(
+                normalizedItem.length + 1,
+            );
+            const segments = remainingPath.split('/');
+            const nextSegment = segments[0];
+
+            // If next segment is numeric (ID) or is a known action like 'create' or 'edit'
+            if (/^\d+$/.test(nextSegment) || nextSegment === 'create') {
+                return true;
+            }
+        }
+
+        return false;
     };
 
     return (
@@ -164,10 +188,11 @@ export function NavMain({
                     const isOpen =
                         item.isActive ||
                         item.items?.some((subItem) => {
-                            if (currentUrl.includes(subItem.url)) return true;
+                            if (currentPathname.includes(subItem.url))
+                                return true;
                             if (subItem.items) {
                                 return subItem.items.some((nestedItem) =>
-                                    currentUrl.includes(nestedItem.url),
+                                    currentPathname.includes(nestedItem.url),
                                 );
                             }
                             return false;
@@ -204,7 +229,7 @@ export function NavMain({
                                                         ) ||
                                                         subItem.items.some(
                                                             (nestedItem) =>
-                                                                currentUrl.includes(
+                                                                currentPathname.includes(
                                                                     nestedItem.url,
                                                                 ),
                                                         )
