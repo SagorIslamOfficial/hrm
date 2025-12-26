@@ -25,6 +25,12 @@ export { NoteMeta } from './NoteMeta';
 export { NotesEdit } from './NotesEdit';
 export { NotesList } from './NotesList';
 export { PageHeader } from './PageHeader';
+export {
+    PaginatedTable,
+    arrayToPaginatedData,
+    type PaginatedData,
+    type PaginationMeta,
+} from './PaginatedTable';
 export { PhotoDialog } from './PhotoDialog';
 export { PhotoUploadField } from './PhotoUploadField';
 export { ResourceDialog } from './ResourceDialog';
