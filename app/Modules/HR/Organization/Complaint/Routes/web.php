@@ -26,6 +26,12 @@ Route::middleware(['complaint.access'])->prefix('organization/complaints')->grou
     // Escalations
     Route::post('{complaint}/escalations', [ComplaintEscalationController::class, 'store'])->name('complaints.escalations.store');
 
+    // Comments
+    Route::post('{complaint}/comments', [ComplaintController::class, 'storeComment'])->name('complaints.comments.store');
+
+    // Documents
+    Route::post('{complaint}/documents', [ComplaintController::class, 'storeDocument'])->name('complaints.documents.store');
+
     // Resolution (Singleton - one per complaint)
     Route::post('{complaint}/resolution', [ComplaintResolutionController::class, 'store'])->name('complaints.resolution.store');
     Route::put('{complaint}/resolution', [ComplaintResolutionController::class, 'update'])->name('complaints.resolution.update');
