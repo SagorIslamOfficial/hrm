@@ -20,7 +20,7 @@ interface SelectOption {
 
 interface BaseFieldProps {
     id: string;
-    label: string;
+    label?: string;
     error?: string;
     placeholder?: string;
     required?: boolean;
@@ -130,7 +130,7 @@ export function FormField(props: FormFieldProps) {
                             <SelectValue
                                 placeholder={
                                     placeholder ||
-                                    `Select ${label.toLowerCase()}`
+                                    `Select ${label?.toLowerCase()}`
                                 }
                             />
                         </SelectTrigger>
@@ -156,7 +156,7 @@ export function FormField(props: FormFieldProps) {
                         value={comboboxProps.value}
                         onValueChange={comboboxProps.onChange}
                         placeholder={
-                            placeholder || `Select ${label.toLowerCase()}`
+                            placeholder || `Select ${label?.toLowerCase()}`
                         }
                         searchPlaceholder={
                             comboboxProps.searchPlaceholder || 'Search...'
@@ -181,7 +181,7 @@ export function FormField(props: FormFieldProps) {
                         onChange={(e) => textProps.onChange(e.target.value)}
                         className={error ? 'border-destructive' : ''}
                         placeholder={
-                            placeholder || `Enter ${label.toLowerCase()}`
+                            placeholder || `Enter ${label?.toLowerCase()}`
                         }
                         disabled={disabled}
                         rows={textProps.rows || 3}
@@ -241,7 +241,7 @@ export function FormField(props: FormFieldProps) {
                         onChange={(e) => textProps.onChange(e.target.value)}
                         className={error ? 'border-destructive' : ''}
                         placeholder={
-                            placeholder || `Enter ${label.toLowerCase()}`
+                            placeholder || `Enter ${label?.toLowerCase()}`
                         }
                         disabled={disabled}
                     />
@@ -328,7 +328,9 @@ export function FormField(props: FormFieldProps) {
             </Label>
             {renderInput()}
             {helperText && (
-                <p className="text-xs text-muted-foreground">{helperText}</p>
+                <p className="text-xs text-muted-foreground opacity-80">
+                    {helperText}
+                </p>
             )}
             {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
