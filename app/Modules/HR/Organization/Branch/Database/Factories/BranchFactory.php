@@ -2,7 +2,6 @@
 
 namespace App\Modules\HR\Organization\Branch\Database\Factories;
 
-use App\Modules\HR\Employee\Models\Employee;
 use App\Modules\HR\Organization\Branch\Models\Branch;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
