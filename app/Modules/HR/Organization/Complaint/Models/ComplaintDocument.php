@@ -21,7 +21,7 @@ class ComplaintDocument extends Model
         'uploaded_by',
     ];
 
-    protected $appends = ['file_url'];
+    protected $appends = ['file_url', 'file_view_url'];
 
     public function complaint(): BelongsTo
     {
@@ -40,6 +40,18 @@ class ComplaintDocument extends Model
         }
 
         return route('complaints.documents.download', [
+            'complaint' => $this->complaint_id,
+            'document' => $this->id,
+        ]);
+    }
+
+    public function getFileViewUrlAttribute(): ?string
+    {
+        if (! $this->file_path) {
+            return null;
+        }
+
+        return route('complaints.documents.view', [
             'complaint' => $this->complaint_id,
             'document' => $this->id,
         ]);
