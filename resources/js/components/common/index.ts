@@ -1,6 +1,15 @@
 export { BranchDepartmentForm } from '../modules/branch/BranchDepartmentForm';
 export { AddItemInput } from './AddItemInput';
+export {
+    CategorySelector,
+    type CategorySelectorProps,
+} from './CategorySelector';
 export { CheckboxGrid } from './CheckboxGrid';
+export {
+    CheckboxGroup,
+    type CheckboxGroupItem,
+    type CheckboxGroupProps,
+} from './CheckboxGroup';
 export { CheckboxListInput } from './CheckboxListInput';
 export { ContactForm } from './ContactForm';
 export { CreatedByField } from './CreatedByField';
