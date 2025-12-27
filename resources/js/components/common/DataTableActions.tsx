@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Check, Eye, SquarePen, Trash2, X } from 'lucide-react';
+import { Check, Download, Eye, SquarePen, Trash2, X } from 'lucide-react';
 
 interface DataTableActionsProps<T = Record<string, unknown>> {
     item: T;
@@ -8,16 +8,19 @@ interface DataTableActionsProps<T = Record<string, unknown>> {
     onDelete?: (item: T) => void;
     onSave?: (item: T) => void;
     onCancel?: (item: T) => void;
+    onDownload?: (item: T) => void;
     viewLabel?: string;
     editLabel?: string;
     deleteLabel?: string;
     saveLabel?: string;
     cancelLabel?: string;
+    downloadLabel?: string;
     showView?: boolean;
     showEdit?: boolean;
     showDelete?: boolean;
     showSave?: boolean;
     showCancel?: boolean;
+    showDownload?: boolean;
 }
 
 export function DataTableActions<T>({
@@ -27,16 +30,19 @@ export function DataTableActions<T>({
     onDelete,
     onSave,
     onCancel,
+    onDownload,
     viewLabel = 'View',
     editLabel = 'Edit',
     deleteLabel = 'Delete',
     saveLabel = 'Save',
     cancelLabel = 'Cancel',
+    downloadLabel = 'Download',
     showView = true,
     showEdit = true,
     showDelete = true,
     showSave = false,
     showCancel = false,
+    showDownload = false,
 }: DataTableActionsProps<T>) {
     return (
         <div className="flex items-center gap-2">
@@ -50,6 +56,18 @@ export function DataTableActions<T>({
                     title={viewLabel}
                 >
                     <Eye className="h-4 w-4" />
+                </Button>
+            )}
+            {showDownload && onDownload && (
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onDownload(item)}
+                    className="h-8 w-8 cursor-pointer p-0"
+                    title={downloadLabel}
+                >
+                    <Download className="h-4 w-4" />
                 </Button>
             )}
             {showEdit && onEdit && (
