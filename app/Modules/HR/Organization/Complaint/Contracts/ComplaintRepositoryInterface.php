@@ -8,4 +8,3 @@ interface ComplaintRepositoryInterface extends BaseRepositoryInterface
 {
     // Uses base repository methods + custom paginate() override
 }
-

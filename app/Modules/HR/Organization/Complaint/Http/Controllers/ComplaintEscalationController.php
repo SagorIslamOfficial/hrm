@@ -5,7 +5,6 @@ namespace App\Modules\HR\Organization\Complaint\Http\Controllers;
 use App\Modules\HR\Organization\Complaint\Contracts\ComplaintEscalationServiceInterface;
 use App\Modules\HR\Organization\Complaint\Models\Complaint;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 

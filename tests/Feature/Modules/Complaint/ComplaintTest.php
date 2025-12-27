@@ -398,7 +398,7 @@ describe('Complaint Create', function () {
     it('can store new complaint', function () {
         $admin = User::factory()->create();
         $admin->assignRole('Admin');
-        
+
         $adminEmployee = Employee::factory()->create();
         $admin->update(['employee_id' => $adminEmployee->id]);
 

@@ -16,7 +16,7 @@ Route::middleware(['department.access'])->group(function () {
         // Designations
         Route::resource('designations', DesignationController::class);
         Route::post('designations/{designation}/restore', [DesignationController::class, 'restore'])
-        ->name('designations.restore');
+            ->name('designations.restore');
         Route::delete('designations/{designation}/force', [DesignationController::class, 'forceDelete'])
             ->name('designations.forceDelete');
     });

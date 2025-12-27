@@ -25,7 +25,7 @@ class ComplaintResolutionService implements ComplaintResolutionServiceInterface
         $previousStatus = $complaint->status;
 
         $complaint->update([
-             'status' => 'resolved',
+            'status' => 'resolved',
             'resolved_at' => now(),
         ]);
 

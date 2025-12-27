@@ -25,7 +25,7 @@ class ModuleServiceProvider extends ServiceProvider
 
     private function findServiceProviders(): array
     {
-        $modulesPath = app_path('Modules'); //Get path: /app/Modules
+        $modulesPath = app_path('Modules'); // Get path: /app/Modules
         $providers = [];
 
         if (! File::exists($modulesPath)) {

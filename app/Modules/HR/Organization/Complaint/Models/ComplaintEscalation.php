@@ -33,6 +33,7 @@ class ComplaintEscalation extends Model
     public function getEscalatedToUsersAttribute()
     {
         $userIds = $this->escalated_to ?? [];
+
         return User::whereIn('id', $userIds)->get();
     }
 

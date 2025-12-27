@@ -19,4 +19,3 @@ interface ComplaintServiceInterface
 
     public function forceDeleteComplaint(string $id): void;
 }
-

@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->foreign('department_id')->references('id')->on('departments')->cascadeOnDelete();
             $table->unique('department_id');
-            
+
             $table->timestamps();
         });
     }
