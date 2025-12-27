@@ -58,11 +58,18 @@ class ComplaintController
 
         $subjectTypes = ComplaintSubjectType::options();
 
-        $priorities = collect(ComplaintPriority::cases())->map(fn ($priority) => [
-            'value' => $priority->value,
-            'label' => $priority->label(),
-            'badgeClass' => $priority->badgeClass(),
-        ])->values()->all();
+        $commentTypes = [
+            ['value' => 'internal', 'label' => 'Internal'],
+            ['value' => 'external', 'label' => 'External'],
+        ];
+
+        $reminderTypes = [
+            ['value' => 'follow_up', 'label' => 'Follow Up'],
+            ['value' => 'sla_warning', 'label' => 'SLA Warning'],
+            ['value' => 'overdue', 'label' => 'Overdue'],
+        ];
+
+        $priorities = ComplaintPriority::options();
 
         $assignees = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['Admin', 'HR', 'Manager']);
@@ -75,7 +82,7 @@ class ComplaintController
             ];
         })->toArray();
 
-        return Inertia::render('modules/complaint/create', compact('predefinedCategories', 'priorities', 'assignees', 'subjectTypes'));
+        return Inertia::render('modules/complaint/create', compact('predefinedCategories', 'priorities', 'assignees', 'subjectTypes', 'commentTypes', 'reminderTypes'));
     }
 
     // Store a newly created resource in storage.
@@ -123,7 +130,13 @@ class ComplaintController
                 return $employee;
             });
 
-        return Inertia::render('modules/complaint/show', compact('complaint', 'employees'));
+        $reminderTypes = [
+            ['value' => 'follow_up', 'label' => 'Follow Up'],
+            ['value' => 'sla_warning', 'label' => 'SLA Warning'],
+            ['value' => 'overdue', 'label' => 'Overdue'],
+        ];
+
+        return Inertia::render('modules/complaint/show', compact('complaint', 'employees', 'reminderTypes'));
     }
 
     // Show the form for editing the specified resource.
@@ -158,11 +171,18 @@ class ComplaintController
 
         $subjectTypes = ComplaintSubjectType::options();
 
-        $priorities = collect(ComplaintPriority::cases())->map(fn ($priority) => [
-            'value' => $priority->value,
-            'label' => $priority->label(),
-            'badgeClass' => $priority->badgeClass(),
-        ])->values()->all();
+        $commentTypes = [
+            ['value' => 'internal', 'label' => 'Internal'],
+            ['value' => 'external', 'label' => 'External'],
+        ];
+
+        $reminderTypes = [
+            ['value' => 'follow_up', 'label' => 'Follow Up'],
+            ['value' => 'sla_warning', 'label' => 'SLA Warning'],
+            ['value' => 'overdue', 'label' => 'Overdue'],
+        ];
+
+        $priorities = ComplaintPriority::options();
 
         $assignees = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['Admin', 'HR', 'Manager']);
@@ -178,7 +198,7 @@ class ComplaintController
         $departments = Department::select('id', 'name', 'code')->orderBy('name')->get();
         $branches = Branch::select('id', 'name', 'code')->orderBy('name')->get();
 
-        return Inertia::render('modules/complaint/edit', compact('complaint', 'employees', 'departments', 'branches', 'predefinedCategories', 'priorities', 'assignees', 'subjectTypes'));
+        return Inertia::render('modules/complaint/edit', compact('complaint', 'employees', 'departments', 'branches', 'predefinedCategories', 'priorities', 'assignees', 'subjectTypes', 'commentTypes', 'reminderTypes'));
     }
 
     // Update the specified resource in storage.
