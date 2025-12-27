@@ -16,7 +16,7 @@ interface FileUploadFieldProps {
     helperText?: string;
     currentFile?: {
         name: string;
-        size: number;
+        size?: number;
     };
 }
 
@@ -122,9 +122,11 @@ export function FileUploadField({
                         <span className="text-sm">
                             Current: {currentFile.name}
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                            ({formatFileSize(currentFile.size)})
-                        </span>
+                        {currentFile.size !== undefined && (
+                            <span className="text-xs text-muted-foreground">
+                                ({formatFileSize(currentFile.size)})
+                            </span>
+                        )}
                     </div>
                 )}
 
