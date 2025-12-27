@@ -15,5 +15,7 @@ interface ComplaintDocumentServiceInterface
 
     public function downloadDocument(ComplaintDocument $document): StreamedResponse;
 
+    public function viewDocument(ComplaintDocument $document): StreamedResponse;
+
     public function syncDocuments(Complaint $complaint, array $documents): void;
 }

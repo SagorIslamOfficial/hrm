@@ -6,9 +6,6 @@ use App\Modules\HR\Organization\Complaint\Contracts\ComplaintDocumentServiceInte
 use App\Modules\HR\Organization\Complaint\Models\Complaint;
 use App\Modules\HR\Organization\Complaint\Models\ComplaintDocument;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ComplaintDocumentController
@@ -28,5 +25,16 @@ class ComplaintDocumentController
         }
 
         return $this->documentService->downloadDocument($document);
+    }
+
+    // View/stream a complaint document (inline display).
+    public function view(Complaint $complaint, ComplaintDocument $document): StreamedResponse
+    {
+        $this->authorize('view', $complaint);
+        if ($document->complaint_id !== $complaint->id) {
+            abort(404);
+        }
+
+        return $this->documentService->viewDocument($document);
     }
 }

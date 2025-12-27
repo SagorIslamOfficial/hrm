@@ -69,6 +69,26 @@ class ComplaintDocumentService implements ComplaintDocumentServiceInterface
         return $storage->download($document->file_path, $filename);
     }
 
+    // View a document (inline display).
+    public function viewDocument(ComplaintDocument $document): StreamedResponse
+    {
+        $disk = config('complaint.uploads.disk', 'private');
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk($disk);
+
+        if (! $storage->exists($document->file_path)) {
+            abort(404, 'Document not found');
+        }
+
+        $mimeType = $storage->mimeType($document->file_path);
+
+        return $storage->response($document->file_path, null, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline',
+        ]);
+    }
+
     // Sync documents (create new, update metadata, delete removed).
     public function syncDocuments(Complaint $complaint, array $documents): void
     {
