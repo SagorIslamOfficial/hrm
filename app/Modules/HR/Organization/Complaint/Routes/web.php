@@ -21,6 +21,7 @@ Route::middleware(['complaint.access'])->prefix('organization/complaints')->grou
     Route::delete('{complaint}/force', [ComplaintController::class, 'forceDelete'])->name('complaints.forceDelete');
 
     // Documents (download only - CRUD handled via sync in ComplaintService)
+    Route::get('{complaint}/documents/{document}/view', [ComplaintDocumentController::class, 'view'])->name('complaints.documents.view');
     Route::get('{complaint}/documents/{document}/download', [ComplaintDocumentController::class, 'download'])->name('complaints.documents.download');
 
     // Escalations
