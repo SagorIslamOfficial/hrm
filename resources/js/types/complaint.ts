@@ -1,21 +1,18 @@
-export type ComplaintPriority =
-    | 'low'
-    | 'medium'
-    | 'high'
-    | 'urgent'
-    | 'critical';
+// Priority and Status types derived from backend enum options
+export type PriorityOption = {
+    value: string;
+    label: string;
+    badgeClass: string;
+};
 
-export type ComplaintStatus =
-    | 'draft'
-    | 'submitted'
-    | 'acknowledged'
-    | 'under_review'
-    | 'investigating'
-    | 'pending_info'
-    | 'escalated'
-    | 'resolved'
-    | 'closed'
-    | 'rejected';
+export type StatusOption = {
+    value: string;
+    label: string;
+    badgeClass: string;
+};
+
+export type ComplaintPriority = PriorityOption['value']; // 'low' | 'medium' | 'high' | 'urgent' | 'critical'
+export type ComplaintStatus = StatusOption['value']; // 'draft' | 'submitted' | etc.
 
 export interface ComplaintSubject {
     id: string;
@@ -139,6 +136,7 @@ export interface ComplaintDocument {
     uploaded_by: string;
     uploader?: User;
     file_url?: string;
+    file_view_url?: string;
     file?: File; // For staged uploads
     created_at: string;
     updated_at: string;
