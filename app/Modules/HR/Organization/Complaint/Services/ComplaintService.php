@@ -7,6 +7,7 @@ use App\Modules\HR\Organization\Complaint\Contracts\ComplaintDocumentServiceInte
 use App\Modules\HR\Organization\Complaint\Contracts\ComplaintRepositoryInterface;
 use App\Modules\HR\Organization\Complaint\Contracts\ComplaintServiceInterface;
 use App\Modules\HR\Organization\Complaint\Contracts\ComplaintSubjectServiceInterface;
+use App\Modules\HR\Organization\Complaint\Enums\ComplaintPriority;
 use App\Modules\HR\Organization\Complaint\Models\Complaint;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -38,7 +39,7 @@ class ComplaintService implements ComplaintServiceInterface
 
         // Set default priority
         if (! isset($data['priority'])) {
-            $data['priority'] = 'medium';
+            $data['priority'] = ComplaintPriority::MEDIUM->value;
         }
 
         DB::beginTransaction();

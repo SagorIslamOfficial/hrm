@@ -121,13 +121,12 @@ class ComplaintStatusService implements ComplaintStatusServiceInterface
 
     private function getSlaHoursForPriority(ComplaintPriority $priority): int
     {
-        return match ($priority->value) {
-            'critical' => 72,   // 3 days
-            'urgent' => 120,    // 5 days
-            'high' => 168,      // 7 days
-            'medium' => 360,    // 15 days
-            'low' => 720,       // 30 days
-            default => 360,     // default to medium
+        return match ($priority) {
+            ComplaintPriority::CRITICAL => 72,   // 3 days
+            ComplaintPriority::URGENT => 120,    // 5 days
+            ComplaintPriority::HIGH => 168,      // 7 days
+            ComplaintPriority::MEDIUM => 360,    // 15 days
+            ComplaintPriority::LOW => 720,       // 30 days
         };
     }
 }
