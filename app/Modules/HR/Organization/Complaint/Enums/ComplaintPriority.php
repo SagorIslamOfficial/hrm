@@ -49,7 +49,7 @@ enum ComplaintPriority: string
             fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->label(),
-                'color' => $case->color(),
+                'badgeClass' => $case->badgeClass(),
             ],
             self::cases()
         );
