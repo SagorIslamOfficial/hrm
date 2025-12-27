@@ -1,12 +1,13 @@
 import {
+    arrayToPaginatedData,
     DataTableActions,
     DeleteDialog,
     InfoCard,
+    PaginatedTable,
     ResourceDialog,
     StatusBadge,
 } from '@/components/common';
 import { EmptyActionState } from '@/components/common/EmptyActionState';
-import { TableBlueprint } from '@/components/common/TableBlueprint';
 import { BranchDepartmentForm } from '@/components/modules/branch/BranchDepartmentForm';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/config/currency';
@@ -202,9 +203,9 @@ export function DepartmentsEdit({
                 }
             >
                 {activeDepartments.length > 0 ? (
-                    <TableBlueprint
+                    <PaginatedTable
                         columns={columns}
-                        data={activeDepartments}
+                        paginatedData={arrayToPaginatedData(activeDepartments)}
                         searchPlaceholder="Search departments..."
                         globalSearchKeys={['name', 'code', 'is_active']}
                         className="px-0"
