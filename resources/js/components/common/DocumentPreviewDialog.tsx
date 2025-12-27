@@ -73,7 +73,7 @@ export function DocumentPreviewDialog({
     if (!documentUrl) return null;
 
     return (
-        <Dialog open={open}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="h-[85vh] w-full !max-w-3xl overflow-hidden rounded-md border-primary/40 bg-gray-700 [&>button]:hidden">
                 <DialogHeader>
                     <DialogTitle className="text-white">
