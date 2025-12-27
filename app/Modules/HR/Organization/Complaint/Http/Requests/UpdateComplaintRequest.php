@@ -34,12 +34,12 @@ class UpdateComplaintRequest extends FormRequest
             'is_recurring' => ['nullable', 'boolean'],
 
             // Subject fields
-            'subjects' => ['nullable', 'array'],
+            'subjects' => ['nullable', 'array', 'min:1'],
             'subjects.*.id' => ['nullable', 'string'],
-            'subjects.*.subject_id' => ['nullable', 'uuid'],
+            'subjects.*.subject_id' => ['required_if:subjects.*.subject_type,employee,department,branch', 'nullable', 'uuid'],
             'subjects.*.subject_type' => ['required', 'string', Rule::enum(ComplaintSubjectType::class)],
-            'subjects.*.subject_name' => ['nullable', 'string', 'max:255'],
-            'subjects.*.relationship_to_complainant' => ['nullable', 'string', 'max:100'],
+            'subjects.*.subject_name' => ['required_if:subjects.*.subject_type,other,management,policy,workplace', 'nullable', 'string', 'max:255'],
+            'subjects.*.relationship_to_complainant' => ['required', 'string', 'max:100'],
             'subjects.*.specific_issue' => ['required', 'string'],
             'subjects.*.is_primary' => ['required', 'boolean'],
             'subjects.*.desired_outcome' => ['nullable', 'string'],
@@ -72,6 +72,16 @@ class UpdateComplaintRequest extends FormRequest
             'documents.*._isNew' => ['nullable', 'boolean'],
             'documents.*._isModified' => ['nullable', 'boolean'],
             'documents.*._isDeleted' => ['nullable', 'boolean'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'subjects.*.subject_id.required_if' => 'Please select a subject.',
+            'subjects.*.subject_name.required_if' => 'Please enter a subject name.',
+            'subjects.*.relationship_to_complainant.required' => 'Please enter the relationship to complainant.',
+            'subjects.*.specific_issue.required' => 'Please describe the specific issue.',
         ];
     }
 }

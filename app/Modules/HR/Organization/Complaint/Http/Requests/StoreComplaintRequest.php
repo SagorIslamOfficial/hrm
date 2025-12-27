@@ -2,6 +2,7 @@
 
 namespace App\Modules\HR\Organization\Complaint\Http\Requests;
 
+use App\Modules\HR\Organization\Complaint\Enums\ComplaintPriority;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -32,6 +33,7 @@ class StoreComplaintRequest extends FormRequest
             'title' => ['required', 'string', 'max:100'],
             'categories' => ['required', 'array', 'min:1'],
             'categories.*' => ['string', 'max:50'],
+            'priority' => ['nullable', 'string', Rule::enum(ComplaintPriority::class)],
             'employee_id' => Rule::requiredIf(fn () => ! Auth::user()->employee),
             'incident_date' => ['required', 'date', 'before_or_equal:today'],
             'incident_location' => ['nullable', 'string', 'max:50'],
